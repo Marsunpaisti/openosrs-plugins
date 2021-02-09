@@ -51,8 +51,8 @@ import org.pf4j.Extension;
 @Singleton
 @Extension
 @PluginDescriptor(
-	name = "NMZ Helper",
-	description = "An automation utility for NMZ",
+	name = "NMZ Helper Remix",
+	description = "An automation utility for NMZ, copypasta from ben93riggs & modified by Paisti",
 	tags = {"combat", "potion", "overload", "absorption", "nmz", "nightmare", "zone", "helper"},
 	enabledByDefault = false,
 	type = PluginType.MINIGAME
@@ -276,7 +276,7 @@ public class NMZHelperPlugin extends Plugin
 		}
 	}
 
-	private void sendGameMessage(String message)
+	public void sendGameMessage(String message)
 	{
 		chatMessageManager
 			.queue(QueuedMessage.builder()

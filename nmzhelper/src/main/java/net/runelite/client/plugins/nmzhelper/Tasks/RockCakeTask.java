@@ -19,6 +19,9 @@ import net.runelite.client.plugins.nmzhelper.Task;
 
 public class RockCakeTask extends Task
 {
+	private boolean rockCaking = false;
+	private int nextRockCakeHp = 1;
+
 	public RockCakeTask(NMZHelperPlugin plugin, Client client, NMZHelperConfig config)
 	{
 		super(plugin, client, config);
@@ -30,33 +33,67 @@ public class RockCakeTask extends Task
 		//fail if:
 
 		//not in the nightmare zone
-		if (!MiscUtils.isInNightmareZone(client))
+		if (!MiscUtils.isInNightmareZone(client)){
+			rockCaking = false;
 			return false;
+		}
 
 		//not overloaded
-		if (client.getVar(Varbits.NMZ_OVERLOAD) == 0)
+		if (client.getVar(Varbits.NMZ_OVERLOAD) == 0){
+			rockCaking = false;
 			return false;
+		}
 
 		//don't have rock cake
 		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
 
 		if (inventoryWidget == null)
 		{
+			rockCaking = false;
 			return false;
 		}
 
 		if (inventoryWidget.getWidgetItems()
 			.stream()
 			.filter(item -> item.getId() == ItemID.DWARVEN_ROCK_CAKE_7510)
-			.collect(Collectors.toList()).isEmpty())
+			.collect(Collectors.toList()).isEmpty()) {
+
+			rockCaking = false;
 			return false;
+		}
+
+		//out of absorption points
+		if (client.getVar(Varbits.NMZ_ABSORPTION) <= 0){
+			rockCaking = false;
+			return false;
+		}
 
 		//already 1 hp
 		if (client.getBoostedSkillLevel(Skill.HITPOINTS) <= 1)
+		{
+			rockCaking = false;
 			return false;
+		}
 
-		//out of absorption points
-		return client.getVar(Varbits.NMZ_ABSORPTION) > 0;
+		if (rockCaking){
+			return true;
+		}
+
+		if (client.getBoostedSkillLevel(Skill.HITPOINTS) >= nextRockCakeHp) {
+			rockCaking = true;
+			double rand = Math.random();
+			if (rand <= 0.8) {
+				nextRockCakeHp = 1;
+			} else if (rand <= 0.95) {
+				nextRockCakeHp = 2;
+			} else {
+				nextRockCakeHp = 3;
+			}
+			plugin.sendGameMessage("Rock caking. Next rock cake at " + nextRockCakeHp + " hp.");
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override

@@ -25,7 +25,7 @@
 
 version = "0.1"
 
-project.extra["PluginName"] = "NMZ Helper"
+project.extra["PluginName"] = "NMZ Helper Remix"
 project.extra["PluginDescription"] = "An automation utility for NMZ, copypasta from ben93riggs & modified by Paisti"
 
 tasks {
