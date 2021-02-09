@@ -25,8 +25,8 @@ subprojects {
     var subprojectName = name
     group = "com.openosrs.externals"
 
-    project.extra["PluginProvider"] = "OpenOSRS"
-    project.extra["ProjectUrl"] = "https://discord.gg/OpenOSRS"
+    project.extra["PluginProvider"] = "Paisti"
+    project.extra["ProjectUrl"] = ""
     project.extra["PluginLicense"] = "3-Clause BSD License"
 
     repositories {

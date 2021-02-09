@@ -178,6 +178,8 @@ include(":xpglobes")
 include(":xptracker")
 include(":xpupdater")
 include(":zalcano")
+include(":testplugin")
+include(":nmzhelper")
 
 for (project in rootProject.children) {
     project.apply {
