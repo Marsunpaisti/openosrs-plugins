@@ -66,6 +66,7 @@ public class PaistiSuite extends Plugin
 
 	@Override
 	protected void startUp() {
+		addSidePanel();
 		instance = this;
 		if (clientExecutor != null) clientExecutor.clearAllTasks();
 		try {

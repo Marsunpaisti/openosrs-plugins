@@ -14,15 +14,19 @@ public class MenuInterceptor {
     }
 
     public static void onMenuOptionClicked(MenuOptionClicked event) {
-        if (nextEntry != null) {
-            event.setMenuEntry(nextEntry);
-            nextEntry = null;
-        } else if (nextEntry.getOption().equals("Walk here") && PWalking.walkAction)
+        if (nextEntry == null) return;
+
+        event.consume();
+        if (nextEntry.getOption().equals("Walk here") && PWalking.walkAction)
         {
             log.info("Walk action: {} {}", PWalking.coordX, PWalking.coordY);
             PWalking.setSelectedSceneTile(PWalking.coordX, PWalking.coordY);
             PWalking.walkAction = false;
             nextEntry = null;
+            return;
         }
+
+        event.setMenuEntry(nextEntry);
+        nextEntry = null;
     }
 }

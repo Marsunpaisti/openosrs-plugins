@@ -72,13 +72,13 @@ public class PInventory
         return null;
     }
 
-    public static Collection<Pair<WidgetItem, ItemDefinition>> getAllItemsWithDefs()
+    public static List<Pair<WidgetItem, ItemDefinition>> getAllItemsWithDefs()
     {
         Widget inventoryWidget = PUtils.getClient().getWidget(WidgetInfo.INVENTORY);
         if (inventoryWidget != null)
         {
             Collection<WidgetItem> widgetItems = inventoryWidget.getWidgetItems();
-            Collection<Pair<WidgetItem, ItemDefinition>> pItems = null;
+            List<Pair<WidgetItem, ItemDefinition>> pItems = null;
             if (PUtils.getClient().isClientThread()) {
                 pItems = widgetItems.stream().map(wi -> new Pair<WidgetItem, ItemDefinition>(wi, getItemDef(wi))).collect(Collectors.toList());
             } else {
@@ -111,4 +111,29 @@ public class PInventory
         return null;
     }
 
+public static List<Item> getEquippedItems(){
+        List<Item> equipped = new ArrayList<>();
+        Item[] items = null;
+        if (PUtils.getClient().isClientThread()) {
+            items = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
+        } else {
+            try {
+                items = PaistiSuite.getInstance().clientExecutor.scheduleAndWait(() -> {
+                    return PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
+                }, "getEquippedItems");
+            } catch (Exception e){
+                log.error(e.toString());
+            }
+        }
+
+        for (Item item : items)
+        {
+            if (item.getId() == -1 || item.getId() == 0)
+            {
+                continue;
+            }
+            equipped.add(item);
+        }
+        return equipped;
+    }
 }

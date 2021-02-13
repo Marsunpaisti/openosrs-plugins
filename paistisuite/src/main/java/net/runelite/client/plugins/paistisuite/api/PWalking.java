@@ -1,14 +1,16 @@
 package net.runelite.client.plugins.paistisuite.api;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.MenuOpcode;
-import net.runelite.api.Perspective;
-import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.paistisuite.PaistiSuite;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.rs.api.RSClient;
+
+import java.io.IOException;
 
 @Slf4j
 public class PWalking {
@@ -16,6 +18,11 @@ public class PWalking {
     public static int coordY;
     public static boolean walkAction;
 
+    private class Path{
+        RSTile start;
+        RSTile end;
+        Player player;
+    }
     /**
      * Do not call directly
      **/
@@ -29,7 +36,7 @@ public class PWalking {
     }
 
     public static boolean minimapWalk(WorldPoint worldPoint) {
-        if (worldPoint.distanceToHypotenuse(PPlayer.getWorldLocation()) > 19 || worldPoint.getPlane() != PUtils.getClient().getPlane()){
+        if (worldPoint.distanceToHypotenuse(PPlayer.getWorldLocation()) > 18 || worldPoint.getPlane() != PUtils.getClient().getPlane()){
             log.error("Point given to minimapwalk is outside minimap");
             return false;
         }
@@ -40,7 +47,13 @@ public class PWalking {
         }
 
 
-        Point minimapPoint = Perspective.localToMinimap(PUtils.getClient(), localPoint);
+        Point minimapPoint = null;
+        try {
+            minimapPoint = PaistiSuite.getInstance().clientExecutor.scheduleAndWait(() -> Perspective.localToMinimap(PUtils.getClient(), localPoint), "LocalToMinimap");
+        } catch (Exception e){
+            log.error(e.toString());
+            return false;
+        }
         if (minimapPoint == null){
             log.error("MinimapPoint is null in scenewalk");
             return false;

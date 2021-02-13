@@ -18,6 +18,21 @@ public class PPlayer {
         return getPlayer().getWorldLocation();
     }
 
+    public static boolean isMoving()
+    {
+        Player player = PPlayer.get();
+        if (player == null)
+        {
+            return false;
+        }
+        return player.getIdlePoseAnimation() != player.getPoseAnimation();
+    }
+
+    public static boolean isRunEnabled()
+    {
+        return PUtils.getClient().getVarpValue(173) == 1;
+    }
+
     public static WorldPoint location(){
         return getWorldLocation();
     }
