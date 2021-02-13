@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paisticore.framework;
+package net.runelite.client.plugins.paistisuite.framework;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;

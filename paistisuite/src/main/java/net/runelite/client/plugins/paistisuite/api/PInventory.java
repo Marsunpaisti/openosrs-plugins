@@ -1,15 +1,12 @@
-package net.runelite.client.plugins.paisticore.api;
+package net.runelite.client.plugins.paistisuite.api;
 
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.queries.InventoryItemQuery;
-import net.runelite.api.queries.InventoryWidgetItemQuery;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.plugins.paisticore.PaistiCore;
-import net.runelite.client.plugins.paisticore.api.PUtils;
+import net.runelite.client.plugins.paistisuite.PaistiSuite;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -25,9 +22,9 @@ public class PInventory
         ItemDefinition def = null;
         try {
             if (!PUtils.getClient().isClientThread()) {
-                def = PaistiCore.getInstance().clientExecutor.scheduleAndWait(() ->  PaistiCore.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
+                def = PaistiSuite.getInstance().clientExecutor.scheduleAndWait(() ->  PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
             } else {
-                def =  PaistiCore.getInstance().itemManager.getItemDefinition(item.getId());
+                def =  PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId());
             }
         } catch (Exception e) {
             log.error("Error in getItemDef: " + e);
@@ -36,10 +33,10 @@ public class PInventory
         return def;
     }
 
-    public static Future<ItemDefinition> getFutureItemDef(WidgetItem item){
+    private static Future<ItemDefinition> getFutureItemDef(WidgetItem item){
         if (item == null) return null;
 
-        return PaistiCore.getInstance().clientExecutor.schedule(() ->  PaistiCore.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
+        return PaistiSuite.getInstance().clientExecutor.schedule(() ->  PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
     }
 
     public static boolean isFull()

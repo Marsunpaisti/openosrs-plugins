@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paisticore.api;
+package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
@@ -6,7 +6,7 @@ import net.runelite.api.Client;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.QueuedMessage;
-import net.runelite.client.plugins.paisticore.PaistiCore;
+import net.runelite.client.plugins.paistisuite.PaistiSuite;
 
 import javax.inject.Singleton;
 import java.util.concurrent.ThreadLocalRandom;
@@ -22,7 +22,7 @@ public class PUtils {
     }*/
 
     public static Client getClient() {
-        return PaistiCore.getInstance().client;
+        return PaistiSuite.getInstance().client;
     }
 
     private static double clamp(double val, int min, int max)
@@ -61,8 +61,8 @@ public class PUtils {
 
 
     public static void sendGameMessage(String message){
-        if (PaistiCore.getInstance().client.isClientThread()){
-            PaistiCore.getInstance().chatMessageManager
+        if (PaistiSuite.getInstance().client.isClientThread()){
+            PaistiSuite.getInstance().chatMessageManager
                     .queue(QueuedMessage.builder()
                             .type(ChatMessageType.CONSOLE)
                             .runeLiteFormattedMessage(
@@ -72,8 +72,8 @@ public class PUtils {
                                             .build())
                             .build());
         } else {
-            PaistiCore.getInstance().clientExecutor.schedule(() -> {
-                PaistiCore.getInstance().chatMessageManager
+            PaistiSuite.getInstance().clientExecutor.schedule(() -> {
+                PaistiSuite.getInstance().chatMessageManager
                         .queue(QueuedMessage.builder()
                                 .type(ChatMessageType.CONSOLE)
                                 .runeLiteFormattedMessage(

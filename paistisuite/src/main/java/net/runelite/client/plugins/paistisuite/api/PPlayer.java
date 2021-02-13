@@ -1,8 +1,8 @@
-package net.runelite.client.plugins.paisticore.api;
+package net.runelite.client.plugins.paistisuite.api;
 
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.paisticore.PaistiCore;
+import net.runelite.client.plugins.paistisuite.PaistiSuite;
 
 public class PPlayer {
     public static Player get() {
@@ -10,7 +10,7 @@ public class PPlayer {
     }
 
     public static Player getPlayer() {
-        return PaistiCore.getInstance().client.getLocalPlayer();
+        return PaistiSuite.getInstance().client.getLocalPlayer();
     }
 
     public static WorldPoint getWorldLocation() {

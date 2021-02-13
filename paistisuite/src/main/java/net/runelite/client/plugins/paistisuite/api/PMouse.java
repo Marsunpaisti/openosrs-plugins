@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paisticore.api;
+package net.runelite.client.plugins.paistisuite.api;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

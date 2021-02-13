@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paisticore.framework;
+package net.runelite.client.plugins.paistisuite.framework;
 
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;

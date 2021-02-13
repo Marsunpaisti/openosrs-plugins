@@ -1,27 +1,22 @@
-package net.runelite.client.plugins.paisticore.scripts;
+package net.runelite.client.plugins.paistisuite.scripts;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.GameObject;
 import net.runelite.api.ItemDefinition;
-import net.runelite.api.ObjectDefinition;
-import net.runelite.api.queries.GameObjectQuery;
-import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.plugins.paisticore.PaistiCore;
-import net.runelite.client.plugins.paisticore.api.PInteraction;
-import net.runelite.client.plugins.paisticore.api.PInventory;
-import net.runelite.client.plugins.paisticore.api.PPlayer;
-import net.runelite.client.plugins.paisticore.api.PUtils;
-import net.runelite.client.plugins.paisticore.framework.PScript;
+import net.runelite.client.plugins.paistisuite.api.PInteraction;
+import net.runelite.client.plugins.paistisuite.api.PInventory;
+import net.runelite.client.plugins.paistisuite.api.PPlayer;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.framework.PScript;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class TestScript extends PScript {
+public class Firemaker extends PScript {
     @Override
     protected void loop() {
+        PUtils.sleepNormal(3000, 5000);
         log.info("Loop start");
 
         if (PPlayer.get().getAnimation() != -1) return;
@@ -46,11 +41,8 @@ public class TestScript extends PScript {
             PUtils.sendGameMessage("Logs not found");
             return;
         }
-        PUtils.sendGameMessage("Found tinderbox and logs");
 
         PInteraction.useItemOnItem(tinderbox.getFirst(), logs.getFirst());
-
-
     }
 
 

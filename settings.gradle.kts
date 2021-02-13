@@ -178,7 +178,7 @@ include(":xpglobes")
 include(":xptracker")
 include(":xpupdater")
 include(":zalcano")
-include(":paistitest")
+include(":paistisuite")
 include(":nmzhelperremix")
 
 for (project in rootProject.children) {

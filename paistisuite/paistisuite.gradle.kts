@@ -1,7 +1,7 @@
 version = "0.2"
 
-project.extra["PluginName"] = "PaistiTest"
-project.extra["PluginDescription"] = "Test plugin"
+project.extra["PluginName"] = "PaistiSuite"
+project.extra["PluginDescription"] = "Scripting framework by Paisti"
 
 tasks {
     jar {

@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paisticore.framework;
+package net.runelite.client.plugins.paistisuite.framework;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;

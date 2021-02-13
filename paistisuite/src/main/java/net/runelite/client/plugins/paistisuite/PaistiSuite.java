@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paisticore;
+package net.runelite.client.plugins.paistisuite;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -12,24 +12,24 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
-import net.runelite.client.plugins.paisticore.framework.ClientExecutor;
-import net.runelite.client.plugins.paisticore.framework.MenuInterceptor;
-import net.runelite.client.plugins.paisticore.framework.PScriptRunner;
-import net.runelite.client.plugins.paisticore.scripts.TestScript;
+import net.runelite.client.plugins.paistisuite.framework.ClientExecutor;
+import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
+import net.runelite.client.plugins.paistisuite.framework.PScriptRunner;
+import net.runelite.client.plugins.paistisuite.scripts.TestScript;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.pf4j.Extension;
 
 @Extension
 @PluginDescriptor(
-	name = "PaistiTest",
-	description = "PaistiTest description",
+	name = "PaistiSuite",
+	description = "Scripting framework by Paisti",
 	tags = {"npcs", "items"},
 	type = PluginType.UTILITY
 )
 
 @Slf4j
 @Singleton
-public class PaistiCore extends Plugin
+public class PaistiSuite extends Plugin
 {
 	@Inject
 	public ClientExecutor clientExecutor;
@@ -39,14 +39,12 @@ public class PaistiCore extends Plugin
 	public ChatMessageManager chatMessageManager;
 	@Inject
 	public ItemManager itemManager;
-	@Inject
-	public MenuInterceptor menuInterceptor;
 
 	private PScriptRunner scriptRunner;
 	private Thread scriptThread;
-	private static PaistiCore instance;
+	private static PaistiSuite instance;
 
-	public static PaistiCore getInstance(){
+	public static PaistiSuite getInstance(){
 		return instance;
 	}
 
@@ -80,7 +78,7 @@ public class PaistiCore extends Plugin
 
 	@Subscribe
 	private void onMenuOptionClicked(MenuOptionClicked event){
-		menuInterceptor.onMenuOptionClicked(event);
+		MenuInterceptor.onMenuOptionClicked(event);
 	}
 
 }

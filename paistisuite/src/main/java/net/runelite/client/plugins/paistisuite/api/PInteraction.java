@@ -1,42 +1,21 @@
-package net.runelite.client.plugins.paisticore.api;
+package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameObject;
-import net.runelite.api.MenuEntry;
 import net.runelite.api.MenuOpcode;
 import net.runelite.api.ObjectDefinition;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.plugins.paisticore.PaistiCore;
-import net.runelite.client.plugins.paisticore.framework.MenuInterceptor;
+import net.runelite.client.plugins.paistisuite.PaistiSuite;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @Slf4j
 public class PInteraction {
-
-    public static ObjectDefinition getObjectDef(GameObject go) {
-        if (go == null) return null;
-
-        ObjectDefinition def = null;
-        try {
-            if (!PUtils.getClient().isClientThread()) {
-                def = PaistiCore.getInstance().clientExecutor.scheduleAndWait(() -> PUtils.getClient().getObjectDefinition(go.getId()), "getObjectDef");
-            } else {
-                def = PUtils.getClient().getObjectDefinition(go.getId());
-            }
-        } catch (Exception e) {
-            log.error("Error in getObjectDef: " + e);
-        }
-
-        return def;
-    }
-
     public static boolean gameObject(GameObject go, String... actions) {
         if (go == null) return false;
-        ObjectDefinition def = getObjectDef(go);
+        ObjectDefinition def = PObjects.getObjectDef(go);
         if (def == null) return false;
 
         String[] possibleActions = def.getActions();
@@ -90,7 +69,7 @@ public class PInteraction {
 
          */
         MenuOpcode finalActionOp = actionOp;
-        PaistiCore.getInstance().clientExecutor.schedule(() -> {
+        PaistiSuite.getInstance().clientExecutor.schedule(() -> {
             PUtils.getClient().invokeMenuAction(
                     "",
                     "",
@@ -106,7 +85,7 @@ public class PInteraction {
     public static boolean useItemOnItem(WidgetItem item, WidgetItem target){
         if (item.equals(target)) return false;
 
-        PaistiCore.getInstance().clientExecutor.schedule(() -> {
+        PaistiSuite.getInstance().clientExecutor.schedule(() -> {
             PUtils.getClient().setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
             PUtils.getClient().setSelectedItemSlot(item.getIndex());
             PUtils.getClient().setSelectedItemID(item.getId());
