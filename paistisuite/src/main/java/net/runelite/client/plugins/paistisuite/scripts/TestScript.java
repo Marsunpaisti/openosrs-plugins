@@ -10,7 +10,10 @@ public class TestScript extends PScript {
         PUtils.sleepNormal(3000, 5000);
         log.info("Loop start");
         int count = PObjects.getAllObjectsWithDefs().size();
-        PUtils.sendGameMessage(count + " total objects");
+
+        if (PPlayer.get().getAnimation() != -1) return;
+        PUtils.sendGameMessage("Walking");
+        PWalking.minimapWalk(PPlayer.getWorldLocation().dx(5));
     }
 
 

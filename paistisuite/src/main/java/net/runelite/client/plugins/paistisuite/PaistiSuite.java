@@ -3,6 +3,9 @@ package net.runelite.client.plugins.paistisuite;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.google.inject.Injector;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.*;
@@ -16,8 +19,14 @@ import net.runelite.client.plugins.paistisuite.framework.ClientExecutor;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.client.plugins.paistisuite.framework.PScriptRunner;
 import net.runelite.client.plugins.paistisuite.scripts.TestScript;
+import net.runelite.client.plugins.paistisuite.sidepanel.PaistiSuitePanel;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.util.ImageUtil;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.pf4j.Extension;
+
+import java.awt.image.BufferedImage;
 
 @Extension
 @PluginDescriptor(
@@ -39,6 +48,13 @@ public class PaistiSuite extends Plugin
 	public ChatMessageManager chatMessageManager;
 	@Inject
 	public ItemManager itemManager;
+	@Inject
+	private ClientToolbar clientToolbar;
+	@Inject
+	protected Injector injector;
+
+	private PaistiSuitePanel panel;
+	private NavigationButton navButton;
 
 	private PScriptRunner scriptRunner;
 	private Thread scriptThread;
@@ -81,4 +97,18 @@ public class PaistiSuite extends Plugin
 		MenuInterceptor.onMenuOptionClicked(event);
 	}
 
+	private void addSidePanel(){
+		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "nav.png");
+
+		if (injector != null){
+			panel = injector.getInstance(PaistiSuitePanel.class);
+			navButton = NavigationButton.builder()
+					.tooltip("PaistiSuite")
+					.icon(icon)
+					.priority(100)
+					.panel(panel)
+					.build();
+			clientToolbar.addNavigation(navButton);
+		}
+	}
 }

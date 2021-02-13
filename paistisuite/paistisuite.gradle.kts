@@ -3,6 +3,10 @@ version = "0.2"
 project.extra["PluginName"] = "PaistiSuite"
 project.extra["PluginDescription"] = "Scripting framework by Paisti"
 
+dependencies {
+    compileOnly(group = "com.openosrs.rs", name = "runescape-api", version = "3.5.4")
+}
+
 tasks {
     jar {
         manifest {
