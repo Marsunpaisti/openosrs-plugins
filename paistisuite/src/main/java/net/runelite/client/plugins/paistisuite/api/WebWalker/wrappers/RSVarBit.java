@@ -2,6 +2,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers;
 
 import net.runelite.api.Client;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.PVars;
 
 public class RSVarBit {
     int value;
@@ -16,6 +17,6 @@ public class RSVarBit {
 
     public static RSVarBit get(int varbitId){
         Client client = PUtils.getClient();
-        return new RSVarBit(client.getVarbitValue(varbitId));
+        return new RSVarBit(PVars.getVarbitValue(varbitId));
     }
 }

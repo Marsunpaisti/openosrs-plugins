@@ -37,6 +37,7 @@ public abstract class PScript extends Plugin {
 
     @Override
     protected void shutDown() {
+        log.info("Requested stop.");
         requestStop();
     }
 

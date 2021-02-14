@@ -122,10 +122,11 @@ public static List<Item> getEquippedItems(){
                     return PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
                 }, "getEquippedItems");
             } catch (Exception e){
-                log.error(e.toString());
+                log.error("Error in getEquippedItems: " + e.toString());
             }
         }
 
+        if (items == null) return equipped;
         for (Item item : items)
         {
             if (item.getId() == -1 || item.getId() == 0)

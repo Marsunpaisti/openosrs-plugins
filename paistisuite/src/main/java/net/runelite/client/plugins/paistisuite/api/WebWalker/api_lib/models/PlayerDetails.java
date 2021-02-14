@@ -89,68 +89,68 @@ public class PlayerDetails {
         );
     }
 
-    private int attack;
-    private int defence;
-    private int strength;
-    private int hitpoints;
-    private int ranged;
-    private int prayer;
-    private int magic;
-    private int cooking;
-    private int woodcutting;
-    private int fletching;
-    private int fishing;
+    public int attack;
+    public int defence;
+    public int strength;
+    public int hitpoints;
+    public int ranged;
+    public int prayer;
+    public int magic;
+    public int cooking;
+    public int woodcutting;
+    public int fletching;
+    public int fishing;
 
 
-    private int firemaking;
+    public int firemaking;
 
 
-    private int crafting;
+    public int crafting;
 
 
-    private int smithing;
+    public int smithing;
 
 
-    private int mining;
+    public int mining;
 
 
-    private int herblore;
+    public int herblore;
 
 
-    private int agility;
+    public int agility;
 
 
-    private int thieving;
+    public int thieving;
 
 
-    private int slayer;
+    public int slayer;
 
 
-    private int farming;
-
-    
-    private int runecrafting;
+    public int farming;
 
     
-    private int hunter;
+    public int runecrafting;
 
     
-    private int construction;
+    public int hunter;
 
     
-    private List<IntPair> setting;
+    public int construction;
 
     
-    private List<IntPair> varbit;
+    public List<IntPair> setting;
 
     
-    private boolean member;
+    public List<IntPair> varbit;
 
     
-    private List<IntPair> equipment;
+    public boolean member;
 
     
-    private List<IntPair> inventory;
+    public List<IntPair> equipment;
+
+    
+    public List<IntPair> inventory;
 
     public PlayerDetails() {
 
