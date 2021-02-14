@@ -36,4 +36,8 @@ public class PPlayer {
     public static WorldPoint location(){
         return getWorldLocation();
     }
+
+    public static int getRunEnergy(){
+        return PUtils.getClient().getEnergy();
+    }
 }

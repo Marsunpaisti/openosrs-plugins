@@ -235,14 +235,15 @@ public class PInteraction {
         if (!found) return false;
         int finalActionIndex = actionIndex + 1;
         MenuOpcode finalActionOp = MenuOpcode.CC_OP;
+        final int widgetId = widget.getId();
         PaistiSuite.getInstance().clientExecutor.schedule(() -> {
             PUtils.getClient().invokeMenuAction(
                     "",
                     "",
                     finalActionIndex,
                     finalActionOp.getId(),
-                    0,
-                    0);
+                    -1,
+                    widgetId);
         }, "interact_widget");
 
         return true;

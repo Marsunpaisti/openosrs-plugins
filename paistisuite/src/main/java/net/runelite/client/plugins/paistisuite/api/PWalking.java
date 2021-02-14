@@ -3,13 +3,17 @@ package net.runelite.client.plugins.paistisuite.api;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.rs.api.RSClient;
 
+import java.awt.*;
 import java.io.IOException;
 
 @Slf4j
@@ -66,5 +70,23 @@ public class PWalking {
                 0, 0, false));
         PMouse.clickPoint(minimapPoint);
         return true;
+    }
+
+    public static boolean isRunEnabled()
+    {
+        return PUtils.getClient().getVarpValue(173) == 1;
+    }
+
+    public static boolean setRunEnabled(Boolean enabled)
+    {
+        if (isRunEnabled() == enabled) return true;
+
+        Widget runOrb = PUtils.getClient().getWidget(WidgetInfo.MINIMAP_TOGGLE_RUN_ORB);
+        if (runOrb == null) return false;
+        return PInteraction.widget(runOrb, "Toggle Run");
+    }
+
+    public static int getRunEnergy(){
+        return PUtils.getClient().getEnergy();
     }
 }

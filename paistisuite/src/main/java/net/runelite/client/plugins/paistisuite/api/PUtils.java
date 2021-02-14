@@ -83,7 +83,17 @@ public class PUtils {
 
     public static long randomNormal(int min, int max, double deviation, double mean)
     {
-        return (long) clamp(Math.round(ThreadLocalRandom.current().nextGaussian() * deviation + mean), min, max);
+        long result;
+        int attempts = 0;
+        do {
+            if (attempts >= 10) {
+                log.error("Had to fallback to clamping in randomNormal!");
+                return Math.round(clamp(ThreadLocalRandom.current().nextGaussian() * deviation + mean, min, max));
+            }
+            result = Math.round(ThreadLocalRandom.current().nextGaussian() * deviation + mean);
+            attempts++;
+        } while ( result < min || result > max);
+        return result;
     }
 
     public static void sleep(int time){
