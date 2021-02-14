@@ -16,7 +16,7 @@ apply<BootstrapPlugin>()
 apply<VersionPlugin>()
 
 allprojects {
-    group = "com.openosrs"
+    group = "com.openosrs.externals"
     version = ProjectVersions.openosrsVersion
     apply<MavenPublishPlugin>()
 }
@@ -26,7 +26,7 @@ subprojects {
     group = "com.openosrs.externals"
 
     project.extra["PluginProvider"] = "Paisti"
-    project.extra["ProjectUrl"] = ""
+    project.extra["ProjectUrl"] = "https://github.com/Marsunpaisti/openosrs-plugins"
     project.extra["PluginLicense"] = "3-Clause BSD License"
 
     repositories {

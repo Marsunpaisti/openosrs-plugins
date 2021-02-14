@@ -1,10 +1,12 @@
-version = "1.0.0"
+version = "1.0.2"
 
-project.extra["PluginName"] = "PaistiSuite"
-project.extra["PluginDescription"] = "Scripting framework by Paisti"
+project.extra["PluginName"] = "WebWalker"
+project.extra["PluginDescription"] = "Walks around with daxwalker"
 
 dependencies {
-    compileOnly(group = "com.openosrs.rs", name = "runescape-api", version = "3.5.4")
+    annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
+    annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.2.0")
+    compileOnly(group = "com.openosrs.externals", name = "paistisuite", version = "+")
 }
 
 tasks {
@@ -14,6 +16,7 @@ tasks {
                     "Plugin-Version" to project.version,
                     "Plugin-Id" to nameToId(project.extra["PluginName"] as String),
                     "Plugin-Provider" to project.extra["PluginProvider"],
+                    "Plugin-Dependencies" to nameToId("PaistiSuite"),
                     "Plugin-Description" to project.extra["PluginDescription"],
                     "Plugin-License" to project.extra["PluginLicense"]
             ))

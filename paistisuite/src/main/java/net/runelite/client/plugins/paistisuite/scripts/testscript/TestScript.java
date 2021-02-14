@@ -1,18 +1,13 @@
 package net.runelite.client.plugins.paistisuite.scripts.testscript;
-import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
-import net.runelite.api.ItemDefinition;
-import net.runelite.api.ObjectDefinition;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
-import net.runelite.client.plugins.paistisuite.framework.PScript;
+import net.runelite.client.plugins.paistisuite.PScript;
 
 import java.util.ArrayList;
 

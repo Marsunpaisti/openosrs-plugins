@@ -2,7 +2,7 @@ package net.runelite.client.plugins.paistisuite.scripts.chopper;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameState;
 import net.runelite.client.plugins.paistisuite.api.*;
-import net.runelite.client.plugins.paistisuite.framework.PScript;
+import net.runelite.client.plugins.paistisuite.PScript;
 
 @Slf4j
 public class Chopper extends PScript {

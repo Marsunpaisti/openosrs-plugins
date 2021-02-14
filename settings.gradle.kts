@@ -23,10 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-rootProject.name = "OpenOSRS Plugins"
+rootProject.name = "Paisti Plugins"
 
 include(":paistisuite")
-include(":nmzhelperremix")
+include(":webwalker")
 
 for (project in rootProject.children) {
     project.apply {

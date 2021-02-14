@@ -7,7 +7,7 @@ import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
-import net.runelite.client.plugins.paistisuite.framework.PScript;
+import net.runelite.client.plugins.paistisuite.PScript;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

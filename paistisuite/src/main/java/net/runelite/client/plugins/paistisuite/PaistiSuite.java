@@ -15,14 +15,10 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.paistisuite.framework.ClientExecutor;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
-import net.runelite.client.plugins.paistisuite.framework.PScriptRunner;
-import net.runelite.client.plugins.paistisuite.scripts.testscript.TestScript;
-import net.runelite.client.plugins.paistisuite.scripts.worldwalker.WorldWalker;
 import net.runelite.client.plugins.paistisuite.sidepanel.PaistiSuitePanel;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.pf4j.Extension;
 
 import java.awt.image.BufferedImage;
@@ -54,9 +50,6 @@ public class PaistiSuite extends Plugin
 
 	private PaistiSuitePanel panel;
 	private NavigationButton navButton;
-
-	private PScriptRunner scriptRunner;
-	private Thread scriptThread;
 	private static PaistiSuite instance;
 
 	public static PaistiSuite getInstance(){
@@ -68,28 +61,16 @@ public class PaistiSuite extends Plugin
 		addSidePanel();
 		instance = this;
 		if (clientExecutor != null) clientExecutor.clearAllTasks();
-		try {
-			scriptRunner = new PScriptRunner(WorldWalker.class);
-		} catch (Exception e){
-			log.error("Error: " + ExceptionUtils.getStackTrace(e));
-			return;
-		}
-		scriptThread = new Thread(scriptRunner);
-		scriptThread.start();
 	}
 
 	@Override
 	protected void shutDown() {
-		if (scriptRunner != null) scriptRunner.requestStop();
 		if (clientExecutor != null) clientExecutor.clearAllTasks();
 	}
 
 	@Subscribe
 	private void onClientTick(ClientTick t) {
 		clientExecutor.runAllTasks();
-	}
-
-	@Subscribe void onGameTick(GameTick t){
 	}
 
 	@Subscribe
