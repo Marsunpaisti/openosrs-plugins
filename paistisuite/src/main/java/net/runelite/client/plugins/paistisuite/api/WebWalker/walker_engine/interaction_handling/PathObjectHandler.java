@@ -257,7 +257,7 @@ public class PathObjectHandler {
     public static boolean handle(PathAnalyzer.DestinationDetails destinationDetails, List<RSTile> path){
         RealTimeCollisionTile start = destinationDetails.getDestination(), end = destinationDetails.getNextTile();
 
-        List<Pair<GameObject, ObjectDefinition>> interactiveObjects = null;
+        List<Pair<TileObject, ObjectDefinition>> interactiveObjects = null;
 
         String action = null;
         SpecialObject specialObject = SpecialObject.getValidSpecialObjects(destinationDetails);
@@ -267,7 +267,7 @@ public class PathObjectHandler {
             }
         } else {
             action = specialObject.getAction();
-            Predicate<Pair<GameObject, ObjectDefinition>> specialObjectFilter = (Pair<GameObject, ObjectDefinition> objDefPair) -> {
+            Predicate<Pair<TileObject, ObjectDefinition>> specialObjectFilter = (Pair<TileObject, ObjectDefinition> objDefPair) -> {
                     ObjectDefinition def = objDefPair.getSecond();
                     if (def == null) return false;
                     return def.getName().equals(specialObject.getName()) &&
@@ -302,7 +302,7 @@ public class PathObjectHandler {
         return handle(path, interactiveObjects.get(0), destinationDetails, action, specialObject);
     }
 
-    private static boolean handle(List<RSTile> path, Pair<GameObject, ObjectDefinition> objDefPair, PathAnalyzer.DestinationDetails destinationDetails, String action, SpecialObject specialObject){
+    private static boolean handle(List<RSTile> path, Pair<TileObject, ObjectDefinition> objDefPair, PathAnalyzer.DestinationDetails destinationDetails, String action, SpecialObject specialObject){
         PathAnalyzer.DestinationDetails current = PathAnalyzer.furthestReachableTile(path);
 
         if (current == null){
@@ -331,7 +331,7 @@ public class PathObjectHandler {
             Client client = PUtils.getClient();
             switch (specialObject){
                 case WEB:
-                    List<Pair<GameObject, ObjectDefinition>> webs = PObjects.getAllObjectsWithDefs()
+                    List<Pair<TileObject, ObjectDefinition>> webs = PObjects.getAllObjectsWithDefs()
                             .stream()
                             .filter(pair -> pair.getFirst().getWorldLocation().equals(objDefPair.getFirst().getWorldLocation()))
                             .filter(pair -> Arrays.asList(pair.getSecond().getActions())
@@ -340,7 +340,7 @@ public class PathObjectHandler {
                             .collect(Collectors.toList());
                     int iterations = 0;
                     while (webs.size() > 0){
-                        GameObject web = webs.get(0).getFirst();
+                        TileObject web = webs.get(0).getFirst();
                         if (canLeftclickWeb()) {
                             InteractionHelper.click(web, "Slash");
                         } else {
@@ -476,9 +476,9 @@ public class PathObjectHandler {
         return true;
     }
 
-    public static List<Pair<GameObject, ObjectDefinition>> getInteractiveObjects(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
+    public static List<Pair<TileObject, ObjectDefinition>> getInteractiveObjects(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
         Client client = PUtils.getClient();
-        List<Pair<GameObject, ObjectDefinition>> objects = PObjects.getAllObjectsWithDefs()
+        List<Pair<TileObject, ObjectDefinition>> objects = PObjects.getAllObjectsWithDefs()
                 .stream()
                 .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 25)
                 .filter(interactiveObjectFilter(x, y, z, destinationDetails))
@@ -537,9 +537,9 @@ public class PathObjectHandler {
      * @param destinationDetails context where destination is at
      * @return
      */
-    private static Predicate<Pair<GameObject, ObjectDefinition>> interactiveObjectFilter(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
+    private static Predicate<Pair<TileObject, ObjectDefinition>> interactiveObjectFilter(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
         final WorldPoint position = new WorldPoint(x, y, z);
-        return (Pair<GameObject, ObjectDefinition> pair) -> {
+        return (Pair<TileObject, ObjectDefinition> pair) -> {
             ObjectDefinition def = pair.getSecond();
             if (def == null){
                 return false;
@@ -593,7 +593,7 @@ public class PathObjectHandler {
         return options;
     }
 
-    private static boolean clickOnObject(Pair<GameObject, ObjectDefinition> objDefPair, String... options){
+    private static boolean clickOnObject(Pair<TileObject, ObjectDefinition> objDefPair, String... options){
         boolean result;
 
         if (isClosedTrapDoor(objDefPair, options)){
@@ -607,7 +607,7 @@ public class PathObjectHandler {
         return result;
     }
 
-    private static boolean isStrongholdDoor(Pair<GameObject, ObjectDefinition> object){
+    private static boolean isStrongholdDoor(Pair<TileObject, ObjectDefinition> object){
         List<String> doorNames = Arrays.asList("Gate of War", "Rickety door", "Oozing barrier", "Portal of Death");
         return  doorNames.contains( object.getSecond().getName());
     }
@@ -662,11 +662,11 @@ public class PathObjectHandler {
     }
 
 
-    private static boolean isClosedTrapDoor(Pair<GameObject, ObjectDefinition> object, String[] options){
+    private static boolean isClosedTrapDoor(Pair<TileObject, ObjectDefinition> object, String[] options){
         return  (object.getSecond().getName().equals("Trapdoor") && Arrays.asList(options).contains("Open"));
     }
 
-    private static boolean handleTrapDoor(GameObject object){
+    private static boolean handleTrapDoor(TileObject object){
         Client client = PUtils.getClient();
         if (getActions(object).contains("Open")){
             if (!InteractionHelper.click(object, "Open", () -> {
@@ -703,7 +703,7 @@ public class PathObjectHandler {
         return InteractionHelper.click(object, "Climb-down");
     }
 
-    public static List<String> getActions(GameObject object){
+    public static List<String> getActions(TileObject object){
         List<String> list = new ArrayList<>();
         if (object == null){
             return list;
@@ -731,7 +731,7 @@ public class PathObjectHandler {
         return (weaponType != null && SLASH_WEAPONS.contains(weaponType.getValue())) || haveKnife;
     }
 
-    private static boolean useBladeOnWeb(GameObject web){
+    private static boolean useBladeOnWeb(TileObject web){
         List<String> slashItemNames = Arrays.asList("whip", "sword", "dagger", "claws", "scimitar", " axe", "knife", "halberd", "machete", "rapier");
         var slashItems = PInventory.getAllItemsWithDefs()
                 .stream()

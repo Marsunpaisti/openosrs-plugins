@@ -2,6 +2,7 @@ package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
@@ -13,9 +14,9 @@ import java.util.List;
 
 @Slf4j
 public class PInteraction {
-    public static boolean gameObject(GameObject go, String... actions) {
-        if (go == null) return false;
-        ObjectDefinition def = PObjects.getObjectDef(go);
+    public static boolean tileObject(TileObject to, String... actions) {
+        if (to == null) return false;
+        ObjectDefinition def = PObjects.getObjectDef(to);
         if (def == null) return false;
 
         String[] possibleActions = def.getActions();
@@ -69,18 +70,34 @@ public class PInteraction {
         );
 
         PMouse.clickShape(go.getConvexHull());
-
          */
-        MenuOpcode finalActionOp = actionOp;
-        PaistiSuite.getInstance().clientExecutor.schedule(() -> {
-            PUtils.getClient().invokeMenuAction(
-                    "",
-                    "",
-                    go.getId(),
-                    finalActionOp.getId(),
-                    go.getSceneMinLocation().getX(),
-                    go.getSceneMinLocation().getY());
-        }, "interact_gameObject");
+
+        if (to instanceof GameObject){
+            MenuOpcode finalActionOp = actionOp;
+            PaistiSuite.getInstance().clientExecutor.schedule(() -> {
+                PUtils.getClient().invokeMenuAction(
+                        "",
+                        "",
+                        to.getId(),
+                        finalActionOp.getId(),
+                        ((GameObject)to).getSceneMinLocation().getX(),
+                        ((GameObject)to).getSceneMinLocation().getY());
+            }, "interact_gameObject");
+        } else if (to instanceof WallObject){
+            MenuOpcode finalActionOp = actionOp;
+            PaistiSuite.getInstance().clientExecutor.schedule(() -> {
+                PUtils.getClient().invokeMenuAction(
+                        "",
+                        "",
+                        to.getId(),
+                        finalActionOp.getId(),
+                        ((WallObject)to).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
+                        ((WallObject)to).getWorldLocation().getY() - PUtils.getClient().getBaseY()
+                );
+            }, "interact_gameObject");
+        } else {
+            return false;
+        }
 
         return true;
     }
@@ -105,21 +122,40 @@ public class PInteraction {
         return true;
     }
 
-    public static boolean useItemOnGameObject(WidgetItem item, GameObject go){
-        if (item == null || go == null) return false;
+    public static boolean useItemOnGameObject(WidgetItem item, TileObject to){
+        if (item == null || to == null) return false;
 
-        PaistiSuite.getInstance().clientExecutor.schedule(() -> {
-            PUtils.getClient().setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
-            PUtils.getClient().setSelectedItemSlot(item.getIndex());
-            PUtils.getClient().setSelectedItemID(item.getId());
-            PUtils.getClient().invokeMenuAction(
-                    "",
-                    "",
-                    go.getId(),
-                    MenuOpcode.ITEM_USE_ON_GAME_OBJECT.getId(),
-                    go.getSceneMinLocation().getX(),
-                    go.getSceneMinLocation().getY());
-        }, "interact_useItemOnItem");
+        if (to instanceof GameObject){
+            PaistiSuite.getInstance().clientExecutor.schedule(() -> {
+                PUtils.getClient().setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+                PUtils.getClient().setSelectedItemSlot(item.getIndex());
+                PUtils.getClient().setSelectedItemID(item.getId());
+                PUtils.getClient().invokeMenuAction(
+                        "",
+                        "",
+                        to.getId(),
+                        MenuOpcode.ITEM_USE_ON_GAME_OBJECT.getId(),
+                        ((GameObject)to).getSceneMinLocation().getX(),
+                        ((GameObject)to).getSceneMinLocation().getY());
+            }, "interact_useItemOnItem");
+        } else if (to instanceof WallObject){
+            PaistiSuite.getInstance().clientExecutor.schedule(() -> {
+                PUtils.getClient().setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+                PUtils.getClient().setSelectedItemSlot(item.getIndex());
+                PUtils.getClient().setSelectedItemID(item.getId());
+                PUtils.getClient().invokeMenuAction(
+                        "",
+                        "",
+                        to.getId(),
+                        MenuOpcode.ITEM_USE_ON_GAME_OBJECT.getId(),
+                        ((WallObject)to).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
+                        ((WallObject)to).getWorldLocation().getY() - PUtils.getClient().getBaseY());
+            }, "interact_useItemOnItem");
+        } else {
+            return false;
+        }
+
+
 
         return true;
     }

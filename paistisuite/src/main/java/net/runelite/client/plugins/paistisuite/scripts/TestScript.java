@@ -22,17 +22,14 @@ public class TestScript extends PScript {
     @Override
     protected void loop() {
         PUtils.sleepNormal(3000, 5000);
+        if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
         PUtils.sendGameMessage("Looping");
 
-
         if (path == null){
-
-            path = WebWalkerServerApi.getInstance().getPath(new Point3D(PPlayer.location()), new Point3D(RunescapeBank.GRAND_EXCHANGE.getPosition()), null).toRSTilePath();
+            path = WebWalkerServerApi.getInstance().getPath(new Point3D(PPlayer.location()), new Point3D(RunescapeBank.LUMBRIDGE_TOP.getPosition()), null).toRSTilePath();
         } else {
             WalkerEngine.getInstance().walkPath(path);
         }
-
-        if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
     }
 
 
