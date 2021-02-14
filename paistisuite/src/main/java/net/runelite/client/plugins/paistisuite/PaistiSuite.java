@@ -4,8 +4,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.inject.Injector;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.*;
@@ -18,7 +16,8 @@ import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.paistisuite.framework.ClientExecutor;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.client.plugins.paistisuite.framework.PScriptRunner;
-import net.runelite.client.plugins.paistisuite.scripts.TestScript;
+import net.runelite.client.plugins.paistisuite.scripts.testscript.TestScript;
+import net.runelite.client.plugins.paistisuite.scripts.worldwalker.WorldWalker;
 import net.runelite.client.plugins.paistisuite.sidepanel.PaistiSuitePanel;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
@@ -70,7 +69,7 @@ public class PaistiSuite extends Plugin
 		instance = this;
 		if (clientExecutor != null) clientExecutor.clearAllTasks();
 		try {
-			scriptRunner = new PScriptRunner(TestScript.class);
+			scriptRunner = new PScriptRunner(WorldWalker.class);
 		} catch (Exception e){
 			log.error("Error: " + ExceptionUtils.getStackTrace(e));
 			return;

@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paistisuite.scripts;
+package net.runelite.client.plugins.paistisuite.scripts.chopper;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameState;
 import net.runelite.client.plugins.paistisuite.api.*;

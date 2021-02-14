@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paistisuite.scripts;
+package net.runelite.client.plugins.paistisuite.scripts.firemaker;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ItemDefinition;
