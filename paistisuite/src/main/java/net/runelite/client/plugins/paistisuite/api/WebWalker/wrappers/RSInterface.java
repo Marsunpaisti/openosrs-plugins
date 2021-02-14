@@ -40,6 +40,10 @@ public class RSInterface {
         return PInteraction.widget(this.widget, options);
     }
 
+    public Widget getWidget(){
+        return this.widget;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof RSInterface)) return false;

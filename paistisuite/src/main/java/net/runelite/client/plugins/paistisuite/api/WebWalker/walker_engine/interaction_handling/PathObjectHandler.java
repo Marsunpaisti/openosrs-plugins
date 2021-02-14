@@ -57,8 +57,7 @@ public class PathObjectHandler {
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Web"))
                         .anyMatch(
-                                pair -> Arrays.asList(pair.getSecond().getActions())
-                                        .stream()
+                                pair -> Arrays.stream(pair.getSecond().getActions())
                                         .anyMatch(a -> a.equalsIgnoreCase("Slash")));
             }
         }),
@@ -71,8 +70,7 @@ public class PathObjectHandler {
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Rockfall"))
                         .anyMatch(
-                                pair -> Arrays.asList(pair.getSecond().getActions())
-                                        .stream()
+                                pair -> Arrays.stream(pair.getSecond().getActions())
                                         .filter(Objects::nonNull)
                                         .anyMatch(a -> a.equalsIgnoreCase("Mine")));
             }
@@ -86,8 +84,7 @@ public class PathObjectHandler {
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Roots"))
                         .anyMatch(
-                                pair -> Arrays.asList(pair.getSecond().getActions())
-                                        .stream()
+                                pair -> Arrays.stream(pair.getSecond().getActions())
                                         .filter(Objects::nonNull)
                                         .anyMatch(a -> a.equalsIgnoreCase("Chop")));
             }
@@ -101,8 +98,7 @@ public class PathObjectHandler {
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Rockslide"))
                         .anyMatch(
-                                pair -> Arrays.asList(pair.getSecond().getActions())
-                                        .stream()
+                                pair -> Arrays.stream(pair.getSecond().getActions())
                                         .filter(Objects::nonNull)
                                         .anyMatch(a -> a.equalsIgnoreCase("Climb-over")));
             }
@@ -116,8 +112,7 @@ public class PathObjectHandler {
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Root"))
                         .anyMatch(
-                                pair -> Arrays.asList(pair.getSecond().getActions())
-                                        .stream()
+                                pair -> Arrays.stream(pair.getSecond().getActions())
                                         .filter(Objects::nonNull)
                                         .anyMatch(a -> a.equalsIgnoreCase("Step-over")));
             }
@@ -131,8 +126,7 @@ public class PathObjectHandler {
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Vines"))
                         .anyMatch(
-                                pair -> Arrays.asList(pair.getSecond().getActions())
-                                .stream()
+                                pair -> Arrays.stream(pair.getSecond().getActions())
                                 .filter(Objects::nonNull)
                                 .anyMatch(a -> a.equalsIgnoreCase("Chop-down")));
             }
@@ -361,8 +355,7 @@ public class PathObjectHandler {
                         webs = PObjects.getAllObjectsWithDefs()
                                 .stream()
                                 .filter(pair -> pair.getFirst().getWorldLocation().equals(objDefPair.getFirst().getWorldLocation()))
-                                .filter(pair -> Arrays.asList(pair.getSecond().getActions())
-                                        .stream()
+                                .filter(pair -> Arrays.stream(pair.getSecond().getActions())
                                         .anyMatch(a -> a.equalsIgnoreCase("Slash")))
                                 .collect(Collectors.toList());
                         if (Reachable.getMap().getParent(destinationDetails.getAssumedX(), destinationDetails.getAssumedY()) != null && (webs == null || webs.size() == 0) ){
@@ -377,7 +370,7 @@ public class PathObjectHandler {
                 case ARDY_DOOR_LOCK_SIDE:
                 case YANILLE_DOOR_LOCK_SIDE:
                     for (int i = 0; i < PUtils.random(15, 25); i++) {
-                        if (!clickOnObject(objDefPair, new String[]{specialObject.getAction()})){
+                        if (!clickOnObject(objDefPair, specialObject.getAction())){
                             continue;
                         }
                         if (PPlayer.location().distanceTo(specialObject.getLocation()) > 1){

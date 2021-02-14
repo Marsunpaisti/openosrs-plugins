@@ -11,6 +11,8 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.B
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.PathObjectHandler;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.PathAnalyzer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.Charter;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.ShipUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.RealTimeCollisionTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.AccurateMouse;
@@ -81,7 +83,6 @@ public class WalkerEngine{
                     return false;
                 }
 
-                /* TODO:
                 if (ShipUtils.isOnShip()) {
                     if (!ShipUtils.crossGangplank()) {
                         log.info("Failed to exit ship via gangplank.");
@@ -91,7 +92,6 @@ public class WalkerEngine{
                     continue;
                 }
 
-                 */
 
                 if (isFailedOverThreshhold()) {
                     log.info("Too many failed attempts");
@@ -142,12 +142,11 @@ public class WalkerEngine{
 
                          */
 
-                        /* TODO:
-                        Charter.LocationProperty
-                                locationProperty = Charter.LocationProperty.getLocation(currentNode.getWorldPoint()),
-                                destinationProperty = Charter.LocationProperty.getLocation(assumedNext);
+
+                        Charter.LocationProperty locationProperty = Charter.LocationProperty.getLocation(currentNode.getRSTile());
+                        Charter.LocationProperty destinationProperty = Charter.LocationProperty.getLocation(assumedNext);
                         if (locationProperty != null && destinationProperty != null) {
-                            log.info(("Chartering to: " + destinationProperty);
+                            log.info("Chartering to: " + destinationProperty);
                             if (!Charter.to(destinationProperty)) {
                                 failedAttempt();
                             } else {
@@ -156,7 +155,6 @@ public class WalkerEngine{
                             break;
                         }
 
-                         */
                         //DO NOT BREAK OUT
                     case OBJECT_BLOCKING:
                         RSTile walkingTile = Reachable.getBestWalkableTile(destination.getRSTile(), new Reachable());

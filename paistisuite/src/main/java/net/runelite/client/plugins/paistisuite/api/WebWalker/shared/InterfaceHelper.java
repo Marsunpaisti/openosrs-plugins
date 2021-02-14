@@ -2,13 +2,13 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.shared;
 
 import net.runelite.api.Client;
 import net.runelite.api.mixins.Inject;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 
 import java.util.*;
 
 public class InterfaceHelper {
-    @Inject
-    private static Client client;
+    private static Client client = PUtils.getClient();
 
     /**
      *

@@ -79,7 +79,6 @@ public class WebWalker extends PScript {
         if (path == null){
             PlayerDetails details = PlayerDetails.generate();
             // Remove stuff from playerdetails so server wont try to use certain shortcuts or teleports.
-            details.inventory = new ArrayList<IntPair>();
             details.equipment = new ArrayList<IntPair>();
             details.setting.forEach(pair -> log.info("Setting " + pair.getKey() + ": " + pair.getValue()));
             details.varbit.forEach(pair -> log.info("Varbit " + pair.getKey() + ": " + pair.getValue()));

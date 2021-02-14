@@ -6,7 +6,9 @@ import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.Teleport;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.ShipUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 
 import java.util.*;
@@ -55,12 +57,12 @@ public class DaxWalker {
     }
 
     public static boolean walkTo(RSTile destination, WalkingCondition walkingCondition) {
-        /* TODO:
+
         if (ShipUtils.isOnShip()) {
             ShipUtils.crossGangplank();
             WaitFor.milliseconds(500, 1200);
         }
-         */
+
         RSTile start = new RSTile(PPlayer.location());
         if (start.equals(destination)) {
             return true;
@@ -96,13 +98,10 @@ public class DaxWalker {
     }
 
     public static boolean walkToBank(RunescapeBank bank, WalkingCondition walkingCondition) {
-        /* TODO:
         if (ShipUtils.isOnShip()) {
             ShipUtils.crossGangplank();
             WaitFor.milliseconds(500, 1200);
         }
-
-         */
 
         if(bank != null)
             return walkTo(bank.getPosition());
