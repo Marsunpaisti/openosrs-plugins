@@ -69,7 +69,7 @@ public class PInteraction {
                         ((GameObject)to.getFirst()).getSceneMinLocation().getX(),
                         ((GameObject)to.getFirst()).getSceneMinLocation().getY());
             }, "interact_gameObject");
-        } else if (to.getFirst() instanceof WallObject){
+        } else {
             MenuOpcode finalActionOp = actionOp;
             PaistiSuite.getInstance().clientExecutor.schedule(() -> {
                 PUtils.getClient().invokeMenuAction(
@@ -77,12 +77,10 @@ public class PInteraction {
                         "",
                         to.getFirst().getId(),
                         finalActionOp.getId(),
-                        ((WallObject)to.getFirst()).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
-                        ((WallObject)to.getFirst()).getWorldLocation().getY() - PUtils.getClient().getBaseY()
+                        (to.getFirst()).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
+                        (to.getFirst()).getWorldLocation().getY() - PUtils.getClient().getBaseY()
                 );
             }, "interact_gameObject");
-        } else {
-            return false;
         }
 
         return true;
@@ -190,7 +188,7 @@ public class PInteraction {
                         ((GameObject)to.getFirst()).getSceneMinLocation().getX(),
                         ((GameObject)to.getFirst()).getSceneMinLocation().getY());
             }, "interact_useItemOnItem");
-        } else if (to.getFirst() instanceof WallObject){
+        } else {
             PaistiSuite.getInstance().clientExecutor.schedule(() -> {
                 PUtils.getClient().setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
                 PUtils.getClient().setSelectedItemSlot(item.getWidgetItem().getIndex());
@@ -200,11 +198,9 @@ public class PInteraction {
                         "",
                         to.getFirst().getId(),
                         MenuOpcode.ITEM_USE_ON_GAME_OBJECT.getId(),
-                        ((WallObject)to.getFirst()).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
-                        ((WallObject)to.getFirst()).getWorldLocation().getY() - PUtils.getClient().getBaseY());
+                        (to.getFirst()).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
+                        (to.getFirst()).getWorldLocation().getY() - PUtils.getClient().getBaseY());
             }, "interact_useItemOnItem");
-        } else {
-            return false;
         }
 
         return true;

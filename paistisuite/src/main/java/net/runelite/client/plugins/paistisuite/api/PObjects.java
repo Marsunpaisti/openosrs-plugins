@@ -6,11 +6,13 @@ import net.runelite.api.NPC;
 import net.runelite.api.ObjectDefinition;
 import net.runelite.api.TileObject;
 import net.runelite.api.queries.GameObjectQuery;
+import net.runelite.api.queries.GroundObjectQuery;
 import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.queries.WallObjectQuery;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -22,12 +24,9 @@ import java.util.stream.Collectors;
 public class PObjects {
 
     public static ObjectDefinition getRealDefinition(int id) {
-        //log.info("Getting def: " + id);
         ObjectDefinition def = PUtils.getClient().getObjectDefinition(id);
-        ObjectDefinition impostor = def.getImpostorIds() != null ? def.getImpostor() : def;
-        //if (impostor != null) log.info("Found impostor for id: " + id +  " -> " + impostor.getId());
+        ObjectDefinition impostor = def.getImpostorIds() != null ? def.getImpostor() : null;
         if (impostor != null) return impostor;
-        //log.info("No impostors for " + id);
         return def;
     }
 
@@ -57,9 +56,15 @@ public class PObjects {
                     .stream()
                     .map(go -> (TileObject)go)
                     .forEach(allObjects::add);
+            new GroundObjectQuery()
+                    .result(PUtils.getClient())
+                    .list
+                    .stream()
+                    .map(go -> (TileObject)go)
+                    .forEach(allObjects::add);
             return allObjects
                     .stream()
-                    .map(ob -> new PTileObject(ob))
+                    .map(PTileObject::new)
                     .collect(Collectors.toList());
         }, "getAllObjects");
     }

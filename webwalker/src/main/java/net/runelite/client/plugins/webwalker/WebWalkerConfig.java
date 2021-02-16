@@ -286,6 +286,18 @@ public interface WebWalkerConfig extends Config
     }
 
     @ConfigItem(
+            keyName = "allowTeleports",
+            name = "Allow Teleporting",
+            description = "Allows walker to use teleport items in your inventory to travel.",
+            position = 145
+    )
+    default boolean allowTeleports()
+    {
+        return false;
+    }
+
+
+    @ConfigItem(
             keyName = "startButton",
             name = "Start",
             description = "Start walker",

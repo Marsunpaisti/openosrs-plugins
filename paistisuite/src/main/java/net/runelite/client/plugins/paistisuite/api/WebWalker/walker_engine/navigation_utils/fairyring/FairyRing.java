@@ -112,7 +112,7 @@ public class FairyRing {
         PTileObject ring = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
         final WorldPoint startPos = PPlayer.location();
         return InteractionHelper.click(ring,"Last-destination (" + location + ")") &&
-                WaitFor.condition(8000, () -> startPos.distanceToHypotenuse(PPlayer.location()) > 20? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
+                WaitFor.condition(8000, () -> startPos.distanceToHypotenuse(PPlayer.location()) > 20 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
     }
 
     private static boolean pressTeleport(){

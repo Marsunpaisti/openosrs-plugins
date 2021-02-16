@@ -122,7 +122,7 @@ public class DaxWalker {
         return WalkerEngine.getInstance().walkPath(pathResult.toRSTilePath(), getGlobalWalkingCondition().combine(walkingCondition));
     }
 
-    private List<PathRequestPair> getPathTeleports(RSTile start) {
+    public List<PathRequestPair> getPathTeleports(RSTile start) {
         return Teleport.getValidStartingRSTiles().stream()
                 .map((RSTile t) -> new PathRequestPair(new Point3D(t),
                         new Point3D(start)))

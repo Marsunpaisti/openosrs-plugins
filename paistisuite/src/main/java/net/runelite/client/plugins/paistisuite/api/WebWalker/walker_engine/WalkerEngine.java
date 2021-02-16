@@ -3,6 +3,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.paistisuite.api.PBanking;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
@@ -313,7 +314,7 @@ public class WalkerEngine{
                 log.info("Using teleport method: " + teleport);
                 teleport.trigger();
                 return WaitFor.condition(PUtils.random(3000, 20000),
-                        () -> startPosition.distanceToDouble(new RSTile(PPlayer.location())) < 10 ?
+                        () -> startPosition.distanceTo(new RSTile(PPlayer.location())) < 10 ?
                                 WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
             }
         }

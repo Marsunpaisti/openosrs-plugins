@@ -194,6 +194,9 @@ public class NPCInteraction {
             if (!interfaces.equals(getAllChatInterfaces().stream().map(RSInterface::getText).collect(Collectors.toList()))){
                 return WaitFor.Return.SUCCESS;
             }
+            if (!isConversationWindowUp()){
+                return WaitFor.Return.SUCCESS;
+            }
             return WaitFor.Return.IGNORE;
         });
     }

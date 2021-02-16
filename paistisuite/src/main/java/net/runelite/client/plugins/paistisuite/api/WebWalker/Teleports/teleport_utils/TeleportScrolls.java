@@ -1,6 +1,12 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.teleport_utils;
+import net.runelite.client.plugins.paistisuite.api.Filters;
+import net.runelite.client.plugins.paistisuite.api.PInteraction;
+import net.runelite.client.plugins.paistisuite.api.PInventory;
+import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic.Validatable;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import org.apache.commons.lang3.NotImplementedException;
 
 public enum TeleportScrolls implements Validatable {
@@ -38,11 +44,14 @@ public enum TeleportScrolls implements Validatable {
     }
 
     public boolean teleportTo(boolean shouldWait){
-        throw new NotImplementedException();
+        PItem scroll = PInventory.findItem(Filters.Items.nameEquals(this.name));
+        return PInteraction.clickItem(scroll) &&
+                (!shouldWait || WaitFor.condition(8000, () -> this.location.toWorldPoint().distanceTo(PPlayer.location()) < 15 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS);
     }
 
     public boolean hasScroll(){
-        throw new NotImplementedException();
+        PItem scroll = PInventory.findItem(Filters.Items.nameEquals(this.name));
+        return scroll != null;
     }
 
     public RSTile getLocation(){
@@ -51,11 +60,44 @@ public enum TeleportScrolls implements Validatable {
 
     @Override
     public boolean canUse(){
-        throw new NotImplementedException();
+        return this.hasScroll() || (MasterScrollBook.hasBook() && this.scrollbookContains());
     }
 
     public boolean scrollbookContains(){
-        throw new NotImplementedException();
+        if(!MasterScrollBook.has())
+            return false;
+        switch(this){
+
+            case NARDAH:
+                return MasterScrollBook.Teleports.NARDAH.getCount() > 0;
+            case DIGSITE:
+                return MasterScrollBook.Teleports.DIGSITE.getCount() > 0;
+            case FELDIP_HILLS:
+                return MasterScrollBook.Teleports.FELDIP_HILLS.getCount() > 0;
+            case LUNAR_ISLE:
+                return MasterScrollBook.Teleports.LUNAR_ISLE.getCount() > 0;
+            case MORTTON:
+                return MasterScrollBook.Teleports.MORTTON.getCount() > 0;
+            case PEST_CONTROL:
+                return MasterScrollBook.Teleports.PEST_CONTROL.getCount() > 0;
+            case PISCATORIS:
+                return MasterScrollBook.Teleports.PISCATORIS.getCount() > 0;
+            case TAI_BWO_WANNAI:
+                return MasterScrollBook.Teleports.TAI_BWO_WANNAI.getCount() > 0;
+            case ELF_CAMP:
+                return MasterScrollBook.Teleports.ELF_CAMP.getCount() > 0;
+            case MOS_LE_HARMLESS:
+                return MasterScrollBook.Teleports.MOS_LE_HARMLESS.getCount() > 0;
+            case LUMBERYARD:
+                return MasterScrollBook.Teleports.LUMBERYARD.getCount() > 0;
+            case ZULLANDRA:
+                return MasterScrollBook.Teleports.ZULLANDRA.getCount() > 0;
+            case KEY_MASTER:
+                return MasterScrollBook.Teleports.KEY_MASTER.getCount() > 0;
+            case REVENANT_CAVES:
+                return MasterScrollBook.Teleports.REVENANT_CAVES.getCount() > 0;
+        }
+        return false;
     }
 
 }

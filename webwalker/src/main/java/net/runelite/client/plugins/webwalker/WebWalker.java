@@ -2,8 +2,11 @@ package net.runelite.client.plugins.webwalker;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.events.ConfigButtonClicked;
-import net.runelite.api.events.GameTick;
+import net.runelite.api.Point;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.*;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.PluginDependency;
@@ -18,22 +21,23 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerSe
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.util.ColorUtil;
 import org.pf4j.Extension;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.awt.*;
 import java.util.ArrayList;
-
-import static net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper.getAllChildren;
 
 @Extension
 @PluginDependency(PaistiSuite.class)
 @PluginDescriptor(
         name = "WebWalker",
         enabledByDefault = false,
-        description = "Walks around with dax walker",
-        tags = {"npcs", "items"},
+        description = "Walks around with DaxWalker. Special thanks to Manhattan, Illumine and Runemoro.",
+        tags = {"npcs", "items", "paisti"},
         type = PluginType.UTILITY
 )
 
@@ -45,6 +49,8 @@ public class WebWalker extends PScript {
     ArrayList<RSTile> path = null;
     RSTile targetLocation = null;
     int nextRunAt = PUtils.random(55, 95);
+    private boolean allowTeleports;
+    private Point lastMenuOpenedPoint;
 
     @Inject
     private OverlayManager overlayManager;
@@ -71,6 +77,96 @@ public class WebWalker extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
+
+    }
+
+    @Subscribe
+    public void onMenuEntryAdded(MenuEntryAdded event) {
+
+        final Widget map = PUtils.getClient().getWidget(WidgetInfo.WORLD_MAP_VIEW);
+
+        if (map == null) {
+            return;
+        }
+
+        if (map.getBounds().contains(PUtils.getClient().getMouseCanvasPosition().getX(), PUtils.getClient().getMouseCanvasPosition().getY())) {
+            PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan));
+            PMenu.addEntry(event, ColorUtil.wrapWithColorTag("Webwalker", Color.cyan) + " Autowalk");
+        }
+    }
+
+    @Subscribe
+    public void onMenuOpened(MenuOpened event){
+        lastMenuOpenedPoint = PUtils.getClient().getMouseCanvasPosition();
+    }
+
+    @Subscribe
+    public void onMenuOptionClicked(MenuOptionClicked event) {
+
+        if (event.getOption().contains("Autowalk")) {
+            WorldPoint wp = calculateMapPoint(PUtils.getClient().isMenuOpen() ? lastMenuOpenedPoint : PUtils.getClient().getMouseCanvasPosition());
+            allowTeleports = config.allowTeleports();
+            targetLocation = new RSTile(wp);
+            event.consume();
+            try {
+                super.start();
+            } catch (Exception e){
+                log.error("Error trying to start WebWalker");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private WorldPoint calculateMapPoint(Point point) {
+        float zoom = PUtils.getClient().getRenderOverview().getWorldMapZoom();
+        RenderOverview renderOverview = PUtils.getClient().getRenderOverview();
+        final WorldPoint mapPoint = new WorldPoint(renderOverview.getWorldMapPosition().getX(), renderOverview.getWorldMapPosition().getY(), 0);
+        final Point middle = mapWorldPointToGraphicsPoint(mapPoint);
+
+        final int dx = (int) ((point.getX() - middle.getX()) / zoom);
+        final int dy = (int) ((-(point.getY() - middle.getY())) / zoom);
+
+        return mapPoint.dx(dx).dy(dy);
+    }
+
+
+    private Point mapWorldPointToGraphicsPoint(WorldPoint worldPoint) {
+        RenderOverview ro = PUtils.getClient().getRenderOverview();
+
+        if (!ro.getWorldMapData().surfaceContainsPosition(worldPoint.getX(), worldPoint.getY())) {
+            return null;
+        }
+
+        Float pixelsPerTile = ro.getWorldMapZoom();
+
+        Widget map = PUtils.getClient().getWidget(WidgetInfo.WORLD_MAP_VIEW);
+        if (map != null) {
+            Rectangle worldMapRect = map.getBounds();
+
+            int widthInTiles = (int) Math.ceil(worldMapRect.getWidth() / pixelsPerTile);
+            int heightInTiles = (int) Math.ceil(worldMapRect.getHeight() / pixelsPerTile);
+
+            Point worldMapPosition = ro.getWorldMapPosition();
+
+            //Offset in tiles from anchor sides
+            int yTileMax = worldMapPosition.getY() - heightInTiles / 2;
+            int yTileOffset = (yTileMax - worldPoint.getY() - 1) * -1;
+            int xTileOffset = worldPoint.getX() + widthInTiles / 2 - worldMapPosition.getX();
+
+            int xGraphDiff = ((int) (xTileOffset * pixelsPerTile));
+            int yGraphDiff = (int) (yTileOffset * pixelsPerTile);
+
+            //Center on tile.
+            yGraphDiff -= pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+            xGraphDiff += pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+
+            yGraphDiff = worldMapRect.height - yGraphDiff;
+            yGraphDiff += (int) worldMapRect.getY();
+            xGraphDiff += (int) worldMapRect.getX();
+
+            return new Point(xGraphDiff, yGraphDiff);
+        }
+        return null;
     }
 
     @Override
@@ -78,16 +174,36 @@ public class WebWalker extends PScript {
         PUtils.sleepFlat(1500, 3000);
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
 
+
         if (path == null){
             PlayerDetails details = PlayerDetails.generate();
-            // Remove stuff from playerdetails so server wont try to use certain shortcuts or teleports.
-            path = WebWalkerServerApi.getInstance().getPath(new Point3D(PPlayer.location()), new Point3D(targetLocation), details).toRSTilePath();
+
+            // Im doing it manually to get the path to my local variables, you can just call DaxWalker.walkTo methods too
+            DaxWalker.getInstance().allowTeleports = allowTeleports;
+            java.util.List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<PathRequestPair>();
+            pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), new Point3D(targetLocation)));
+            java.util.List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details,pathRequestPairs));
+            java.util.List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
+            PathResult pathResult = DaxWalker.getInstance().getBestPath(validPaths);
+            if (pathResult == null) {
+                log.warn("No valid path found");
+                PUtils.sendGameMessage("No valid path found");
+                requestStop();
+                return;
+            }
+
+            path = pathResult.toRSTilePath();
         }
-        if (WalkerEngine.getInstance().walkPath(path, walkingCondition)) requestStop();
+
+        if (WalkerEngine.getInstance().walkPath(path, walkingCondition)) {
+            requestStop();
+            return;
+        }
     }
 
     public WalkingCondition walkingCondition = () -> {
         if (isStopRequested()) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
+        if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
         handleRun();
         return WalkingCondition.State.CONTINUE_WALKER;
     };
@@ -140,6 +256,7 @@ public class WebWalker extends PScript {
             return;
         }
 
+        allowTeleports = config.allowTeleports();
         targetLocation = getConfigTargetLocation();
         if (targetLocation == null) {
             PUtils.sendGameMessage("Invalid target location!");

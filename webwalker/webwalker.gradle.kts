@@ -1,7 +1,7 @@
-version = "1.0.2"
+version = "1.1.0"
 
 project.extra["PluginName"] = "WebWalker"
-project.extra["PluginDescription"] = "Walks around with daxwalker"
+project.extra["PluginDescription"] = "Walks around with DaxWalker. Special thanks to Manhattan, Illumine and Runemoro."
 
 dependencies {
     annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")

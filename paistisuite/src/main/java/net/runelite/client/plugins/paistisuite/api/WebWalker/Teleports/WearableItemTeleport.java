@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.client.plugins.paistisuite.api.Filters;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
+@Slf4j
 public class WearableItemTeleport {
 
     private static final Predicate<PItem> NOT_NOTED = itm -> itm.getDefinition() != null && itm.getDefinition().getNote() == -1;
@@ -65,14 +67,27 @@ public class WearableItemTeleport {
         PItem teleportItem = items.get(0);
         final WorldPoint startingPosition = PPlayer.location();
 
-        return RSItemHelper.clickMatch(teleportItem, "(Rub|Teleport|" + regex + ")") && WaitFor.condition(
+        boolean clickRes = RSItemHelper.clickMatch(teleportItem, "(Rub|Teleport|" + regex + ")");
+        if (!clickRes) {
+            log.info("Clicking tp item failed");
+            return false;
+        }
+        boolean waitRes = WaitFor.condition(
                 PUtils.random(3800, 4600), () -> {
                     NPCInteraction.handleConversationRegex(regex);
-                    if (startingPosition.distanceTo(PPlayer.location()) > 5) {
+                    if (startingPosition.distanceToHypotenuse(PPlayer.location()) > 5) {
+                        log.info("Teleported!");
                         return WaitFor.Return.SUCCESS;
                     }
+                    log.info("not there yet!");
                     return WaitFor.Return.IGNORE;
                 }) == WaitFor.Return.SUCCESS;
+
+        if (!waitRes){
+            log.info("Waiting for teleport movement failed");
+        }
+
+        return waitRes;
     }
 
 }
