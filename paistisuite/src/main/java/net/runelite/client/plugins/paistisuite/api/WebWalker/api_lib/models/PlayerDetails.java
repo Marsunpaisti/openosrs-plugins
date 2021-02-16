@@ -20,7 +20,7 @@ public class PlayerDetails {
 
         List<IntPair> inventory = PInventory.getAllItems()
                 .stream()
-                .map(widgetItem -> new IntPair(widgetItem.getId(), widgetItem.getQuantity()))
+                .map(pItem -> new IntPair(pItem.getId(), pItem.getQuantity()))
                 .collect(Collectors.toList());
 
         List<IntPair> equipment = PInventory.getEquippedItems()

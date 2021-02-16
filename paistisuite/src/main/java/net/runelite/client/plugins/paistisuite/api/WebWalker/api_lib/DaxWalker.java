@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class DaxWalker {
     private static Map<RSTile, Teleport> map;
     private static DaxWalker daxWalker;
+    public boolean allowTeleports = false;
     public static DaxWalker getInstance() {
         return daxWalker != null ? daxWalker : (daxWalker = new DaxWalker());
     }
@@ -68,7 +69,7 @@ public class DaxWalker {
             return true;
         }
 
-        List<PathRequestPair> pathRequestPairs = getInstance().getPathTeleports(destination);
+        List<PathRequestPair> pathRequestPairs = getInstance().allowTeleports ? getInstance().getPathTeleports(destination) : new ArrayList<PathRequestPair>();
 
         pathRequestPairs.add(new PathRequestPair(new Point3D(start), new Point3D(destination)));
 

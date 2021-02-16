@@ -103,7 +103,7 @@ public class PUtils {
 
     public static long randomNormal(int min, int max)
     {
-        return randomNormal(min, max, (max-min)/6d, min + (max-min)/2d);
+        return randomNormal(min, max, ((double)max-(double)min)/6d, min + ((double)max-(double)min)/2d);
     }
 
     public static void sleep(int time){
@@ -119,7 +119,7 @@ public class PUtils {
     }
 
     public static void sleepNormal(int min, int max){
-        sleepNormal(min, max, (max-min)/6d, (max-min)/2d);
+        sleep((int) randomNormal(min, max));
     }
 
     public static void sleepNormal(int min, int max, double deviation, double mean){

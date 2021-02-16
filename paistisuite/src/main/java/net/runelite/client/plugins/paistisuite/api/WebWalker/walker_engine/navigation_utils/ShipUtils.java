@@ -9,8 +9,8 @@ import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -25,7 +25,7 @@ public class ShipUtils {
 
         return getGangplank() != null
                 && new RSTile(PPlayer.location()).getPlane() == 1
-                && PObjects.getAllObjectsWithDefs()
+                && PObjects.getAllObjects()
                 .stream()
                 .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 10)
                 .anyMatch(pair ->
@@ -36,7 +36,7 @@ public class ShipUtils {
     }
 
     public static boolean crossGangplank() {
-        TileObject gangplank = getGangplank();
+        PTileObject gangplank = getGangplank();
         if (gangplank == null){
             return false;
         }
@@ -46,15 +46,15 @@ public class ShipUtils {
         return WaitFor.condition(PUtils.random(2500, 3000), () -> !ShipUtils.isOnShip() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
     }
 
-    private static TileObject getGangplank(){
-        var optional = PObjects.getAllObjectsWithDefs()
+    private static PTileObject getGangplank(){
+        return PObjects.getAllObjects()
                 .stream()
-                .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Gangplank"))
+                .filter(pair -> pair.getSecond().getName() != null && pair.getSecond().getName().equalsIgnoreCase("Gangplank"))
                 .filter(pair -> Arrays.stream(pair.getSecond().getActions())
                         .filter(Objects::nonNull)
                         .anyMatch(s -> s.equals("Cross")))
-                .findFirst();
-        return optional.map(Pair<TileObject, ObjectDefinition>::getFirst).orElse(null);
+                .findFirst()
+                .orElse(null);
     }
 
 }

@@ -5,6 +5,7 @@ import kotlin.Pair;
 import net.runelite.api.ItemDefinition;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +34,7 @@ public enum RuneElement {
         if (haveStaff()) {
             return Integer.MAX_VALUE;
         }
-        List<Pair<WidgetItem, ItemDefinition>> items = PInventory.findAllItems((Pair<WidgetItem, ItemDefinition> pair) -> {
+        List<PItem> items = PInventory.findAllItems((PItem pair) -> {
             String name = pair.getSecond().getName().toLowerCase();
 
             if (!name.contains("rune")) {
@@ -52,32 +53,25 @@ public enum RuneElement {
     }
 
     private boolean haveStaff() {
-        /* TODO:
-        return Equipment.find(new Filter<RSItem>() {
-            @Override
-            public boolean accept(RSItem rsItem) {
-                String name = getItemName(rsItem).toLowerCase();
-                if (!name.contains("staff")) {
-                    return false;
-                }
-                for (String alternativeName : alternativeNames) {
-                    if (name.contains(alternativeName.toLowerCase())) {
-                        return true;
-                    }
-                }
+        return PInventory.findEquipmentItem((PItem item) -> {
+            String name = item.getDefinition().getName().toLowerCase();
+            if (!name.contains("staff")) {
                 return false;
             }
-        }).length > 0;
-
-         */
-        return true;
+            for (String alternativeName : alternativeNames) {
+                if (name.contains(alternativeName.toLowerCase())) {
+                    return true;
+                }
+            }
+            return false;
+        }) != null;
     }
 
     /**
      * @param item
      * @return item name. Never null. "null" if no name.
      */
-    private static String getItemName(Pair<WidgetItem, ItemDefinition> item) {
+    private static String getItemName(PItem item) {
         ItemDefinition definition = item.getSecond();
         String name;
         return definition == null || (name = definition.getName()) == null ? "null" : name;

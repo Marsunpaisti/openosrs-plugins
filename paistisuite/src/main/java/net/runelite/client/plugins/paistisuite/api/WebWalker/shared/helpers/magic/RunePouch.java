@@ -2,7 +2,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.mag
 
 
 import net.runelite.client.plugins.paistisuite.api.PInventory;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Filters;
+import net.runelite.client.plugins.paistisuite.api.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSVarBit;
 
 import java.util.Arrays;

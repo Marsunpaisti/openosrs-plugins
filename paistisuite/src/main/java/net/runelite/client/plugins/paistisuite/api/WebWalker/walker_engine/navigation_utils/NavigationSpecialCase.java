@@ -16,8 +16,10 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.inter
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.NPCInteraction;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.FairyRing;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.AccurateMouse;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Filters;
+import net.runelite.client.plugins.paistisuite.api.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
+
 import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.NavigationSpecialCase.SpecialLocation.*;
 
 import java.awt.geom.Point2D;
@@ -357,13 +359,13 @@ public class NavigationSpecialCase {
                         break;
                     }
                 }
-                if (InteractionHelper.clickDefPair(
+                if (InteractionHelper.click(
                         PObjects.findObject(Filters.Objects.nameEquals("Door")), "Open", () -> SpecialLocation.ZANARIS_RING.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE)){
                     return true;
                 }
                 break;
             case LUMBRIDGE_ZANARIS_SHED:
-                if (InteractionHelper.clickDefPair(PObjects.findObject(Filters.Objects.nameEquals("Fairy ring")),
+                if (InteractionHelper.click(PObjects.findObject(Filters.Objects.nameEquals("Fairy ring")),
                        new String[]{"Use"}, () -> LUMBRIDGE_ZANARIS_SHED.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE)){
                     return true;
                 }
@@ -373,8 +375,8 @@ public class NavigationSpecialCase {
                 break;
             case FINISHED_ROPE_TO_ROCK:
                 if (PInteraction.useItemOnGameObject(
-                        PInventory.findItem(Filters.Items.idEquals(954)).getFirst(),
-                        PObjects.findObject(Filters.Objects.actionsContains("Swim to")).getFirst()
+                        PInventory.findItem(Filters.Items.idEquals(954)),
+                        PObjects.findObject(Filters.Objects.actionsContains("Swim to"))
                 )) {
                     if (WaitFor.condition(15000,
                             () -> PPlayer.location().equals(new RSTile(2513, 3468, 0)) ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS) {
@@ -389,7 +391,7 @@ public class NavigationSpecialCase {
                 break;
             case WATERFALL_DUNGEON_ENTRANCE:
                 if (WATERFALL_DUNGEON.getRSTile().toWorldPoint().distanceToHypotenuse(PPlayer.location()) < 500){
-                    return InteractionHelper.clickDefPair(PObjects.findObject(Filters.Objects.nameEquals("Door")), new String[]{"Open"}, () -> WATERFALL_DUNGEON_ENTRANCE.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+                    return InteractionHelper.click(PObjects.findObject(Filters.Objects.nameEquals("Door")), new String[]{"Open"}, () -> WATERFALL_DUNGEON_ENTRANCE.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
                 } else if (PInteraction.useItemOnGameObject(
                         PInventory.findItem(Filters.Items.idEquals(954)),
                         PObjects.findObject(Filters.Objects.nameContains("Dead tree"))))
@@ -405,14 +407,14 @@ public class NavigationSpecialCase {
                 break;
 
             case WATERFALL_DUNGEON:
-                if (InteractionHelper.clickDefPair(
+                if (InteractionHelper.click(
                         PObjects.findObject(Filters.Objects.idEquals(2010)), "Open", () -> PPlayer.location().getX() == WATERFALL_DUNGEON.x ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE)){
                     return true;
                 }
                 log.info("Failed to get to waterfall dungeon");
                 break;
             case WATERFALL_FALL_DOWN:
-                if (InteractionHelper.clickDefPair(PObjects.findObject(Filters.Objects.actionsContains("Get in")), "Get in", () -> PPlayer.location().distanceTo(new WorldPoint(2527, 3413, 0)) < 5 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE)){
+                if (InteractionHelper.click(PObjects.findObject(Filters.Objects.actionsContains("Get in")), "Get in", () -> PPlayer.location().distanceTo(new WorldPoint(2527, 3413, 0)) < 5 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE)){
                     return true;
                 }
                 log.info("Failed to fall down waterfall");
@@ -582,7 +584,7 @@ public class NavigationSpecialCase {
                                 .and(Filters.Objects.nameEquals("Log balance"))
                                 .and(Filters.Objects.actionsContains("Walk-across")));
 
-                if (logobj != null && PInteraction.tileObject(logobj.getFirst(), "Walk-across")){
+                if (PInteraction.tileObject(logobj, "Walk-across")){
                     int agilityXP = PSkills.getXp(Skill.AGILITY);
                     if (WaitFor.condition(PUtils.random(7600, 1200), () -> PSkills.getXp(Skill.AGILITY) > agilityXP ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS) {
                         return true;
@@ -647,14 +649,14 @@ public class NavigationSpecialCase {
             case HAM_INSIDE:
                 var lockDoor = PObjects.findObject(Filters.Objects.actionsContains("Pick-lock"));
                 if (lockDoor != null){
-                    if (InteractionHelper.click(lockDoor.getFirst(), "Pick-Lock")){
+                    if (InteractionHelper.click(lockDoor, "Pick-Lock")){
                         WaitFor.condition(
                                 WaitFor.random(6000, 9000), () ->  PObjects.findObject(Filters.Objects.actionsContains("Pick-lock")) == null ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
                         return true;
                     }
                 } else {
                     var openDoor = PObjects.findObject(Filters.Objects.actionsContains("Climb-down"));
-                    if (InteractionHelper.click(openDoor.getFirst(), "Climb-down")){
+                    if (InteractionHelper.click(openDoor, "Climb-down")){
                         WaitFor.condition(3000, () -> HAM_INSIDE.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 10 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
                         return true;
                     }
@@ -860,10 +862,10 @@ public class NavigationSpecialCase {
                         ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) && WaitFor.milliseconds(600,1800) != null;
 
             case SWAMP_BOATY:
-                return InteractionHelper.click(PObjects.findObject(Filters.Objects.nameEquals("Swamp Boaty")).getFirst(), "Quick-board") && WaitFor.condition( 15000,  () -> SWAMP_BOATY.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5
+                return InteractionHelper.click(PObjects.findObject(Filters.Objects.nameEquals("Swamp Boaty")), "Quick-board") && WaitFor.condition( 15000,  () -> SWAMP_BOATY.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5
                         ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) != null && WaitFor.milliseconds(600,1800) != null;
             case SWAMP_BOATY_MORTTON:
-                return InteractionHelper.click(PObjects.findObject(Filters.Objects.nameEquals("Swamp Boaty")).getFirst(), "Board") && WaitFor.condition( 15000,  () -> SWAMP_BOATY_MORTTON.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5
+                return InteractionHelper.click(PObjects.findObject(Filters.Objects.nameEquals("Swamp Boaty")), "Board") && WaitFor.condition( 15000,  () -> SWAMP_BOATY_MORTTON.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5
                         ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) != null && WaitFor.milliseconds(600,1800) != null;
 
             case BRINE_RAT_CAVE_TREE:
@@ -951,23 +953,23 @@ public class NavigationSpecialCase {
         return false;
     }
 
-    public static boolean walkToObject(Pair<TileObject, ObjectDefinition> object) {
+    public static boolean walkToObject(PTileObject object) {
         if ( !AccurateMouse.walkTo(object.getFirst().getWorldLocation())) {
             return false;
         }
         return WaitFor.condition(PUtils.random(7000, 10000), () -> PPlayer.location().distanceToHypotenuse(object.getFirst().getWorldLocation()) < 10 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
     }
 
-    public static boolean clickObject(Pair<TileObject, ObjectDefinition> objDefPair, String action, WaitFor.Condition condition) {
-        return InteractionHelper.click(objDefPair.getFirst(), action, condition);
+    public static boolean clickObject(PTileObject obj, String action, WaitFor.Condition condition) {
+        return InteractionHelper.click(obj, action, condition);
     }
 
-    public static boolean clickObject(Predicate<Pair<TileObject, ObjectDefinition>> filter, String action, WaitFor.Condition condition) {
+    public static boolean clickObject(Predicate<PTileObject> filter, String action, WaitFor.Condition condition) {
         return clickObject(filter, new String[]{action}, condition);
     }
 
-    public static boolean clickObject(Predicate<Pair<TileObject, ObjectDefinition>> filter, String[] action, WaitFor.Condition condition){
-        List<Pair<TileObject, ObjectDefinition>> objects = PObjects.getAllObjectsWithDefs()
+    public static boolean clickObject(Predicate<PTileObject> filter, String[] action, WaitFor.Condition condition){
+        List<PTileObject> objects = PObjects.getAllObjects()
                 .stream()
                 .filter(filter)
                 .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 15)
@@ -977,7 +979,7 @@ public class NavigationSpecialCase {
         if (objects.size() == 0){
             return false;
         }
-        return InteractionHelper.click(objects.get(0).getFirst(), action, condition);
+        return InteractionHelper.click(objects.get(0), action, condition);
     }
 
 

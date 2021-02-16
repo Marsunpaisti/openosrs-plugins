@@ -4,7 +4,6 @@ import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ObjectDefinition;
 import net.runelite.api.TileObject;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.PObjects;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
@@ -12,9 +11,10 @@ import net.runelite.client.plugins.paistisuite.api.PWidgets;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.InteractionHelper;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Filters;
+import net.runelite.client.plugins.paistisuite.api.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 @Slf4j
 public class SpiritTree {
@@ -57,11 +57,11 @@ public class SpiritTree {
     }
 
     public static boolean to(Location location){
-        Pair<TileObject, ObjectDefinition> tree = PObjects.findObject(Filters.Objects.nameEquals("Spirit tree").and(Filters.Objects.actionsContains("Travel")));
+        PTileObject tree = PObjects.findObject(Filters.Objects.nameEquals("Spirit tree").and(Filters.Objects.actionsContains("Travel")));
         if (tree == null) return false;
 
         if (!PWidgets.isValid(SPIRIT_TREE_MASTER_INTERFACE, SPIRIT_TREE_CHILD_INTERFACE)
-                && !InteractionHelper.clickDefPair(tree, "Travel", () -> PWidgets.isValid(SPIRIT_TREE_MASTER_INTERFACE, SPIRIT_TREE_CHILD_INTERFACE) ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE)) {
+                && !InteractionHelper.click(tree, "Travel", () -> PWidgets.isValid(SPIRIT_TREE_MASTER_INTERFACE, SPIRIT_TREE_CHILD_INTERFACE) ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE)) {
             return false;
         }
         

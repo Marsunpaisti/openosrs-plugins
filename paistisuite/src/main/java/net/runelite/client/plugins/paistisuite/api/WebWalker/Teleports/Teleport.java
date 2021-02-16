@@ -1,92 +1,95 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports;
 
 
-import kotlin.Pair;
-import net.runelite.api.ItemDefinition;
-import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.plugins.paistisuite.api.PInteraction;
-import net.runelite.client.plugins.paistisuite.api.PInventory;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.teleport_utils.TeleportConstants;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.teleport_utils.TeleportLimit;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.teleport_utils.TeleportScrolls;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Requirement;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
-import org.apache.commons.lang3.NotImplementedException;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.RSItemHelper;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic.Spell;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.*;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 
 public enum Teleport {
-
     VARROCK_TELEPORT(
             35, new RSTile(3212, 3424, 0),
             Spell.VARROCK_TELEPORT::canUse,
-            () -> selectSpell("Varrock Teleport","Cast")
+            () -> castSpell("Varrock Teleport","Cast")
     ),
 
     VARROCK_TELEPORT_TAB(
             35, new RSTile(3212, 3424, 0),
-            () -> inMembersWorld() && Inventory.getCount("Varrock teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Varrock teleport") > 0,
             () -> RSItemHelper.click("Varrock t.*", "Break")
     ),
 
     VARROCK_TELEPORT_GRAND_EXCHANGE(
             35, new RSTile(3161, 3478, 0),
             () -> Spell.VARROCK_TELEPORT.canUse() && TeleportConstants.isVarrockTeleportAtGE(),
-            () -> selectSpell("Varrock Teleport","Grand Exchange")
+            () -> castSpell("Varrock Teleport","Grand Exchange")
     ),
 
     LUMBRIDGE_TELEPORT(
             35, new RSTile(3225, 3219, 0),
             Spell.LUMBRIDGE_TELEPORT::canUse,
-            () -> selectSpell("Lumbridge Teleport","Cast")
+            () -> castSpell("Lumbridge Teleport","Cast")
     ),
 
     LUMBRIDGE_TELEPORT_TAB(
             35, new RSTile(3225, 3219, 0),
-            () -> inMembersWorld() && Inventory.getCount("Lumbridge teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Lumbridge teleport") > 0,
             () -> RSItemHelper.click("Lumbridge t.*", "Break")
     ),
 
     FALADOR_TELEPORT(
             35, new RSTile(2966, 3379, 0),
             Spell.FALADOR_TELEPORT::canUse,
-            () -> selectSpell("Falador Teleport","Cast")
+            () -> castSpell("Falador Teleport","Cast")
     ),
 
     FALADOR_TELEPORT_TAB(
             35, new RSTile(2966, 3379, 0),
-            () -> inMembersWorld() && Inventory.getCount("Falador teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Falador teleport") > 0,
             () -> RSItemHelper.click("Falador t.*", "Break")
     ),
 
     CAMELOT_TELEPORT(
             35, new RSTile(2757, 3479, 0),
             () -> inMembersWorld() && Spell.CAMELOT_TELEPORT.canUse(),
-            () -> selectSpell("Camelot Teleport","Cast")
+            () -> castSpell("Camelot Teleport","Cast")
 
     ),
 
     CAMELOT_TELEPORT_TAB(
             35, new RSTile(2757, 3479, 0),
-            () -> inMembersWorld() && Inventory.getCount("Camelot teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Camelot teleport") > 0,
             () -> RSItemHelper.click("Camelot t.*", "Break")
     ),
 
     SEERS_TELEPORT(
             35, new RSTile(2757, 3479, 0),
             () -> inMembersWorld() && Spell.CAMELOT_TELEPORT.canUse() && RSVarBit.get(4560).getValue() == 1,
-            () -> selectSpell("Camelot Teleport","Seers'")
+            () -> castSpell("Camelot Teleport","Seers'")
     ),
 
     ARDOUGNE_TELEPORT(
             35, new RSTile(2661, 3300, 0),
             () -> inMembersWorld() && Spell.ARDOUGNE_TELEPORT.canUse(),
-            () -> selectSpell("Ardougne Teleport","Cast")
+            () -> castSpell("Ardougne Teleport","Cast")
 
     ),
 
     ARDOUGNE_TELEPORT_TAB(
             35, new RSTile(2661, 3300, 0),
-            () -> inMembersWorld() && Inventory.getCount("Ardougne teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Ardougne teleport") > 0,
             () -> RSItemHelper.click("Ardougne t.*", "Break")
     ),
 
@@ -153,7 +156,7 @@ public enum Teleport {
 
     RING_OF_WEALTH_MISCELLANIA(
             35, new RSTile(2535, 3861, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RING_OF_WEALTH_FILTER) && Game.getSetting(359) >= 100,
+            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RING_OF_WEALTH_FILTER) && PVars.getSetting(359) >= 100,
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_WEALTH_FILTER, "(?i)misc.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
@@ -340,7 +343,7 @@ public enum Teleport {
 
     ECTOPHIAL (
             0, new RSTile(3660, 3524, 0),
-            () -> inMembersWorld() && Inventory.find(Filters.Items.nameContains("Ectophial")).length > 0,
+            () -> inMembersWorld() && PInventory.findItem(Filters.Items.nameContains("Ectophial")) != null,
             () -> RSItemHelper.click(Filters.Items.nameContains("Ectophial"), "Empty")
     ),
 
@@ -368,7 +371,7 @@ public enum Teleport {
 
     WEST_ARDOUGNE_TELEPORT_TAB(
             35, new RSTile(2500,3290,0),
-            () -> inMembersWorld() && Inventory.getCount("West ardougne teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("West ardougne teleport") > 0,
             () -> RSItemHelper.click("West ardougne t.*", "Break")
     ),
 
@@ -409,43 +412,43 @@ public enum Teleport {
 
     RIMMINGTON_TELEPORT_TAB(
             35, new RSTile(2954,3224, 0),
-            () -> inMembersWorld() && Inventory.getCount("Rimmington teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Rimmington teleport") > 0,
             () -> RSItemHelper.click("Rimmington t.*", "Break")
     ),
 
     TAVERLEY_TELEPORT_TAB(
             35, new RSTile(2894, 3465, 0),
-            () -> inMembersWorld() && Inventory.getCount("Taverley teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Taverley teleport") > 0,
             () -> RSItemHelper.click("Taverley t.*", "Break")
     ),
 
     RELLEKKA_TELEPORT_TAB(
             35, new RSTile(2668, 3631, 0),
-            () -> inMembersWorld() && Inventory.getCount("Rellekka teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Rellekka teleport") > 0,
             () -> RSItemHelper.click("Rellekka t.*", "Break")
     ),
 
     BRIMHAVEN_TELEPORT_TAB(
             35, new RSTile(2758, 3178, 0),
-            () -> inMembersWorld() && Inventory.getCount("Brimhaven teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Brimhaven teleport") > 0,
             () -> RSItemHelper.click("Brimhaven t.*", "Break")
     ),
 
     POLLNIVNEACH_TELEPORT_TAB(
             35, new RSTile(3340, 3004, 0),
-            () -> inMembersWorld() && Inventory.getCount("Pollnivneach teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Pollnivneach teleport") > 0,
             () -> RSItemHelper.click("Pollnivneach t.*", "Break")
     ),
 
     YANILLE_TELEPORT_TAB(
             35, new RSTile(2544, 3095, 0),
-            () -> inMembersWorld() && Inventory.getCount("Yanille teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Yanille teleport") > 0,
             () -> RSItemHelper.click("Yanille t.*", "Break")
     ),
 
     HOSIDIUS_TELEPORT_TAB(
             35, new RSTile(1744, 3517, 0),
-            () -> inMembersWorld() && Inventory.getCount("Hosidius teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Hosidius teleport") > 0,
             () -> RSItemHelper.click("Hosidius t.*", "Break")
     ),
 
@@ -511,10 +514,9 @@ public enum Teleport {
 
     SALVE_GRAVEYARD_TAB(
             35, new RSTile(3432, 3460, 0),
-            () -> inMembersWorld() && Inventory.getCount("Salve graveyard teleport") > 0,
+            () -> inMembersWorld() && PInventory.getCount("Salve graveyard teleport") > 0,
             () -> RSItemHelper.click("Salve graveyard t.*", "Break")
     )
-
     ;
     private int moveCost;
     private RSTile location;
@@ -612,47 +614,35 @@ public enum Teleport {
     private interface Action {
         boolean trigger();
     }
-    private static boolean value = false;
-
-    private static int lastWorldChecked = -1;
 
     private static boolean inMembersWorld() {
-        int current = WorldHopper.getWorld();
-        if(lastWorldChecked == current)
-            return value;
-        lastWorldChecked = current;
-        value = WorldHelper.isMember(Game.getCurrentWorld());
-        return value;
+        return PUtils.isMembersWorld();
     }
 
-    private static Predicate<RSItem> notNotedFilter() {
-        return rsItem -> rsItem.getDefinition() != null && !rsItem.getDefinition().isNoted();
+    private static Predicate<PItem> notNotedFilter() {
+        return itm -> itm.getDefinition() != null && itm.getDefinition().getNote() == -1;
     }
 
     private static boolean itemAction(String name, String... actions) {
-        RSItem[] items = Inventory.find(name);
-        if (items.length == 0) {
-            return false;
-        }
-        return items[0].click(actions);
+        PItem item = PInventory.findItem(Filters.Items.nameEquals(name));
+        return PInteraction.item(item, actions);
     }
 
-
-
-    private static boolean teleportWithScrollInterface(Predicate<RSItem> itemFilter, String regex){
-        ArrayList<RSItem> items = new ArrayList<>();
-        items.addAll(Arrays.asList(Inventory.find(itemFilter)));
-        items.addAll(Arrays.asList(Equipment.find(itemFilter)));
+    private static boolean teleportWithScrollInterface(Predicate<PItem> itemFilter, String regex){
+        ArrayList<PItem> items = new ArrayList<>();
+        items.addAll(PInventory.findAllItems(itemFilter));
+        items.addAll(PInventory.findAllEquipmentItems(itemFilter));
 
         if (items.size() == 0) {
             return false;
         }
 
-        if(!Interfaces.isInterfaceSubstantiated(TeleportConstants.SCROLL_INTERFACE_MASTER)){
-            RSItem teleportItem = items.get(0);
-            if (!RSItemHelper.clickMatch(teleportItem, "(Rub|Teleport|" + regex + ")") ||
-                    !Timing.waitCondition(() -> Interfaces.isInterfaceSubstantiated(
-                            TeleportConstants.SCROLL_INTERFACE_MASTER),2500)) {
+        if(!PWidgets.isSubstantiated(TeleportConstants.SCROLL_INTERFACE_MASTER)){
+            PItem teleportItem = items.get(0);
+            if (!RSItemHelper.clickMatch(teleportItem, "(Rub|Teleport|" + regex + ")")
+                    || WaitFor.condition(2500,
+                    () -> PWidgets.isSubstantiated(TeleportConstants.SCROLL_INTERFACE_MASTER) ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE)
+                    != WaitFor.Return.SUCCESS) {
                 return false;
             }
         }
@@ -661,32 +651,28 @@ public enum Teleport {
     }
 
     private static boolean handleScrollInterface(String regex){
-        RSInterface box = Interfaces.get(187, 3);
-        if(box == null)
-            return false;
+        RSInterface box = new RSInterface(PWidgets.get(187, 3));
+        if(box == null || box.getWidget() == null) return false;
+
         RSInterface[] children = box.getChildren();
         if(children == null)
             return false;
-        for(RSInterface child:children){
+        for(RSInterface child : children){
             String txt = child.getText();
-            if(txt != null && General.stripFormatting(txt).matches(regex)){
-                Keyboard.typeString(General.stripFormatting(txt).substring(0,1));
+            if(txt != null && txt.matches(regex)){
+                Keyboard.typeString(txt.substring(0,1));
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean selectSpell(String spellName, String action){
-        if(!GameTab.TABS.MAGIC.open()){
-            return false;
+    public static boolean castSpell(String spellName, String action){
+        WidgetInfo spellWidgetInfo = Spells.getWidget(spellName);
+        if (PWidgets.isValid(spellWidgetInfo)) {
+            return PInteraction.widget(PWidgets.get(spellWidgetInfo), action);
         }
-        List<RSInterface> spells = InterfaceHelper.getAllInterfaces(TeleportConstants.SPELLBOOK_INTERFACE_MASTER);
-        RSInterface target = spells.stream().filter(spell -> {
-            String name = spell.getComponentName();
-            return name != null && name.contains(spellName) && !spell.isHidden();
-        }).findFirst().orElse(null);
-        return target != null && target.click(action);
+        return false;
     }
 
     private static boolean hasBeenToZeah(){

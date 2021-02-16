@@ -123,7 +123,7 @@ public class PInventory
     }
     */
 
-    public static List<PItem> getAllPItems(){
+    public static List<PItem> getAllItems(){
        return PUtils.clientOnly(() -> {
             Widget inventoryWidget = PUtils.getClient().getWidget(WidgetInfo.INVENTORY);
             if (inventoryWidget == null) return null;
@@ -136,22 +136,33 @@ public class PInventory
         }, "getAllPItems");
     }
 
-    public static List<PItem> findAllPItems(Predicate<PItem> filter){
-        return getAllPItems()
+    public static int getCount(String name){
+        int count = 0;
+        List<PItem> items = getAllItems();
+        for (PItem i : items){
+            if (i.getDefinition().getName().equals(name)) {
+                count += i.getQuantity();
+            }
+        }
+        return count;
+    }
+
+    public static List<PItem> findAllItems(Predicate<PItem> filter){
+        return getAllItems()
                 .stream()
                 .filter(filter)
                 .collect(Collectors.toList());
     }
 
-    public static PItem findPItem(Predicate<PItem> filter){
-        return getAllPItems()
+    public static PItem findItem(Predicate<PItem> filter){
+        return getAllItems()
                 .stream()
                 .filter(filter)
                 .findFirst()
                 .orElse(null);
     }
 
-    public static List<PItem> getEquipmentPItems(){
+    public static List<PItem> getEquipmentItems(){
         return PUtils.clientOnly(() -> {
             ItemContainer container = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT);
             if (container == null) return null;
@@ -164,15 +175,15 @@ public class PInventory
         }, "getEquippedPItems");
     }
 
-    public static List<PItem> findAllEquipmentPItems(Predicate<PItem> filter){
-        return getEquipmentPItems()
+    public static List<PItem> findAllEquipmentItems(Predicate<PItem> filter){
+        return getEquipmentItems()
                 .stream()
                 .filter(filter)
                 .collect(Collectors.toList());
     }
 
-    public static PItem findEquipmentPItem(Predicate<PItem> filter){
-        return getEquipmentPItems()
+    public static PItem findEquipmentItem(Predicate<PItem> filter){
+        return getEquipmentItems()
                 .stream()
                 .filter(filter)
                 .findFirst()

@@ -85,16 +85,13 @@ public class WaitFor {
     }
 
     public static Return milliseconds(int low, int high){
-        try {
-            Thread.sleep(random(low, high));
-        } catch (InterruptedException e){
-            throw new IllegalStateException("Break out");
-        }
+        PUtils.sleepNormal(low, high);
         return Return.IGNORE;
     }
 
     public static Return milliseconds(int amount){
-        return milliseconds(amount, amount);
+        PUtils.sleep(amount);
+        return Return.IGNORE;
     }
 
 

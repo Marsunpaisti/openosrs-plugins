@@ -3,10 +3,8 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navi
 
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ItemDefinition;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PObjects;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
@@ -20,10 +18,11 @@ import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engin
 import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.letters.SecondLetter.*;
 import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.letters.ThirdLetter.*;
 
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Filters;
+import net.runelite.client.plugins.paistisuite.api.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSVarBit;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -46,25 +45,22 @@ public class FairyRing {
     }
 
     public static boolean takeFairyRing(Locations location){
-        var ringSearch = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
+        PTileObject ring = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
 
-        if (ringSearch == null) {
+        if (ring == null) {
             log.error("Unable to find fairy ring!");
             return false;
         }
 
-        ring = ringSearch.getFirst();
         if(location == null)
             return false;
-
-        if (ring == null) return false;
 
         boolean staffEquipped = PInventory.getEquippedItems()
                 .stream()
                 .anyMatch(item -> item.getId() == DRAMEN_STAFFS[0] || item.getId() == DRAMEN_STAFFS[1]);
 
         if (RSVarBit.get(ELITE_DIARY_VARBIT).getValue() == 0 && !staffEquipped){
-            Pair<WidgetItem, ItemDefinition> staff = PInventory.getAllItemsWithDefs()
+            PItem staff = PInventory.getAllItems()
                     .stream()
                     .filter(pair -> pair.getSecond().getId() == DRAMEN_STAFFS[0] || pair.getSecond().getId() == DRAMEN_STAFFS[1])
                     .findFirst()
@@ -98,7 +94,7 @@ public class FairyRing {
     }
 
     private static boolean hasCachedLocation(Locations location){
-        TileObject ring = PObjects.getAllObjectsWithDefs()
+        TileObject ring = PObjects.getAllObjects()
                 .stream()
                 .filter(pair -> pair.getSecond().getName().equals("Fairy ring"))
                 .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 25)
@@ -106,14 +102,14 @@ public class FairyRing {
                                     .filter(Objects::nonNull)
                                     .anyMatch(a -> a.equals(location.toString())))
                 .findFirst()
-                .map(Pair::getFirst).orElse(null);
+                .map(PTileObject::getFirst)
+                .orElse(null);
 
         return ring != null;
     }
 
     private static boolean takeLastDestination(Locations location){
-        var ringSearch = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
-        if (ringSearch != null) ring = ringSearch.getFirst();
+        PTileObject ring = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
         final WorldPoint startPos = PPlayer.location();
         return InteractionHelper.click(ring,"Last-destination (" + location + ")") &&
                 WaitFor.condition(8000, () -> startPos.distanceToHypotenuse(PPlayer.location()) > 20? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
@@ -125,8 +121,8 @@ public class FairyRing {
     }
 
     private static boolean openFairyRing(){
-        var ringSearch = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
-        if (ringSearch != null) ring = ringSearch.getFirst();
+        PTileObject ring = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
+        if (ring == null) return false;
         return InteractionHelper.click(ring,"Configure") &&
                 WaitFor.condition(10000, () -> PWidgets.isSubstantiated(INTERFACE_MASTER) ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
     }

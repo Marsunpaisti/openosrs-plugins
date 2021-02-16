@@ -3,14 +3,9 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.inte
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.queries.NPCQuery;
-import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.plugins.paistisuite.api.PInventory;
-import net.runelite.client.plugins.paistisuite.api.PObjects;
-import net.runelite.client.plugins.paistisuite.api.PPlayer;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.BFS;
@@ -19,6 +14,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.RealTimeCollisionTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSVarBit;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 import javax.inject.Singleton;
 import java.util.*;
@@ -52,7 +48,7 @@ public class PathObjectHandler {
         WEB("Web", "Slash", null, new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PObjects.getAllObjectsWithDefs()
+                return PObjects.getAllObjects()
                         .stream()
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
@@ -65,7 +61,7 @@ public class PathObjectHandler {
         ROCKFALL("Rockfall", "Mine", null, new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PObjects.getAllObjectsWithDefs()
+                return PObjects.getAllObjects()
                         .stream()
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
@@ -79,7 +75,7 @@ public class PathObjectHandler {
         ROOTS("Roots", "Chop", null, new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PObjects.getAllObjectsWithDefs()
+                return PObjects.getAllObjects()
                         .stream()
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
@@ -93,7 +89,7 @@ public class PathObjectHandler {
         ROCK_SLIDE("Rockslide", "Climb-over", null, new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PObjects.getAllObjectsWithDefs()
+                return PObjects.getAllObjects()
                         .stream()
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
@@ -107,7 +103,7 @@ public class PathObjectHandler {
         ROOT("Root", "Step-over", null, new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PObjects.getAllObjectsWithDefs()
+                return PObjects.getAllObjects()
                         .stream()
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
@@ -121,7 +117,7 @@ public class PathObjectHandler {
         BRIMHAVEN_VINES("Vines", "Chop-down", null, new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PObjects.getAllObjectsWithDefs()
+                return PObjects.getAllObjects()
                         .stream()
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
@@ -252,7 +248,7 @@ public class PathObjectHandler {
     public static boolean handle(PathAnalyzer.DestinationDetails destinationDetails, List<RSTile> path){
         RealTimeCollisionTile start = destinationDetails.getDestination(), end = destinationDetails.getNextTile();
 
-        List<Pair<TileObject, ObjectDefinition>> interactiveObjects = null;
+        List<PTileObject> interactiveObjects = null;
 
         String action = null;
         SpecialObject specialObject = SpecialObject.getValidSpecialObjects(destinationDetails);
@@ -262,7 +258,7 @@ public class PathObjectHandler {
             }
         } else {
             action = specialObject.getAction();
-            Predicate<Pair<TileObject, ObjectDefinition>> specialObjectFilter = (Pair<TileObject, ObjectDefinition> objDefPair) -> {
+            Predicate<PTileObject> specialObjectFilter = (PTileObject objDefPair) -> {
                     ObjectDefinition def = objDefPair.getSecond();
                     if (def == null) return false;
                     return def.getName().equals(specialObject.getName()) &&
@@ -278,7 +274,7 @@ public class PathObjectHandler {
             interactiveObjects = Objects.findNearest(15, specialObjectFilter);
              */
             Client client = PUtils.getClient();
-            interactiveObjects = PObjects.getAllObjectsWithDefs()
+            interactiveObjects = PObjects.getAllObjects()
                     .stream()
                     .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 15)
                     .filter(specialObjectFilter)
@@ -297,7 +293,7 @@ public class PathObjectHandler {
         return handle(path, interactiveObjects.get(0), destinationDetails, action, specialObject);
     }
 
-    private static boolean handle(List<RSTile> path, Pair<TileObject, ObjectDefinition> objDefPair, PathAnalyzer.DestinationDetails destinationDetails, String action, SpecialObject specialObject){
+    private static boolean handle(List<RSTile> path, PTileObject objDefPair, PathAnalyzer.DestinationDetails destinationDetails, String action, SpecialObject specialObject){
         PathAnalyzer.DestinationDetails current = PathAnalyzer.furthestReachableTile(path);
         WalkerEngine.getInstance().debugFurthestReachable = current;
 
@@ -327,7 +323,7 @@ public class PathObjectHandler {
             Client client = PUtils.getClient();
             switch (specialObject){
                 case WEB:
-                    List<Pair<TileObject, ObjectDefinition>> webs = PObjects.getAllObjectsWithDefs()
+                    List<PTileObject> webs = PObjects.getAllObjects()
                             .stream()
                             .filter(pair -> pair.getFirst().getWorldLocation().equals(objDefPair.getFirst().getWorldLocation()))
                             .filter(pair -> Arrays.asList(pair.getSecond().getActions())
@@ -336,11 +332,10 @@ public class PathObjectHandler {
                             .collect(Collectors.toList());
                     int iterations = 0;
                     while (webs.size() > 0){
-                        TileObject web = webs.get(0).getFirst();
                         if (canLeftclickWeb()) {
-                            InteractionHelper.click(web, "Slash");
+                            InteractionHelper.click(webs.get(0), "Slash");
                         } else {
-                            useBladeOnWeb(web);
+                            useBladeOnWeb(webs.get(0));
                         }
 
                         /*
@@ -349,12 +344,12 @@ public class PathObjectHandler {
                         }
                          */
 
-                        if (web.getWorldLocation().distanceTo(PPlayer.location()) <= 1) {
+                        if (webs.get(0).getWorldLocation().distanceTo(PPlayer.location()) <= 1) {
                             WaitFor.milliseconds((int)PUtils.randomNormal(50, 800, 250, 150));
                         } else {
                             WaitFor.milliseconds(2000, 4000);
                         }
-                        webs = PObjects.getAllObjectsWithDefs()
+                        webs = PObjects.getAllObjects()
                                 .stream()
                                 .filter(pair -> pair.getFirst().getWorldLocation().equals(objDefPair.getFirst().getWorldLocation()))
                                 .filter(pair -> Arrays.stream(pair.getSecond().getActions())
@@ -471,9 +466,9 @@ public class PathObjectHandler {
         return true;
     }
 
-    public static List<Pair<TileObject, ObjectDefinition>> getInteractiveObjects(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
+    public static List<PTileObject> getInteractiveObjects(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
         Client client = PUtils.getClient();
-        List<Pair<TileObject, ObjectDefinition>> objects = PObjects.getAllObjectsWithDefs()
+        List<PTileObject> objects = PObjects.getAllObjects()
                 .stream()
                 .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 25)
                 .filter(interactiveObjectFilter(x, y, z, destinationDetails))
@@ -532,9 +527,9 @@ public class PathObjectHandler {
      * @param destinationDetails context where destination is at
      * @return
      */
-    private static Predicate<Pair<TileObject, ObjectDefinition>> interactiveObjectFilter(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
+    private static Predicate<PTileObject> interactiveObjectFilter(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
         final WorldPoint position = new WorldPoint(x, y, z);
-        return (Pair<TileObject, ObjectDefinition> pair) -> {
+        return (PTileObject pair) -> {
             ObjectDefinition def = pair.getSecond();
             if (def == null){
                 return false;
@@ -588,21 +583,33 @@ public class PathObjectHandler {
         return options;
     }
 
-    private static boolean clickOnObject(Pair<TileObject, ObjectDefinition> objDefPair, String... options){
+    private static boolean clickOnObject(PTileObject obj, String... options){
         boolean result;
 
-        if (isClosedTrapDoor(objDefPair, options)){
-            result = handleTrapDoor(objDefPair.getFirst());
+        if (isClosedTrapDoor(obj, options)){
+            result = handleTrapDoor(obj);
         } else {
-            result = InteractionHelper.click(objDefPair.getFirst(), options);
-            log.info("Interacting with (" +  objDefPair.getSecond().getName() + ") at " + objDefPair.getFirst().getWorldLocation() + " with options: " + Arrays.toString(options) + " " + (result ? "SUCCESS" : "FAIL"));
-            WaitFor.milliseconds(500,2500);
+            result = InteractionHelper.click(obj, options);
+            log.info("Interacting with (" +  obj.getSecond().getName() + ") at " + obj.getFirst().getWorldLocation() + " with options: " + Arrays.toString(options) + " " + (result ? "SUCCESS" : "FAIL"));
+            if ( obj.getWorldLocation().distanceTo(PPlayer.location()) > 1){
+                // Wait for movement start
+                WaitFor.condition(PUtils.random(100, 300), () -> PPlayer.isMoving() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+                log.info("Move started");
+                // Wait for movement to end
+                WaitFor.condition(PUtils.random(2500, 4000), () -> !PPlayer.isMoving() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+                log.info("Move stopped");
+            }
+
+            // Wait a little bit more for any animations to end
+            WaitFor.milliseconds(700, 1500);
+            log.info("hard waited");
+
         }
 
         return result;
     }
 
-    private static boolean isStrongholdDoor(Pair<TileObject, ObjectDefinition> object){
+    private static boolean isStrongholdDoor(PTileObject object){
         List<String> doorNames = Arrays.asList("Gate of War", "Rickety door", "Oozing barrier", "Portal of Death");
         return  doorNames.contains( object.getSecond().getName());
     }
@@ -657,15 +664,15 @@ public class PathObjectHandler {
     }
 
 
-    private static boolean isClosedTrapDoor(Pair<TileObject, ObjectDefinition> object, String[] options){
+    private static boolean isClosedTrapDoor(PTileObject object, String[] options){
         return  (object.getSecond().getName().equals("Trapdoor") && Arrays.asList(options).contains("Open"));
     }
 
-    private static boolean handleTrapDoor(TileObject object){
+    private static boolean handleTrapDoor(PTileObject object){
         Client client = PUtils.getClient();
         if (getActions(object).contains("Open")){
             if (!InteractionHelper.click(object, "Open", () -> {
-                var result = PObjects.getAllObjectsWithDefs().stream()
+                var result = PObjects.getAllObjects().stream()
                         .filter(
                                 pair -> Arrays.asList(pair.getSecond().getActions())
                                         .stream()
@@ -682,7 +689,7 @@ public class PathObjectHandler {
             })){
                 return false;
             } else {
-                var result = PObjects.getAllObjectsWithDefs().stream()
+                var result = PObjects.getAllObjects().stream()
                         .filter(
                                 pair -> Arrays.asList(pair.getSecond().getActions())
                                         .stream()
@@ -691,19 +698,19 @@ public class PathObjectHandler {
                         )
                         .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(object.getWorldLocation()) <= 2)
                         .collect(Collectors.toList());
-                return result.size() > 0 && handleTrapDoor(result.get(0).getFirst());
+                return result.size() > 0 && handleTrapDoor(result.get(0));
             }
         }
-        log.info("Interacting with (" + PObjects.getObjectDef(object).getName() + ") at " + object.getWorldLocation() + " with option: Climb-down");
+        log.info("Interacting with (" + object.getDef().getName() + ") at " + object.getWorldLocation() + " with option: Climb-down");
         return InteractionHelper.click(object, "Climb-down");
     }
 
-    public static List<String> getActions(TileObject object){
+    public static List<String> getActions(PTileObject object){
         List<String> list = new ArrayList<>();
         if (object == null){
             return list;
         }
-        ObjectDefinition objectDefinition = PObjects.getObjectDef(object);
+        ObjectDefinition objectDefinition = object.getDef();
         if (objectDefinition == null){
             return list;
         }
@@ -718,7 +725,7 @@ public class PathObjectHandler {
 
     private static boolean canLeftclickWeb(){
         RSVarBit weaponType = RSVarBit.get(357);
-        boolean haveKnife = PInventory.getAllItemsWithDefs()
+        boolean haveKnife = PInventory.getAllItems()
                 .stream()
                 .filter(pair -> pair.getSecond().getName().contains("Knife"))
                 .collect(Collectors.toList())
@@ -726,14 +733,14 @@ public class PathObjectHandler {
         return (weaponType != null && SLASH_WEAPONS.contains(weaponType.getValue())) || haveKnife;
     }
 
-    private static boolean useBladeOnWeb(TileObject web){
+    private static boolean useBladeOnWeb(PTileObject web){
         List<String> slashItemNames = Arrays.asList("whip", "sword", "dagger", "claws", "scimitar", " axe", "knife", "halberd", "machete", "rapier");
-        var slashItems = PInventory.getAllItemsWithDefs()
+        var slashItems = PInventory.getAllItems()
                 .stream()
                 .filter(pair -> slashItemNames.stream().anyMatch(slashItemName -> pair.getSecond().getName().contains(slashItemName)))
                 .collect(Collectors.toList());
         if(slashItems == null || slashItems.size() == 0) return false;
-        return InteractionHelper.useItemOnObject(slashItems.get(0).getFirst(), web);
+        return InteractionHelper.useItemOnObject(slashItems.get(0), web);
     }
 
 }

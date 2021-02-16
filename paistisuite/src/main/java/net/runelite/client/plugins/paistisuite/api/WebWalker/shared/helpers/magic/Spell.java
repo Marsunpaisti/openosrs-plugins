@@ -6,6 +6,8 @@ import net.runelite.api.Skill;
 import net.runelite.client.plugins.paistisuite.api.PSkills;
 import net.runelite.client.plugins.paistisuite.api.PVars;
 
+import static net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.Teleport.castSpell;
+
 public enum Spell implements Validatable {
 
     VARROCK_TELEPORT    (SpellBook.Type.STANDARD, 25, "Varrock Teleport",    new Pair<>(1, RuneElement.LAW), new Pair<>(3, RuneElement.AIR),     new Pair<>(1, RuneElement.FIRE)),
@@ -38,9 +40,7 @@ public enum Spell implements Validatable {
     }
 
     public boolean cast() {
-        return true;
-        // TODO:
-       // return canUse() && Magic.selectSpell(getSpellName());
+        return canUse() && castSpell(getSpellName(), "Cast");
     }
 
     @Override

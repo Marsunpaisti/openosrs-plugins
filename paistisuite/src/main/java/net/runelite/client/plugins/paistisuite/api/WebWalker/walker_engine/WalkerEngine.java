@@ -3,9 +3,12 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.client.plugins.paistisuite.api.PBanking;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.Teleport;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.PathFindingNode;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.BFS;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.PathObjectHandler;
@@ -65,14 +68,12 @@ public class WalkerEngine{
             return false;
         }
 
-        /* TODO:
-        if (!handleTeleports(path)) {
-            log.warn("Failed to handle teleports...");
-            return false;
+        if (DaxWalker.getInstance().allowTeleports) {
+            if (!handleTeleports(path)) {
+                log.warn("Failed to handle teleports...");
+                return false;
+            }
         }
-
-        */
-
 
         navigating = true;
         currentPath = path;
@@ -298,24 +299,25 @@ public class WalkerEngine{
         }
     }
 
-    /* TODO:
-    private boolean handleTeleports(List<WorldPoint> path) {
-        WorldPoint startPosition = path.get(0);
-        WorldPoint playerPosition = PPlayer.location();
-        if(startPosition.equals(playerPosition))
-            return true;
-        if(MBanking.isBankOpen()) MBanking.closeBank();
+    private boolean handleTeleports(List<RSTile> path) {
+        RSTile startPosition = path.get(0);
+        RSTile playerPosition = new RSTile(PPlayer.location());
+        if(startPosition.equals(playerPosition)) return true;
+        if (PBanking.isBankOpen()){
+            PBanking.closeBank();
+            return WaitFor.condition(2000, () -> !PBanking.isBankOpen() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
+        }
         for (Teleport teleport : Teleport.values()) {
             if (!teleport.getRequirement().satisfies()) continue;
             if(teleport.isAtTeleportSpot(startPosition) && !teleport.isAtTeleportSpot(playerPosition)){
                 log.info("Using teleport method: " + teleport);
                 teleport.trigger();
                 return WaitFor.condition(PUtils.random(3000, 20000),
-                        () -> startPosition.distanceToHypotenuse(PPlayer.location()) < 10 ?
+                        () -> startPosition.distanceToDouble(new RSTile(PPlayer.location())) < 10 ?
                                 WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
             }
         }
         return true;
     }
-    */
+
 }
