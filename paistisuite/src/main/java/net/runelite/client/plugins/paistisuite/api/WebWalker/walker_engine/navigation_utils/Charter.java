@@ -56,7 +56,7 @@ public class Charter{
         boolean widgetValid = PUtils.getClient().getWidget(CHARTER_INTERFACE_MASTER, 0) != null;
         if (widgetValid) return true;
         NPC charterNpc = new NPCQuery()
-                .filter(npc -> Arrays.stream(npc.getDefinition().getActions())
+                .filter(npc -> Arrays.stream(npc.getTransformedDefinition().getActions())
                             .filter(Objects::nonNull)
                             .anyMatch(a -> a.equalsIgnoreCase("Charter")))
                 .result(PUtils.getClient())
@@ -68,7 +68,7 @@ public class Charter{
 
     private static HashMap<LocationProperty, Location> getCharterLocations(){
         HashMap<LocationProperty, Location> locations = new HashMap<>();
-        InterfaceHelper.getAllInterfaces(CHARTER_INTERFACE_MASTER).stream().filter(
+        InterfaceHelper.getAllChildren(CHARTER_INTERFACE_MASTER).stream().filter(
                 rsInterface -> rsInterface != null
                         && rsInterface.getWidget().getFontId() == 495
                         && !rsInterface.getWidget().isHidden()

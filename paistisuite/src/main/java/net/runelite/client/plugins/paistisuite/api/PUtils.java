@@ -10,10 +10,14 @@ import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
+import net.runelite.client.plugins.paistisuite.framework.ClientFuture;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
 import java.awt.*;
 import java.util.EnumSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
@@ -88,12 +92,18 @@ public class PUtils {
         do {
             if (attempts >= 10) {
                 log.error("Had to fallback to clamping in randomNormal!");
+                log.error("Min: " + min + " Max: " + max + " Dev: " + deviation + " mean: " + mean);
                 return Math.round(clamp(ThreadLocalRandom.current().nextGaussian() * deviation + mean, min, max));
             }
             result = Math.round(ThreadLocalRandom.current().nextGaussian() * deviation + mean);
             attempts++;
         } while ( result < min || result > max);
         return result;
+    }
+
+    public static long randomNormal(int min, int max)
+    {
+        return randomNormal(min, max, (max-min)/6d, min + (max-min)/2d);
     }
 
     public static void sleep(int time){
@@ -119,6 +129,24 @@ public class PUtils {
     public static boolean isMembersWorld(){
         EnumSet<WorldType> types = PUtils.getClient().getWorldType();
         return types.contains(WorldType.MEMBERS);
+    }
+
+    public static boolean isClientThread(){
+        return PUtils.getClient().isClientThread();
+    }
+
+    public static <T> T clientOnly(@NotNull Callable<T> task, String name){
+        try {
+            if (PUtils.isClientThread()){
+                return task.call();
+            }
+
+            return PaistiSuite.getInstance().clientExecutor.scheduleAndWait(task, name);
+        } catch (Exception e){
+            log.error("Exception in " + name);
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static void sendGameMessage(String message){

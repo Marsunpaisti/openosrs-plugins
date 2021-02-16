@@ -77,7 +77,7 @@ public class RSTile {
     }
 
     public boolean isInMinimap(){
-        return new RSTile(PPlayer.location()).distanceToDouble(this) <= 14;
+        return new RSTile(PPlayer.location()).distanceToDouble(this) <= 17;
     }
 
     public boolean isWithinDistance(double distance){
@@ -94,9 +94,15 @@ public class RSTile {
 
     @Override
     public boolean equals(Object o){
-        assert (o instanceof RSTile);
-        if (!(o instanceof RSTile)) return false;
-        RSTile other = ((RSTile)o);
-        return other.getX() == getX() && other.getY() == getY() && other.getPlane() == getPlane() && other.getType() == getType();
+        if ((o instanceof RSTile)) {
+            RSTile other = (RSTile)o;
+            return other.getX() == getX() && other.getY() == getY() && other.getPlane() == getPlane() && other.getType() == getType();
+        }
+        if ((o instanceof WorldPoint)) {
+            RSTile other = new RSTile((WorldPoint)o);
+            return other.getX() == getX() && other.getY() == getY() && other.getPlane() == getPlane() && other.getType() == getType();
+        }
+
+        return false;
     }
 }

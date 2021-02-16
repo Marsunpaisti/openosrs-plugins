@@ -12,6 +12,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.inter
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.PathAnalyzer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.Charter;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.NavigationSpecialCase;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.ShipUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.RealTimeCollisionTile;
@@ -27,9 +28,11 @@ public class WalkerEngine{
     private static WalkerEngine walkerEngine;
     private static Client client = PUtils.getClient();
     private int attemptsForAction;
+    private int clickAfterSteps = (int)PUtils.randomNormal(5, 10);
     private final int failThreshold;
     private boolean navigating;
     private List<RSTile> currentPath;
+    public PathAnalyzer.DestinationDetails debugFurthestReachable = null;
 
     public static WalkerEngine getInstance(){
         return walkerEngine != null ? walkerEngine : (walkerEngine = new WalkerEngine());
@@ -88,7 +91,7 @@ public class WalkerEngine{
                         log.info("Failed to exit ship via gangplank.");
                         failedAttempt();
                     }
-                    WaitFor.milliseconds(50);
+                    WaitFor.milliseconds(50, 250);
                     continue;
                 }
 
@@ -99,6 +102,7 @@ public class WalkerEngine{
                 }
 
                 destinationDetails = PathAnalyzer.furthestReachableTile(path);
+                debugFurthestReachable = destinationDetails;
                 if (destinationDetails == null) {
                     log.info("Could not grab destination details.");
                     failedAttempt();
@@ -113,13 +117,14 @@ public class WalkerEngine{
                 }
 
                 final RealTimeCollisionTile destination = currentNode;
-                if (destination.getRSTile().toWorldPoint().distanceToHypotenuse(PPlayer.location()) > 19) {
+                if (!destination.getRSTile().isInMinimap()) {
                     log.info("Closest tile in path is not in minimap: " + destination);
                     failedAttempt();
                     continue;
                 }
 
                 CustomConditionContainer conditionContainer = new CustomConditionContainer(walkingCondition);
+                log.info(destinationDetails.toString());
                 switch (destinationDetails.getState()) {
                     case DISCONNECTED_PATH:
                         if (currentNode.getRSTile().toWorldPoint().distanceToHypotenuse(PPlayer.location()) > 10){
@@ -127,11 +132,11 @@ public class WalkerEngine{
                             WaitFor.milliseconds(1200, 3400);
                         }
 
-                        /* TODO:
-                        NavigationSpecialCase.SpecialLocation specialLocation = NavigationSpecialCase.getLocation(currentNode.getWorldPoint()),
-                                specialLocationDestination = NavigationSpecialCase.getLocation(assumedNext);
+
+                        NavigationSpecialCase.SpecialLocation specialLocation = NavigationSpecialCase.getLocation(currentNode.getRSTile());
+                        NavigationSpecialCase.SpecialLocation specialLocationDestination = NavigationSpecialCase.getLocation(assumedNext);
                         if (specialLocation != null && specialLocationDestination != null) {
-                            log.info(("[SPECIAL LOCATION] We are at " + specialLocation + " and our destination is " + specialLocationDestination);
+                            log.info("[SPECIAL LOCATION] We are at " + specialLocation + " and our destination is " + specialLocationDestination);
                             if (!NavigationSpecialCase.handle(specialLocationDestination)) {
                                 failedAttempt();
                             } else {
@@ -139,8 +144,6 @@ public class WalkerEngine{
                             }
                             break;
                         }
-
-                         */
 
 
                         Charter.LocationProperty locationProperty = Charter.LocationProperty.getLocation(currentNode.getRSTile());
@@ -158,7 +161,7 @@ public class WalkerEngine{
                         //DO NOT BREAK OUT
                     case OBJECT_BLOCKING:
                         RSTile walkingTile = Reachable.getBestWalkableTile(destination.getRSTile(), new Reachable());
-                        if (isDestinationClose(destination) || (walkingTile != null ? AccurateMouse.clickMinimap(walkingTile) : clickMinimap(destination))) {
+                        if (isDestinationClose(destination) || (walkingTile != null ? AccurateMouse.walkTo(walkingTile) : clickMinimap(destination))) {
                             log.info("Handling Object...");
                             if (!PathObjectHandler.handle(destinationDetails, path)) {
                                 failedAttempt();
@@ -171,7 +174,7 @@ public class WalkerEngine{
 
                     case FURTHEST_CLICKABLE_TILE:
                         if (clickMinimap(currentNode)) {
-                            long offsetWalkingTimeout = System.currentTimeMillis() + PUtils.random(2500, 4000);
+                            long offsetWalkingTimeout = System.currentTimeMillis() + PUtils.random(3000, 4500);
                             WaitFor.condition(10000, () -> {
                                 switch (conditionContainer.trigger()) {
                                     case EXIT_OUT_WALKER_SUCCESS:
@@ -180,6 +183,7 @@ public class WalkerEngine{
                                 }
 
                                 PathAnalyzer.DestinationDetails furthestReachable = PathAnalyzer.furthestReachableTile(path);
+                                debugFurthestReachable = furthestReachable;
                                 PathFindingNode currentDestination = BFS.bfsClosestToPath(path, RealTimeCollisionTile.get(destination.getX(), destination.getY(), destination.getZ()));
                                 if (currentDestination == null) {
                                     log.info("Could not walk to closest tile in path.");
@@ -200,7 +204,8 @@ public class WalkerEngine{
                                     return WaitFor.Return.FAIL;
                                 }
                                 int indexNextDestination = path.indexOf(furthestReachable.getDestination().getRSTile());
-                                if (indexNextDestination - indexCurrentDestination > 5 || indexCurrentDestination - indexCurrentPosition < 5) {
+                                if (indexNextDestination - indexCurrentDestination > clickAfterSteps || indexCurrentDestination - indexCurrentPosition < 5) {
+                                    clickAfterSteps = (int)PUtils.randomNormal(5, 10);
                                     return WaitFor.Return.SUCCESS;
                                 }
                                 if (System.currentTimeMillis() > offsetWalkingTimeout && !PPlayer.isMoving()){
@@ -254,8 +259,8 @@ public class WalkerEngine{
             return false;
         }
 
-        log.info("Randomize(" + pathFindingNode.getX() + "," + pathFindingNode.getY() + "," + pathFindingNode.getZ() + ") -> (" + randomNearby.getX() + "," + randomNearby.getY() + "," + randomNearby.getZ() + ")");
-        return AccurateMouse.clickMinimap(new RSTile(randomNearby.getX(), randomNearby.getY(), randomNearby.getZ())) || AccurateMouse.clickMinimap(new RSTile(pathFindingNode.getX(), pathFindingNode.getY(), pathFindingNode.getZ()));
+        //log.info("Randomize(" + pathFindingNode.getX() + "," + pathFindingNode.getY() + "," + pathFindingNode.getZ() + ") -> (" + randomNearby.getX() + "," + randomNearby.getY() + "," + randomNearby.getZ() + ")");
+        return AccurateMouse.walkTo(new RSTile(randomNearby.getX(), randomNearby.getY(), randomNearby.getZ())) || AccurateMouse.walkTo(new RSTile(pathFindingNode.getX(), pathFindingNode.getY(), pathFindingNode.getZ()));
     }
 
     private boolean resetAttempts(){

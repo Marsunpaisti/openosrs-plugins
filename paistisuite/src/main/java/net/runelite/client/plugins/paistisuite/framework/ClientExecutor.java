@@ -15,6 +15,7 @@ public class ClientExecutor{
     @Inject
     private Client client;
 
+    private boolean debug = false;
     BlockingQueue<Runnable> scheduledTasks = new LinkedBlockingQueue<Runnable>();
     BlockingQueue<String> scheduledTasksNames = new LinkedBlockingQueue<String>();
 
@@ -76,7 +77,7 @@ public class ClientExecutor{
             tasksRan++;
             ranTasks.merge(taskName, 1, Integer::sum);
         }
-        if (tasksRan > 0){
+        if (tasksRan > 0 && debug){
             StringBuilder message = new StringBuilder();
             message.append("Ran " + tasksRan + " tasks.");
             ranTasks.forEach((key, val) -> {
@@ -102,7 +103,7 @@ public class ClientExecutor{
         if (scheduledTasks.size() > 0){
             scheduledTasks.poll().run();
             String taskName = scheduledTasksNames.poll();
-            log.info("Ran task: " + taskName);
+            if (debug) log.info("Ran task: " + taskName);
             return true;
         }
         return false;

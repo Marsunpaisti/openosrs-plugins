@@ -3,6 +3,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.inte
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.PWidgets;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
@@ -34,20 +35,15 @@ public class DoomsToggle {
         }
     }
 
-    public static void handle(int parentInterface, String... option){
-        /*
-        if (!Interfaces.isInterfaceSubstantiated(parentInterface)){
-            return;
-        } */
-        if (client.getWidget(parentInterface, 0) == null || client.getWidget(parentInterface, 0).isHidden()) {
-            return;
-        }
+    public static boolean handle(int parentInterface, String... option){
+        if (!PWidgets.isSubstantiated(parentInterface)) return false;
         log.info("Handling Interface: " + parentInterface);
-        Optional<RSInterface> optional = InterfaceHelper.getAllInterfaces(parentInterface).stream().filter(rsInterface -> {
+        Optional<RSInterface> optional = InterfaceHelper.getAllChildren(parentInterface).stream().filter(rsInterface -> {
             String[] actions = rsInterface.getActions();
             return actions != null && Arrays.stream(option).anyMatch(s -> Arrays.stream(actions).anyMatch(s1 -> s1.equals(s)));
         }).findAny();
         optional.ifPresent(rsInterface -> rsInterface.click(option));
         WaitFor.milliseconds(500, 1500);
+        return true;
     }
 }

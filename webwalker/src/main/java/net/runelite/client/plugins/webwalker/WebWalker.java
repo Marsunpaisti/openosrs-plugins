@@ -1,10 +1,15 @@
 package net.runelite.client.plugins.webwalker;
 import com.google.inject.Provides;
+import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.GameState;
-import net.runelite.api.Player;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ConfigButtonClicked;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.queries.GameObjectQuery;
+import net.runelite.api.queries.NPCQuery;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -13,14 +18,17 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.paistisuite.PScript;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
-import net.runelite.client.plugins.paistisuite.api.PPlayer;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
-import net.runelite.client.plugins.paistisuite.api.PWalking;
+import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.InteractionHelper;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Filters;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.webwalker.Category;
 import net.runelite.client.plugins.webwalker.WebWalkerConfig;
@@ -30,7 +38,11 @@ import org.pf4j.Extension;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper.getAllChildren;
 
 @Extension
 @PluginDependency(PaistiSuite.class)
@@ -58,6 +70,9 @@ public class WebWalker extends PScript {
     private WebWalkerOverlay overlay;
 
     @Inject
+    private WebWalkerWorldmapOverlay worldmapOverlay;
+
+    @Inject
     private ConfigManager configManager;
 
     @Provides
@@ -71,6 +86,10 @@ public class WebWalker extends PScript {
     {
     }
 
+    @Subscribe
+    private void onGameTick(GameTick event){
+    }
+
     @Override
     protected void loop() {
         PUtils.sleepFlat(1500, 3000);
@@ -79,16 +98,6 @@ public class WebWalker extends PScript {
         if (path == null){
             PlayerDetails details = PlayerDetails.generate();
             // Remove stuff from playerdetails so server wont try to use certain shortcuts or teleports.
-            details.equipment = new ArrayList<IntPair>();
-            details.setting.forEach(pair -> log.info("Setting " + pair.getKey() + ": " + pair.getValue()));
-            details.varbit.forEach(pair -> log.info("Varbit " + pair.getKey() + ": " + pair.getValue()));
-            details.firemaking = 1;
-            details.woodcutting = 1;
-            details.hunter = 1;
-            details.construction = 1;
-            details.magic = 1;
-            details.mining = 1;
-
             path = WebWalkerServerApi.getInstance().getPath(new Point3D(PPlayer.location()), new Point3D(targetLocation), details).toRSTilePath();
         }
         if (WalkerEngine.getInstance().walkPath(path, walkingCondition)) requestStop();
@@ -118,6 +127,7 @@ public class WebWalker extends PScript {
     @Override
     protected void onStart() {
         overlayManager.add(overlay);
+        overlayManager.add(worldmapOverlay);
         PUtils.sendGameMessage("WebWalker started!");
         DaxWalker.setCredentials(new DaxCredentialsProvider() {
             @Override
@@ -131,6 +141,7 @@ public class WebWalker extends PScript {
     @Override
     protected void onStop() {
         overlayManager.remove(overlay);
+        overlayManager.remove(worldmapOverlay);
         if (path != null) {
             path.clear();
             path = null;

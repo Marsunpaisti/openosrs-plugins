@@ -21,17 +21,9 @@ public class PVars {
         return -1;
     }
 
-    public static int getVarbitValue(final int varbitId){
-        if (PUtils.getClient().isClientThread()){
+    public static Integer getVarbitValue(final int varbitId){
+        return PUtils.clientOnly(() -> {
             return PUtils.getClient().getVarbitValue(varbitId);
-        } else {
-            try {
-                return PaistiSuite.getInstance().clientExecutor.scheduleAndWait(() -> PUtils.getClient().getVarbitValue(varbitId), "getVarbitValue");
-            } catch (Exception e){
-                log.error("Error during getVarbitValue");
-            }
-        }
-
-        return -1;
+        }, "getVarbitValue");
     }
 }

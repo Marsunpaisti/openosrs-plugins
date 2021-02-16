@@ -12,7 +12,7 @@ import net.runelite.api.Point;
 
 @Slf4j
 public class PMouse {
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
     public static void clickShape(Shape shape){
         executorService.submit(() -> {
             clickPoint(getClickPoint(shape));
@@ -30,8 +30,8 @@ public class PMouse {
         int maxX = (int) rectangle.getMaxX();
         int minY = (int) rectangle.getMinY();
         int maxY = (int) rectangle.getMaxY();
-        int x = (int)PUtils.randomNormal(minX, maxX, (maxX-minX)/6d, (maxX-minX)/2d);
-        int y = (int)PUtils.randomNormal(minY, maxY, (maxY-minY)/6d, (maxY-minY)/2d);
+        int x = (int)PUtils.randomNormal(minX, maxX);
+        int y = (int)PUtils.randomNormal(minY, maxY);
         return new Point(x, y);
     }
 
@@ -45,9 +45,15 @@ public class PMouse {
         int minY = (int) bounds.getMinY();
         int maxY = (int) bounds.getMaxY();
 
+        int attempts = 0;
         while (!shape.contains(x, y)) {
-            x = PUtils.random(minX, maxX);
-            y = PUtils.random(minY, maxY);
+            attempts++;
+            x = (int)PUtils.randomNormal(minX, maxX);
+            y = (int)PUtils.randomNormal(minY, maxY);
+            if (attempts > 10) {
+                x = PUtils.random(minX, maxX);
+                y = PUtils.random(minY, maxY);
+            }
         }
         return new Point(x, y);
     }

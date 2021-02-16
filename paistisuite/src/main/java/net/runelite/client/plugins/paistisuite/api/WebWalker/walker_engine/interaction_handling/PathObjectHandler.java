@@ -12,6 +12,7 @@ import net.runelite.client.plugins.paistisuite.api.PObjects;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.BFS;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.PathAnalyzer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
@@ -199,7 +200,7 @@ public class PathObjectHandler {
                 return destinationDetails.getDestination().getRSTile().toWorldPoint().equals(new WorldPoint(2690, 10125, 0))
                         && new NPCQuery()
                         .nameEquals("Boulder")
-                        .filter((npc) -> Arrays.asList(npc.getDefinition().getActions()).contains("Roll"))
+                        .filter((npc) -> Arrays.asList(npc.getTransformedDefinition().getActions()).contains("Roll"))
                         .result(PUtils.getClient())
                         .size() > 0;
 
@@ -298,6 +299,7 @@ public class PathObjectHandler {
 
     private static boolean handle(List<RSTile> path, Pair<TileObject, ObjectDefinition> objDefPair, PathAnalyzer.DestinationDetails destinationDetails, String action, SpecialObject specialObject){
         PathAnalyzer.DestinationDetails current = PathAnalyzer.furthestReachableTile(path);
+        WalkerEngine.getInstance().debugFurthestReachable = current;
 
         if (current == null){
             return false;
@@ -403,7 +405,7 @@ public class PathObjectHandler {
                 case BRINE_RAT_CAVE_BOULDER:
                     NPC boulder = new NPCQuery()
                             .nameEquals("Boulder")
-                            .filter((npc) -> Arrays.asList(npc.getDefinition().getActions()).contains("Roll"))
+                            .filter((npc) -> Arrays.asList(npc.getTransformedDefinition().getActions()).contains("Roll"))
                             .result(client)
                             .first();
                     if (boulder == null) return false;
@@ -411,7 +413,7 @@ public class PathObjectHandler {
                         if(WaitFor.condition(12000,
                                 () -> new NPCQuery()
                                         .nameEquals("Boulder")
-                                        .filter((npc) -> Arrays.asList(npc.getDefinition().getActions()).contains("Roll"))
+                                        .filter((npc) -> Arrays.asList(npc.getTransformedDefinition().getActions()).contains("Roll"))
                                         .result(client)
                                         .size() > 0 ?
                                         WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS){
@@ -594,7 +596,7 @@ public class PathObjectHandler {
         } else {
             result = InteractionHelper.click(objDefPair.getFirst(), options);
             log.info("Interacting with (" +  objDefPair.getSecond().getName() + ") at " + objDefPair.getFirst().getWorldLocation() + " with options: " + Arrays.toString(options) + " " + (result ? "SUCCESS" : "FAIL"));
-            WaitFor.milliseconds(250,800);
+            WaitFor.milliseconds(500,2500);
         }
 
         return result;

@@ -19,7 +19,7 @@ public class MenuInterceptor {
         event.consume();
         if (nextEntry.getOption().equals("Walk here") && PWalking.walkAction)
         {
-            log.info("Walk action: {} {}", PWalking.coordX, PWalking.coordY);
+            //log.info("Walk action: {} {}", PWalking.coordX, PWalking.coordY);
             PWalking.setSelectedSceneTile(PWalking.coordX, PWalking.coordY);
             PWalking.walkAction = false;
             nextEntry = null;

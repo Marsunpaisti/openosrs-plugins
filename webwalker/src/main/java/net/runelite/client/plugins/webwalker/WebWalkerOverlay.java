@@ -25,10 +25,13 @@
  */
 package net.runelite.client.plugins.webwalker;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.PathAnalyzer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.ui.overlay.*;
 
@@ -37,6 +40,7 @@ import javax.inject.Singleton;
 import java.awt.*;
 import java.util.List;
 
+@Slf4j
 @Singleton
 public class WebWalkerOverlay extends Overlay
 {
@@ -59,18 +63,28 @@ public class WebWalkerOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		RSTile debugFurthestTile = null;
+		if (WalkerEngine.getInstance().debugFurthestReachable != null) {
+			debugFurthestTile = WalkerEngine.getInstance().debugFurthestReachable.getDestination().getRSTile();
+			if (debugFurthestTile != null){
+				drawTile(graphics, debugFurthestTile, Color.green);
+			}
+		}
 
 		List<RSTile> path = plugin.path;
 		if (path == null) return null;
 		for (RSTile tile : path)
 		{
-			drawTile(graphics, tile);
+			if (debugFurthestTile != null){
+				if (tile.equals(debugFurthestTile)) continue;
+			}
+			drawTile(graphics, tile, Color.cyan);
 		}
 
 		return null;
 	}
 
-	private void drawTile(Graphics2D graphics, RSTile tile)
+	private void drawTile(Graphics2D graphics, RSTile tile, Color color)
 	{
 		WorldPoint point = tile.toWorldPoint();
 		if (point.getPlane() != client.getPlane())
@@ -90,7 +104,6 @@ public class WebWalkerOverlay extends Overlay
 			return;
 		}
 
-		Color color = Color.cyan;
 		OverlayUtil.renderPolygonThin(graphics, poly, color);
 		//OverlayUtil.renderPolygon(graphics, poly, color);
 	}

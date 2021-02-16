@@ -11,6 +11,7 @@ import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -111,7 +112,23 @@ public class PInventory
         return null;
     }
 
-public static List<Item> getEquippedItems(){
+    public static Pair<WidgetItem, ItemDefinition> findItem(Predicate<Pair<WidgetItem, ItemDefinition>> filter){
+        return getAllItemsWithDefs()
+                .stream()
+                .filter(filter)
+                .findFirst()
+                .orElse(null);
+    }
+
+
+    public static List<Pair<WidgetItem, ItemDefinition>> findAllItems(Predicate<Pair<WidgetItem, ItemDefinition>> filter){
+        return getAllItemsWithDefs()
+                .stream()
+                .filter(filter)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Item> getEquippedItems(){
         List<Item> equipped = new ArrayList<>();
         Item[] items = null;
         if (PUtils.getClient().isClientThread()) {
@@ -136,5 +153,18 @@ public static List<Item> getEquippedItems(){
             equipped.add(item);
         }
         return equipped;
+    }
+
+    public static int getEquippedCount(int equipmentId){
+        int count = 0;
+        List<Item> equipment = getEquippedItems();
+
+        for (Item i : equipment){
+            if (i.getId() == equipmentId) {
+                count += i.getQuantity();
+            }
+        }
+
+        return count;
     }
 }

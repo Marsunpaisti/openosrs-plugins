@@ -139,7 +139,7 @@ public enum Teleport {
             return false;
         }
 
-        return PInteraction.item(items.get(0).getFirst(), actions);
+        return PInteraction.item(items.get(0), actions);
     }
 
 

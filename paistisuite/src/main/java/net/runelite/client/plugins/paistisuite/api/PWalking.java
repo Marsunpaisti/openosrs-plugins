@@ -40,13 +40,13 @@ public class PWalking {
     }
 
     public static boolean minimapWalk(WorldPoint worldPoint) {
-        if (worldPoint.distanceToHypotenuse(PPlayer.getWorldLocation()) > 18 || worldPoint.getPlane() != PUtils.getClient().getPlane()){
+        if (worldPoint.distanceToHypotenuse(PPlayer.getWorldLocation()) >= 18 || worldPoint.getPlane() != PUtils.getClient().getPlane()){
             log.error("Point given to minimapwalk is outside minimap");
             return false;
         }
         LocalPoint localPoint = LocalPoint.fromWorld(PUtils.getClient(), worldPoint);
         if (localPoint == null) {
-            log.error("LocalPoint is null in scenewalk");
+            log.error("LocalPoint is null in minimapwalk");
             return false;
         }
 
@@ -59,8 +59,18 @@ public class PWalking {
             return false;
         }
         if (minimapPoint == null){
-            log.error("MinimapPoint is null in scenewalk");
+            log.error("MinimapPoint is null in minimapwalk");
             return false;
+        }
+
+        Widget worldmapButton = PUtils.getClient().getWidget(WidgetInfo.WORLD_MAP_OPTION);
+        if (worldmapButton != null){
+            if (worldmapButton.getBounds() != null) {
+                if (worldmapButton.getBounds().contains(minimapPoint.getX(), minimapPoint.getY())){
+                    log.info("Minimapwalk tile under worldmap button");
+                    return false;
+                }
+            }
         }
 
         coordX = localPoint.getSceneX();
@@ -69,6 +79,23 @@ public class PWalking {
         MenuInterceptor.setNextEntry(new MenuEntry("Walk here", "", 0, MenuOpcode.WALK.getId(),
                 0, 0, false));
         PMouse.clickPoint(minimapPoint);
+        return true;
+    }
+
+    public static boolean sceneWalk(WorldPoint worldPoint) {
+        LocalPoint localPoint = LocalPoint.fromWorld(PUtils.getClient(), worldPoint);
+        if (localPoint == null) {
+            log.error("LocalPoint is null in scenewalk");
+            return false;
+        }
+
+        coordX = localPoint.getSceneX();
+        coordY = localPoint.getSceneY();
+        PWalking.walkAction = true;
+        MenuInterceptor.setNextEntry(new MenuEntry("Walk here", "", 0, MenuOpcode.WALK.getId(),
+                0, 0, false));
+        Point randPoint = new Point(PUtils.getClient().getCenterX() + PUtils.random(-100, 100), PUtils.getClient().getCenterY() + PUtils.random(-100, 100));
+        PMouse.clickPoint(randPoint);
         return true;
     }
 

@@ -5,31 +5,31 @@ import net.runelite.api.Actor;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.queries.NPCQuery;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.PWidgets;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Keyboard;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class NPCInteraction {
     public static String[] GENERAL_RESPONSES = {"Sorry, I'm a bit busy.", "OK then.", "Yes.", "Okay..."};
-    private static final int
-            ITEM_ACTION_INTERFACE_WINDOW = 193,
-            NPC_TALKING_INTERFACE_WINDOW = 231,
-            PLAYER_TALKING_INTERFACE_WINDOW = 217,
-            SELECT_AN_OPTION_INTERFACE_WINDOW = 219,
-            SINGLE_OPTION_DIALOGUE_WINDOW = 229;
 
-    private static final int[] ALL_WINDOWS = new int[]{ITEM_ACTION_INTERFACE_WINDOW, NPC_TALKING_INTERFACE_WINDOW, PLAYER_TALKING_INTERFACE_WINDOW, SELECT_AN_OPTION_INTERFACE_WINDOW, SINGLE_OPTION_DIALOGUE_WINDOW};
+    private static final WidgetInfo[] ALL_WINDOWS = {
+            WidgetInfo.DIALOG_OPTION_OPTION1,
+            WidgetInfo.DIALOG_NPC,
+            WidgetInfo.DIALOG_PLAYER,
+            WidgetInfo.DIALOG_SPRITE,
+            WidgetInfo.DIALOG_NOTIFICATION_CONTINUE
+    };
 
 
     private static NPCInteraction instance;
@@ -92,10 +92,11 @@ public class NPCInteraction {
     }
 
     public static boolean isConversationWindowUp(){
-        return Arrays.stream(ALL_WINDOWS).anyMatch((w) -> PUtils.getClient().getWidget(w, 0) != null && !PUtils.getClient().getWidget(w, 0).isHidden());
+        return Arrays.stream(ALL_WINDOWS).anyMatch(PWidgets::isSubstantiated);
     };
 
     public static void handleConversationRegex(String regex){
+        log.info("Handling regex... " + regex);
         while (true){
             if (WaitFor.condition(PUtils.random(650, 800), () -> isConversationWindowUp() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) != WaitFor.Return.SUCCESS){
                 break;
@@ -165,12 +166,14 @@ public class NPCInteraction {
      * @return Click here to continue conversation interface
      */
     private static RSInterface getClickHereToContinue(){
-        List<RSInterface> list = getConversationDetails();
-        if (list == null){
-            return null;
-        }
-        Optional<RSInterface> optional = list.stream().filter(rsInterface -> rsInterface.getText().equals("Click here to continue")).findAny();
-        return optional.isPresent() ? optional.get() : null;
+        return PUtils.clientOnly(() -> {
+            List<RSInterface> list = getSelectableOptions();
+            if (list == null){
+                return null;
+            }
+            Optional<RSInterface> optional = list.stream().filter(Objects::nonNull).filter(rsInterface -> rsInterface.getText().equals("Click here to continue")).findAny();
+            return optional.orElse(null);
+        }, "getClickHereToContinue");
     }
 
     /**
@@ -178,17 +181,17 @@ public class NPCInteraction {
      */
     private static void clickHereToContinue(){
         log.info("Clicking continue.");
-        Keyboard.typeKeys(' ');
-        waitForNextOption();
+        Keyboard.pressSpacebar();
+        PUtils.sleepNormal(100, 600);
     }
 
     /**
      * Waits for chat conversation text change.
      */
     private static void waitForNextOption(){
-        List<String> interfaces = getAllInterfaces().stream().map(RSInterface::getText).collect(Collectors.toList());
+        List<String> interfaces = getAllChatInterfaces().stream().map(RSInterface::getText).collect(Collectors.toList());
         WaitFor.condition(5000, () -> {
-            if (!interfaces.equals(getAllInterfaces().stream().map(RSInterface::getText).collect(Collectors.toList()))){
+            if (!interfaces.equals(getAllChatInterfaces().stream().map(RSInterface::getText).collect(Collectors.toList()))){
                 return WaitFor.Return.SUCCESS;
             }
             return WaitFor.Return.IGNORE;
@@ -199,32 +202,42 @@ public class NPCInteraction {
      *
      * @return List of all reply-able interfaces that has valid text.
      */
-    private static List<RSInterface> getConversationDetails(){
-        for (int window : ALL_WINDOWS){
-            List<RSInterface> details = InterfaceHelper.getAllInterfaces(window).stream().filter(rsInterfaceChild -> {
-                if (rsInterfaceChild.getTextureID() != -1) {
-                    return false;
+    private static List<RSInterface> getSelectableOptions(){
+        return PUtils.clientOnly(() -> {
+            List<RSInterface> allInterfaces = new ArrayList<RSInterface>();
+            for (WidgetInfo window : ALL_WINDOWS) {
+                var interfaces = InterfaceHelper.getAllChildren(window);
+                if (interfaces == null) continue;
+
+                for (RSInterface i : interfaces) {
+                    allInterfaces.add(i);
                 }
-                String text = rsInterfaceChild.getText();
-                return text != null && text.length() > 0;
-            }).collect(Collectors.toList());
-            if (details.size() > 0) {
-                log.info("Conversation Options: [" + details.stream().map(RSInterface::getText).collect(
-                        Collectors.joining(", ")) + "]");
-                return details;
             }
-        }
-        return null;
+
+            List<RSInterface> details = allInterfaces.stream()
+                    .filter(Objects::nonNull)
+                    .filter(rsInterfaceChild -> {
+                        if (!rsInterfaceChild.getWidget().hasListener()) return false;
+                        String text = rsInterfaceChild.getText();
+                        return text != null && text.length() > 0;
+                    })
+                    .collect(Collectors.toList());
+            if (details.size() > 0) {
+                log.info("Conversation Options: [" + details.stream().filter(Objects::nonNull).map(RSInterface::getText).filter(Objects::nonNull).collect(
+                        Collectors.joining(", ")) + "]");
+            }
+            return details;
+        }, "getSelectableOptions");
     }
 
     /**
      *
      * @return List of all Chat interfaces
      */
-    private static List<RSInterface> getAllInterfaces(){
-        ArrayList<RSInterface> interfaces = new ArrayList<>();
-        for (int window : ALL_WINDOWS) {
-            interfaces.addAll(InterfaceHelper.getAllInterfaces(window));
+    private static List<RSInterface> getAllChatInterfaces(){
+        List<RSInterface> interfaces = new ArrayList<RSInterface>();
+        for (WidgetInfo window : ALL_WINDOWS) {
+            interfaces.addAll(InterfaceHelper.getAllChildren(window));
         }
         return interfaces;
     }
@@ -235,7 +248,7 @@ public class NPCInteraction {
      * @return list of conversation clickable options that matches {@code regex}
      */
     private static List<RSInterface> getAllOptions(String regex){
-        List<RSInterface> list = getConversationDetails();
+        List<RSInterface> list = getSelectableOptions();
         return list != null ? list.stream().filter(rsInterface -> rsInterface.getText().matches(regex)).collect(
                 Collectors.toList()) : null;
     }
@@ -247,7 +260,7 @@ public class NPCInteraction {
      */
     private static List<RSInterface> getAllOptions(String... options){
         final List<String> optionList = Arrays.stream(options).map(String::toLowerCase).collect(Collectors.toList());
-        List<RSInterface> list = getConversationDetails();
+        List<RSInterface> list = getSelectableOptions();
         return list != null ? list.stream().filter(rsInterface -> optionList.contains(rsInterface.getText().trim().toLowerCase())).collect(
                 Collectors.toList()) : null;
     }

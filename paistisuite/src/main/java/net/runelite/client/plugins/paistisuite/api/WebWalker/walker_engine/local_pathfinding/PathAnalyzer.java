@@ -1,7 +1,10 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.PathFindingNode;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.BFS;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
@@ -44,9 +47,10 @@ public class PathAnalyzer {
                 return new DestinationDetails(PathState.END_OF_PATH, current);
             }
             RSTile nextNode = path.get(i + 1);
-            if(!isLoaded(nextNode) && !nextNode.isInMinimap()){
+            if(!nextNode.toWorldPoint().isInScene(PUtils.getClient()) && nextNode.isInMinimap()){
                 return new DestinationDetails(PathState.FURTHEST_CLICKABLE_TILE, current);
             }
+
             RealTimeCollisionTile next = RealTimeCollisionTile.get(nextNode.getX(), nextNode.getY(), nextNode.getPlane());
             Direction direction = directionTo(current.getRSTile(), nextNode);
             if (direction == Direction.UNKNOWN){

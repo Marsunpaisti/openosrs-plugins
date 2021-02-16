@@ -11,4 +11,8 @@ public class PSkills {
     public static int getCurrentLevel(Skill skill){
         return PUtils.getClient().getBoostedSkillLevel(skill);
     }
+
+    public static int getXp(Skill skill) {
+        return PUtils.getClient().getSkillExperience(skill);
+    }
 }

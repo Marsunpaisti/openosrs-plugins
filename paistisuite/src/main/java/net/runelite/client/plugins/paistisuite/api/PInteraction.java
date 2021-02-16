@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api;
 
+import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
@@ -103,6 +104,7 @@ public class PInteraction {
     }
 
     public static boolean useItemOnItem(WidgetItem item, WidgetItem target){
+        if (item == null || target == null) return false;
         if (item.equals(target)) return false;
 
         PaistiSuite.getInstance().clientExecutor.schedule(() -> {
@@ -120,6 +122,10 @@ public class PInteraction {
 
 
         return true;
+    }
+
+    public static boolean useItemOnGameObject(Pair<WidgetItem, ItemDefinition> item, Pair<TileObject, ObjectDefinition> to) {
+        return useItemOnGameObject(item.getFirst(), to.getFirst());
     }
 
     public static boolean useItemOnGameObject(WidgetItem item, TileObject to){
@@ -161,7 +167,8 @@ public class PInteraction {
     }
 
     public static boolean npc(NPC npc, String... actions) {
-        NPCDefinition def = npc.getDefinition();
+        if (npc == null) return false;
+        NPCDefinition def = npc.getTransformedDefinition();
         if(def == null) return false;
         String[] possibleActions = def.getActions();
         List<String> desiredActions = Arrays.asList(actions);
@@ -215,7 +222,19 @@ public class PInteraction {
         return true;
     }
 
+    /***
+     * Just sends a regular click on the widgets area
+     * @param widget
+     * @return Successful or not
+     */
+    public static boolean clickWidget(Widget widget) {
+        if (widget == null) return false;
+        PMouse.clickShape(widget.getBounds());
+        return true;
+    }
+
     public static boolean widget(Widget widget, String... actions) {
+        if (widget == null) return false;
         String[] possibleActions = widget.getActions();
         List<String> desiredActions = Arrays.asList(actions);
         int actionIndex = -1;
@@ -231,6 +250,7 @@ public class PInteraction {
             }
             i++;
         }
+
 
         if (!found) return false;
         int finalActionIndex = actionIndex + 1;
@@ -249,7 +269,61 @@ public class PInteraction {
         return true;
     }
 
-    public static boolean item(WidgetItem item, String ...actions){
-        throw new NotImplementedException();
+    public static boolean item(Pair<WidgetItem, ItemDefinition> itemDefPair, String ...actions){
+        if (itemDefPair == null) return false;
+        if (itemDefPair.getFirst() == null || itemDefPair.getSecond() == null) return false;
+        String[] possibleActions = itemDefPair.getSecond().getInventoryActions();
+        List<String> desiredActions = Arrays.asList(actions);
+        int actionIndex = -1;
+        String action = "";
+        int i = 0;
+        boolean found = false;
+        for (String a : possibleActions) {
+            if (desiredActions.contains(a)) {
+                action = a;
+                actionIndex = i;
+                found = true;
+                break;
+            }
+            i++;
+        }
+
+        if (!found) return false;
+
+
+        MenuOpcode actionOp = null;
+        switch (actionIndex) {
+            case 0:
+                actionOp = MenuOpcode.ITEM_FIRST_OPTION;
+                break;
+            case 1:
+                actionOp = MenuOpcode.ITEM_SECOND_OPTION;
+                break;
+            case 2:
+                actionOp = MenuOpcode.ITEM_THIRD_OPTION;
+                break;
+            case 3:
+                actionOp = MenuOpcode.ITEM_FOURTH_OPTION;
+                break;
+            case 4:
+                actionOp = MenuOpcode.ITEM_FIFTH_OPTION;
+                break;
+            default:
+                return false;
+        }
+
+        final int id = itemDefPair.getFirst().getId();
+        MenuOpcode finalActionOp = actionOp;
+        PaistiSuite.getInstance().clientExecutor.schedule(() -> {
+            PUtils.getClient().invokeMenuAction(
+                    "",
+                    "",
+                    id,
+                    finalActionOp.getId(),
+                    itemDefPair.getFirst().getIndex(),
+                    9764864);
+        }, "interact_item");
+
+        return true;
     }
 }
