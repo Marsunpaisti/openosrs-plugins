@@ -8,7 +8,6 @@ import net.runelite.api.ObjectDefinition;
 import net.runelite.api.Skill;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.queries.NPCQuery;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
@@ -27,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -353,7 +351,7 @@ public class NavigationSpecialCase {
             case GANDIUS_GLIDER: return GnomeGlider.to(GnomeGlider.Location.GANDIUS);
 
             case ZANARIS_RING:
-                if (PInventory.getEquippedCount(772) == 0){
+                if (PInventory.getEquipmentCount(772) == 0){
                     if (!InteractionHelper.click(PInventory.findItem(Filters.Items.idEquals(772)), "Wield")){
                         log.info("Could not equip Dramen staff.");
                         break;

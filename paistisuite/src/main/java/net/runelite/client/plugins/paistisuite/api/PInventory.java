@@ -7,6 +7,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -18,20 +19,11 @@ import java.util.stream.Collectors;
 public class PInventory
 {
     public static ItemDefinition getItemDef(WidgetItem item){
-        if (item == null) return null;
+        return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
+    }
 
-        ItemDefinition def = null;
-        try {
-            if (!PUtils.getClient().isClientThread()) {
-                def = PaistiSuite.getInstance().clientExecutor.scheduleAndWait(() ->  PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
-            } else {
-                def =  PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId());
-            }
-        } catch (Exception e) {
-            log.error("Error in getItemDef: " + e);
-        }
-
-        return def;
+    public static ItemDefinition getItemDef(Item item){
+        return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
     }
 
     private static Future<ItemDefinition> getFutureItemDef(WidgetItem item){
@@ -50,19 +42,21 @@ public class PInventory
         return getEmptySlots() >= 28;
     }
 
-    public static int getEmptySlots()
+    public static Integer getEmptySlots()
     {
-        Widget inventoryWidget = PUtils.getClient().getWidget(WidgetInfo.INVENTORY);
-        if (inventoryWidget != null)
-        {
-            return 28 - inventoryWidget.getWidgetItems().size();
-        }
-        else
-        {
-            return -1;
-        }
+        return PUtils.clientOnly(() -> {
+            Widget inventoryWidget = PUtils.getClient().getWidget(WidgetInfo.INVENTORY);
+            if (inventoryWidget != null)
+            {
+                return 28 - inventoryWidget.getWidgetItems().size();
+            }
+            else
+            {
+                return -1;
+            }
+        }, "getEmptySlots");
     }
-
+    /*
     public static Collection<WidgetItem> getAllItems()
     {
         Widget inventoryWidget = PUtils.getClient().getWidget(WidgetInfo.INVENTORY);
@@ -127,6 +121,63 @@ public class PInventory
                 .filter(filter)
                 .collect(Collectors.toList());
     }
+    */
+
+    public static List<PItem> getAllPItems(){
+       return PUtils.clientOnly(() -> {
+            Widget inventoryWidget = PUtils.getClient().getWidget(WidgetInfo.INVENTORY);
+            if (inventoryWidget == null) return null;
+            Collection<WidgetItem> widgetItems = inventoryWidget.getWidgetItems();
+            List<PItem> pItems = widgetItems
+                    .stream()
+                    .map(PItem::new)
+                    .collect(Collectors.toList());
+            return pItems;
+        }, "getAllPItems");
+    }
+
+    public static List<PItem> findAllPItems(Predicate<PItem> filter){
+        return getAllPItems()
+                .stream()
+                .filter(filter)
+                .collect(Collectors.toList());
+    }
+
+    public static PItem findPItem(Predicate<PItem> filter){
+        return getAllPItems()
+                .stream()
+                .filter(filter)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static List<PItem> getEquipmentPItems(){
+        return PUtils.clientOnly(() -> {
+            ItemContainer container = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT);
+            if (container == null) return null;
+            Item[] eqitems = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
+            List<PItem> equippedPItems = Arrays
+                    .stream(eqitems)
+                    .map(PItem::new)
+                    .collect(Collectors.toList());
+            return equippedPItems;
+        }, "getEquippedPItems");
+    }
+
+    public static List<PItem> findAllEquipmentPItems(Predicate<PItem> filter){
+        return getEquipmentPItems()
+                .stream()
+                .filter(filter)
+                .collect(Collectors.toList());
+    }
+
+    public static PItem findEquipmentPItem(Predicate<PItem> filter){
+        return getEquipmentPItems()
+                .stream()
+                .filter(filter)
+                .findFirst()
+                .orElse(null);
+    }
 
     public static List<Item> getEquippedItems(){
         List<Item> equipped = new ArrayList<>();
@@ -155,7 +206,7 @@ public class PInventory
         return equipped;
     }
 
-    public static int getEquippedCount(int equipmentId){
+    public static int getEquipmentCount(int equipmentId){
         int count = 0;
         List<Item> equipment = getEquippedItems();
 
