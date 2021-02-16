@@ -228,12 +228,7 @@ public class WebWalker extends PScript {
         overlayManager.add(overlay);
         overlayManager.add(worldmapOverlay);
         PUtils.sendGameMessage("WebWalker started!");
-        DaxWalker.setCredentials(new DaxCredentialsProvider() {
-            @Override
-            public DaxCredentials getDaxCredentials() {
-                return new DaxCredentials("sub_DPjXXzL5DeSiPf", "PUBLIC-KEY");
-            }
-        });
+        DaxWalker.setCredentials(PaistiSuite.getDaxCredentialsProvider());
         path = null;
     }
 

@@ -4,15 +4,20 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.*;
 import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentials;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentialsProvider;
 import net.runelite.client.plugins.paistisuite.framework.ClientExecutor;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.client.plugins.paistisuite.sidepanel.PaistiSuitePanel;
@@ -22,6 +27,7 @@ import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
 
 import java.awt.image.BufferedImage;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Extension
 @PluginDescriptor(
@@ -36,6 +42,8 @@ import java.awt.image.BufferedImage;
 public class PaistiSuite extends Plugin
 {
 	@Inject
+	private PaistiSuiteConfig config;
+	@Inject
 	public ClientExecutor clientExecutor;
 	@Inject
 	public Client client;
@@ -47,20 +55,50 @@ public class PaistiSuite extends Plugin
 	private ClientToolbar clientToolbar;
 	@Inject
 	protected Injector injector;
+	@Inject
+	private ConfigManager configManager;
 
 	private PaistiSuitePanel panel;
 	private NavigationButton navButton;
 	private static PaistiSuite instance;
-
+	private static final ReentrantLock daxCredsLock = new ReentrantLock();
+	private static DaxCredentialsProvider daxCredProvider;
+	private static String daxKey;
+	private static String daxSecret;
 	public static PaistiSuite getInstance(){
 		return instance;
 	}
 
+	@Provides
+	PaistiSuiteConfig provideConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(PaistiSuiteConfig.class);
+	}
+
 	@Override
 	protected void startUp() {
-		addSidePanel();
+		//addSidePanel();
+		updateDaxCredProvider();
 		instance = this;
 		if (clientExecutor != null) clientExecutor.clearAllTasks();
+	}
+
+	public static DaxCredentialsProvider getDaxCredentialsProvider(){
+		synchronized (daxCredsLock){
+			return new DaxCredentialsProvider() {
+				@Override
+				public DaxCredentials getDaxCredentials() {
+					return new DaxCredentials(daxKey, daxSecret);
+				}
+			};
+		}
+	}
+
+	private void updateDaxCredProvider(){
+		synchronized (daxCredsLock){
+			daxKey = config.daxApiKey();
+			daxSecret = config.daxSecretKey();
+		}
 	}
 
 	@Override
@@ -76,6 +114,12 @@ public class PaistiSuite extends Plugin
 	@Subscribe
 	private void onMenuOptionClicked(MenuOptionClicked event){
 		MenuInterceptor.onMenuOptionClicked(event);
+	}
+
+	@Subscribe
+	private void onConfigChanged(ConfigChanged event){
+		if (!event.getGroup().equals("PaistiSuite")) return;
+		updateDaxCredProvider();
 	}
 
 	private void addSidePanel(){
