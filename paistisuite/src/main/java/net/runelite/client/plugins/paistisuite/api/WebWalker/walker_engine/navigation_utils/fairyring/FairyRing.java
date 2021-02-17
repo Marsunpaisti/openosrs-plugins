@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring;
 
 
-import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
@@ -55,7 +54,7 @@ public class FairyRing {
         if(location == null)
             return false;
 
-        boolean staffEquipped = PInventory.getEquippedItems()
+        boolean staffEquipped = PInventory.legacyGetEquipmentItems()
                 .stream()
                 .anyMatch(item -> item.getId() == DRAMEN_STAFFS[0] || item.getId() == DRAMEN_STAFFS[1]);
 

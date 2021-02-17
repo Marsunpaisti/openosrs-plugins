@@ -21,6 +21,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerSe
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
@@ -77,12 +78,10 @@ public class WebWalker extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
-
     }
 
     @Subscribe
     public void onMenuEntryAdded(MenuEntryAdded event) {
-
         final Widget map = PUtils.getClient().getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
         if (map == null) {

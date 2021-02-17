@@ -23,7 +23,7 @@ public class PlayerDetails {
                 .map(pItem -> new IntPair(pItem.getId(), pItem.getQuantity()))
                 .collect(Collectors.toList());
 
-        List<IntPair> equipment = PInventory.getEquippedItems()
+        List<IntPair> equipment = PInventory.legacyGetEquipmentItems()
                 .stream()
                 .map(itm -> new IntPair(itm.getId(), itm.getQuantity()))
                 .collect(Collectors.toList());

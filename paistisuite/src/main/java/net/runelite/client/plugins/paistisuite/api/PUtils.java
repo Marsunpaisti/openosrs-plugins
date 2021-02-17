@@ -15,10 +15,13 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
 import java.awt.*;
+import java.util.List;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -173,5 +176,9 @@ public class PUtils {
                                 .build());
             }, "sendGameMessage");
         }
+    }
+
+    public static String[] parseCommaSeparated(String toParse){
+        return Arrays.stream(toParse.strip().split(",")).map(String::strip).toArray(String[]::new);
     }
 }

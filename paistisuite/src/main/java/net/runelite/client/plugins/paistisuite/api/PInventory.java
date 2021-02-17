@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.paistisuite.api;
 
-import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
@@ -10,7 +9,6 @@ import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -167,10 +165,12 @@ public class PInventory
             ItemContainer container = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT);
             if (container == null) return null;
             Item[] eqitems = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
-            List<PItem> equippedPItems = Arrays
-                    .stream(eqitems)
-                    .map(PItem::new)
-                    .collect(Collectors.toList());
+            List<PItem> equippedPItems = new ArrayList<PItem>();
+            int slot = 0;
+            for (Item i : eqitems){
+                if (i.getId() != -1) equippedPItems.add(new PItem(i, slot));
+                slot++;
+            }
             return equippedPItems;
         }, "getEquippedPItems");
     }
@@ -190,7 +190,7 @@ public class PInventory
                 .orElse(null);
     }
 
-    public static List<Item> getEquippedItems(){
+    public static List<Item> legacyGetEquipmentItems(){
         List<Item> equipped = new ArrayList<>();
         Item[] items = null;
         if (PUtils.getClient().isClientThread()) {
@@ -219,7 +219,7 @@ public class PInventory
 
     public static int getEquipmentCount(int equipmentId){
         int count = 0;
-        List<Item> equipment = getEquippedItems();
+        List<Item> equipment = legacyGetEquipmentItems();
 
         for (Item i : equipment){
             if (i.getId() == equipmentId) {

@@ -26,7 +26,7 @@ public class RSItemHelper {
     }
 
     public static boolean clickMatch(PItem item, String regex){
-        String[] actions = item.getDefinition().getInventoryActions();
+        String[] actions = item.getActions();
         String action = Arrays.stream(actions).filter(a -> a != null && a.matches(regex)).findFirst().orElse(null);
         if (action == null) return false;
         return click(item, action);
@@ -50,6 +50,7 @@ public class RSItemHelper {
             action = "";
         }
         List<PItem> list = PInventory.findAllItems(filter);
+        list.addAll(PInventory.findAllEquipmentItems(filter));
 
         if (list.size() == 0) return false;
 
@@ -69,7 +70,7 @@ public class RSItemHelper {
     }
 
     public static String[] getItemActions(PItem item){
-        return item.getDefinition().getInventoryActions();
+        return item.getActions();
     }
 
     public static String getItemName(PItem item){

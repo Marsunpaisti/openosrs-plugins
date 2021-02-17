@@ -76,10 +76,8 @@ public class WearableItemTeleport {
                 PUtils.random(3800, 4600), () -> {
                     NPCInteraction.handleConversationRegex(regex);
                     if (startingPosition.distanceToHypotenuse(PPlayer.location()) > 5) {
-                        log.info("Teleported!");
                         return WaitFor.Return.SUCCESS;
                     }
-                    log.info("not there yet!");
                     return WaitFor.Return.IGNORE;
                 }) == WaitFor.Return.SUCCESS;
 

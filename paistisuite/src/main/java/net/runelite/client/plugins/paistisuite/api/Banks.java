@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.webwalker;
+package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
