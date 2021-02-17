@@ -5,34 +5,11 @@ import net.runelite.client.config.*;
 @ConfigGroup("AIOFighter")
 public interface AIOFighterConfig extends Config
 {
-    @ConfigSection(
-            keyName = "instructionsTitle",
-            name = "Instructions",
-            description = "Instructions. Don't enter anything into this field",
-            position = 15
-    )
-    default boolean instructionsTitle()
-    {
-        return false;
-    }
-
-    @ConfigItem(
-            keyName = "instructions",
-            name = "",
-            description = "Instructions. Don't enter anything into this field",
-            position = 18,
-            section = "instructionsTitle"
-    )
-    default String instructions()
-    {
-        return "Instructions woop woop";
-    }
-
     @ConfigItem(
             keyName = "enableOverlay",
             name = "Enable overlay",
             description = "Enable drawing of the overlay",
-            position = 145
+            position = 10
     )
     default boolean enableOverlay()
     {
@@ -40,12 +17,12 @@ public interface AIOFighterConfig extends Config
     }
 
     @ConfigSection(
-            keyName = "enemyNamesTitle",
-            name = "Enemy names",
+            keyName = "targetingTitle",
+            name = "Targeting",
             description = "Enter enemy names to target",
             position = 15
     )
-    default boolean enemyNamesTitle()
+    default boolean targetingTitle()
     {
         return false;
     }
@@ -54,8 +31,8 @@ public interface AIOFighterConfig extends Config
             keyName = "enemyNames",
             name = "",
             description = "",
-            position = 18,
-            section = "enemyNamesTitle"
+            section = "targetingTitle",
+            position = 16
     )
     default String enemyNames()
     {
@@ -64,15 +41,14 @@ public interface AIOFighterConfig extends Config
 
     @Range(
             min = 1,
-            max = 64
+            max = 20
     )
     @ConfigItem(
             keyName = "searchRadius",
             name = "Search radius",
             description = "The distance (in tiles) to search for targets.",
-            position = 31,
-            hide = "dropInventory",
-            titleSection = "generalTitle"
+            section = "targetingTitle",
+            position = 17
     )
     default int searchRadius()
     {
@@ -80,10 +56,58 @@ public interface AIOFighterConfig extends Config
     }
 
     @ConfigItem(
+            keyName = "enablePathfind",
+            name = "Check pathfinding",
+            description = "Enable to also check that a valid path to target can be found. May impact performance.",
+            section = "targetingTitle",
+            position = 18
+    )
+    default boolean enablePathfind()
+    {
+        return false;
+    }
+
+    @ConfigSection(
+            keyName = "eatingTitle",
+            name = "Eating",
+            description = "Eating options",
+            position = 20
+    )
+    default boolean eatingTitle()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "minEatHP",
+            name = "Minimum Eat HP",
+            description = "Minimum HP to eat. Bot will always eat below this value.",
+            section = "eatingTitle",
+            position = 25
+
+    )
+    default int minEatHP()
+    {
+        return 10;
+    }
+
+    @ConfigItem(
+            keyName = "maxEatHP",
+            name = "Maximum Eat HP",
+            description = "Highest HP that bot sometimes eats at (random between min and max eat hp)",
+            section = "eatingTitle",
+            position = 30
+    )
+    default int maxEatHP()
+    {
+        return 20;
+    }
+
+    @ConfigItem(
             keyName = "startButton",
             name = "Start",
-            description = "Start fighter",
-            position = 151
+            description = "Start",
+            position = 101
     )
     default Button startButton()
     {
@@ -94,7 +118,7 @@ public interface AIOFighterConfig extends Config
             keyName = "stopButton",
             name = "Stop",
             description = "Stop",
-            position = 151
+            position = 102
     )
     default Button stopButton()
     {

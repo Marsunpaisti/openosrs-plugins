@@ -45,7 +45,7 @@ public class Filters {
             return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedDefinition().getName().contains(n));
         }
         public static Predicate<NPC> nameEquals(String ...name) {
-            return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedDefinition().getName().equals(n));
+            return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedDefinition().getName().equalsIgnoreCase(n));
         }
         public static Predicate<NPC> actionsEquals(String ...action) {
             return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(npc.getTransformedDefinition().getActions())
@@ -62,8 +62,8 @@ public class Filters {
         public static Predicate<PItem> idEquals(int id){
             return (PItem pair) -> pair.getSecond().getId() == id;
         }
-        public static Predicate<PItem> nameEquals(String name){
-            return (PItem pair) -> pair.getSecond().getName().equals(name);
+        public static Predicate<PItem> nameEquals(String ...names){
+            return (PItem pair) -> Arrays.stream(names).anyMatch(str -> pair.getDefinition().getName().equalsIgnoreCase(str));
         }
 
         public static Predicate<PItem> nameContains(String ...s) {
