@@ -1,5 +1,3 @@
-![OpenOSRS - CI (Push)](https://github.com/open-osrs/plugins/workflows/OpenOSRS%20-%20CI%20(Push)/badge.svg?branch=master)
+# OpenOSRS external plugins
 
-# OpenOSRS official plugin repository
-
-This is a collection of officially supported plugins. This is the default repo used in the OpenOSRS client.
+This is a collection of my external plugins. Project based on official OPRS plugins repo.

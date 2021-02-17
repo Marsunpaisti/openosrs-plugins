@@ -27,6 +27,7 @@ rootProject.name = "Paisti Plugins"
 
 include(":paistisuite")
 include(":webwalker")
+include(":aiofighter")
 
 for (project in rootProject.children) {
     project.apply {
