@@ -22,6 +22,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.BFS;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.RealTimeCollisionTile;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -53,10 +54,10 @@ import java.util.stream.Collectors;
 public class AIOFighter extends PScript {
     int nextRunAt = PUtils.random(25,65);
     int nextEatAt;
-
     public int minEatHp;
     public int maxEatHp;
     public int searchRadius;
+    public WorldPoint safeSpot;
     public WorldPoint searchRadiusCenter;
     public String[] enemiesToTarget;
     public String[] foodsToEat;
@@ -65,6 +66,11 @@ public class AIOFighter extends PScript {
     public Predicate<NPC> validTargetFilter;
     public Predicate<PGroundItem> validLootFilter;
     public Predicate<PItem> validFoodFilter;
+    public boolean stopWhenOutOfFood;
+    public boolean eatFoodForLoot;
+    public boolean safeSpotForCombat;
+    public boolean safeSpotForLogout;
+
     State currentState;
     List<State> states = new ArrayList<State>();
     public FightEnemiesState fightEnemiesState = new FightEnemiesState(this);
@@ -92,23 +98,26 @@ public class AIOFighter extends PScript {
     @Override
     protected void startUp()
     {
-
+        overlayManager.add(overlay);
+        overlayManager.add(minimapoverlay);
     }
 
     @Override
     protected synchronized void onStart() {
         PUtils.sendGameMessage("AiO Fighter started!");
         readConfig();
-        searchRadiusCenter = PPlayer.location();
         DaxWalker.setCredentials(PaistiSuite.getDaxCredentialsProvider());
         states.add(this.lootItemsState);
         states.add(this.fightEnemiesState);
-        overlayManager.add(overlay);
-        overlayManager.add(minimapoverlay);
     }
 
     private synchronized void readConfig(){
+        if (searchRadiusCenter == null) {
+            searchRadiusCenter = PPlayer.location();
+        }
         searchRadius = config.searchRadius();
+        stopWhenOutOfFood = config.stopWhenOutOfFood();
+        eatFoodForLoot = config.eatForLoot();
         enemiesToTarget = PUtils.parseCommaSeparated(config.enemyNames());
         foodsToEat = PUtils.parseCommaSeparated(config.foodNames());
         lootNames = PUtils.parseCommaSeparated(config.lootNames());
@@ -119,6 +128,9 @@ public class AIOFighter extends PScript {
         validLootFilter = createValidLootFilter();
         validFoodFilter = createValidFoodFilter();
         lootGEValue = config.lootGEValue();
+        safeSpotForCombat = config.enableSafeSpot();
+        safeSpotForLogout = config.exitInSafeSpot();
+
         log.info("Targeting enemies: " + String.join(", ", enemiesToTarget));
         log.info("Food names: " + String.join(", ", foodsToEat));
         log.info("Loot names: " + String.join(", ", lootNames));
@@ -128,9 +140,13 @@ public class AIOFighter extends PScript {
 
     @Override
     protected synchronized void onStop() {
+        PUtils.sendGameMessage("AiO Fighter stopped!");
+    }
+
+    @Override
+    protected void shutDown() {
         overlayManager.remove(overlay);
         overlayManager.remove(minimapoverlay);
-        PUtils.sendGameMessage("AiO Fighter stopped!");
     }
 
     public State getValidState(){
@@ -144,10 +160,12 @@ public class AIOFighter extends PScript {
     protected void loop() {
         PUtils.sleepFlat(50, 150);
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
+        if (handleStopConditions()) return;
         handleEating();
         if (isStopRequested()) return;
         handleRun();
         if (isStopRequested()) return;
+
         State prevState = currentState;
         currentState = getValidState();
         if (currentState != null) {
@@ -157,6 +175,26 @@ public class AIOFighter extends PScript {
             setCurrentStateName(currentState.getName());
             currentState.loop();
         }
+    }
+
+    private boolean handleStopConditions(){
+        setCurrentStateName("StopConditionActive");
+        if (stopWhenOutOfFood && PInventory.findItem(validFoodFilter) == null) {
+            if (safeSpotForLogout && PPlayer.location().distanceTo(safeSpot) != 0) {
+                if (!PWalking.sceneWalk(safeSpot)) {
+                    DaxWalker.getInstance().allowTeleports = false;
+                    DaxWalker.walkTo(new RSTile(safeSpot), walkingCondition);
+                }
+                return true;
+            }
+            if (!fightEnemiesState.inCombat() && PUtils.logout()){
+                requestStop();
+                return true;
+            } else if (fightEnemiesState.inCombat()){
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean handleEating(){
@@ -187,7 +225,7 @@ public class AIOFighter extends PScript {
         if (food != null) log.info("Eating " + food.getName());
         if (PInteraction.item(food, "Eat")){
             log.info("Ate food");
-            PUtils.sleepNormal(100, 700);
+            PUtils.sleepNormal(300, 1000);
             return true;
         }
         log.info("Failed to eat food!");
@@ -240,7 +278,6 @@ public class AIOFighter extends PScript {
         filter = filter.and(item -> item.getLocation().distanceToHypotenuse(searchRadiusCenter) <= (searchRadius+2));
         if (config.lootOwnKills()) filter = filter.and(item -> item.getLootType() == PGroundItem.LootType.PVM);
         if (config.enablePathfind()) filter = filter.and(item -> isReachable(item.getLocation()));
-        filter = filter.and(item -> PInventory.getEmptySlots() > 0 || (item.isStackable() && PInventory.findItem(Filters.Items.idEquals(item.getId())) != null));
         return filter;
     }
 
@@ -253,7 +290,7 @@ public class AIOFighter extends PScript {
                     RealTimeCollisionTile.get(
                             p.getX(),
                             p.getY(),
-                            p.getPlane()), (int)Math.round(Math.PI*(searchRadius*searchRadius*1.5*1.5)))) {
+                            p.getPlane()), (int)Math.max(650, Math.round(Math.PI*(searchRadius*searchRadius*1.5*1.5))))) {
                 return true;
             }
 
@@ -265,7 +302,6 @@ public class AIOFighter extends PScript {
         return isReachable(n.getWorldLocation());
     }
 
-
     @Subscribe
     private synchronized void onConfigChanged(ConfigChanged event){
         if (!event.getGroup().equalsIgnoreCase("AIOFighter")) return;
@@ -276,20 +312,24 @@ public class AIOFighter extends PScript {
     private synchronized void onConfigButtonPressed(ConfigButtonClicked configButtonClicked)
     {
         if (!configButtonClicked.getGroup().equalsIgnoreCase("AIOFighter")) return;
+        if (PPlayer.get() == null && PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
 
         if (configButtonClicked.getKey().equals("startButton"))
         {
-            Player player = PUtils.getClient().getLocalPlayer();
-            if (player != null && PUtils.getClient().getGameState() == GameState.LOGGED_IN)
-            {
-                try {
-                    super.start();
-                } catch (Exception e){
-                    log.error(e.toString());
-                }
+            Player player = PPlayer.get();
+            try {
+                super.start();
+            } catch (Exception e){
+                log.error(e.toString());
             }
         } else if (configButtonClicked.getKey().equals("stopButton")){
             requestStop();
+        } else if (configButtonClicked.getKey().equals("setFightAreaButton")) {
+            PUtils.sendGameMessage("Fight area set to your position!");
+            searchRadiusCenter = PPlayer.location();
+        } else if (configButtonClicked.getKey().equals("setSafeSpotButton")) {
+            PUtils.sendGameMessage("Safe spot set to your position!");
+            safeSpot = PPlayer.location();
         }
     }
 

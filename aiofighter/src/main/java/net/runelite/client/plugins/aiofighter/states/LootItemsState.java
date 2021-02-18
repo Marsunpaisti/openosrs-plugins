@@ -3,11 +3,9 @@ package net.runelite.client.plugins.aiofighter.states;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.client.plugins.aiofighter.AIOFighter;
-import net.runelite.client.plugins.paistisuite.api.PGroundItems;
-import net.runelite.client.plugins.paistisuite.api.PInteraction;
-import net.runelite.client.plugins.paistisuite.api.PPlayer;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +22,8 @@ public class LootItemsState extends State {
             return false;
         }
 
-        return getNextLootableItem() != null;
+        PGroundItem nextLoot = getNextLootableItem();
+        return nextLoot != null && haveSpaceForItem(nextLoot);
     }
 
     @Override
@@ -38,6 +37,15 @@ public class LootItemsState extends State {
 
         PGroundItem target = getNextLootableItem();
         if (target != null){
+            if (PInventory.getEmptySlots() == 0 && plugin.eatFoodForLoot){
+                List<PItem> foodItems = PInventory.findAllItems(plugin.validFoodFilter);
+                int quantityBefore = foodItems.size();
+                if (quantityBefore == 0) return;
+                if (PInteraction.item(foodItems.get(0), "Eat")){
+                    log.info("Eating food to make space for loot");
+                    PUtils.waitCondition(PUtils.random(700, 1300), () -> PInventory.findAllItems(plugin.validFoodFilter).size() < quantityBefore);
+                }
+            }
             PUtils.sleepNormal(100, 700);
             log.info("Looting " + target.getName() + " price: " + target.getPricePerSlot());
 
@@ -57,6 +65,21 @@ public class LootItemsState extends State {
     public Comparator<PGroundItem> lootPrioritySorter = (a, b) -> {
         return (int)Math.round(PPlayer.distanceTo(a.getLocation())) - (int)Math.round(PPlayer.distanceTo(b.getLocation()));
     };
+
+    public boolean haveSpaceForItem(PGroundItem item){
+        if (PInventory.getEmptySlots() > 0){
+            return true;
+        }
+        if (item.isStackable() && PInventory.findItem(Filters.Items.idEquals(item.getId())) != null){
+            return true;
+        }
+
+        if (plugin.eatFoodForLoot && PInventory.findItem(plugin.validFoodFilter) != null) {
+            return true;
+        }
+
+        return false;
+    }
 
     public PGroundItem getNextLootableItem(){
         return getLootableItems()

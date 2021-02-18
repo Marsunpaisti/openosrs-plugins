@@ -7,6 +7,7 @@ import net.runelite.client.plugins.aiofighter.AIOFighter;
 import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.PWalking;
 
 import java.util.Comparator;
 import java.util.List;
@@ -28,12 +29,36 @@ public class FightEnemiesState extends State {
     public void loop() {
         super.loop();
 
+        // In combat and outside safespot
+        if (inCombat() && plugin.safeSpotForCombat && PPlayer.location().distanceTo(plugin.safeSpot) > 0) {
+            PWalking.sceneWalk(plugin.safeSpot);
+            PUtils.waitCondition(PUtils.random(700, 1300), () -> PPlayer.isMoving());
+            PUtils.waitCondition(PUtils.random(4000, 6000), () -> !PPlayer.isMoving());
+            PUtils.sleepNormal(100, 400);
+            // Attack target again after moving to safespot
+            if (!attackLastTarget()) attackNewTarget();
+            return;
+        }
+
         // No combat and no target
         if (!inCombat() && !isInteracting() ){
             log.info("No combat - Trying to attack new target");
             PUtils.sleepNormal(500, 3500, 250, 800);
             if (plugin.isStopRequested()) return;
             attackNewTarget();
+
+            // Run to safespot after attack animation starts to play
+            if (plugin.safeSpotForCombat && PPlayer.location().distanceTo(plugin.safeSpot) > 0) {
+                PUtils.waitCondition(PUtils.random(2000, 3000), () -> PPlayer.get().getAnimation() != -1);
+                if (PPlayer.location().distanceTo(plugin.safeSpot) == 0) return;
+                PUtils.sleepNormal(100, 800, 150, 200);
+                PWalking.sceneWalk(plugin.safeSpot);
+                PUtils.waitCondition(PUtils.random(700, 1000), () -> PPlayer.isMoving());
+                PUtils.waitCondition(PUtils.random(3000, 4500), () -> !PPlayer.isMoving());
+                PUtils.sleepNormal(100, 800, 150, 200);
+                // Attack target again after moving to safespot
+                if (!attackLastTarget()) attackNewTarget();
+            }
             return;
         }
 
@@ -60,12 +85,23 @@ public class FightEnemiesState extends State {
         if (PInteraction.npc(target, "Attack")) {
             targetAcquiredTimestamp = System.currentTimeMillis();
             lastTarget = target;
-            PUtils.sleepNormal(600, 1500);
+            PUtils.sleepNormal(200, 500);
             return true;
         }
 
         return false;
     }
+
+    public boolean attackLastTarget(){
+        if (lastTarget == null || !plugin.validTargetFilter.test(lastTarget)) return false;
+        if (PInteraction.npc(lastTarget, "Attack")) {
+            PUtils.sleepNormal(200, 500);
+            return true;
+        }
+        return false;
+    }
+
+
 
     public boolean isCurrentTargetValid(){
         NPC interacting = (NPC)PPlayer.get().getInteracting();

@@ -67,6 +67,18 @@ public interface AIOFighterConfig extends Config
         return false;
     }
 
+    @ConfigItem(
+            keyName = "setFightAreaButton",
+            name = "Set fighting area",
+            description = "Set fighting area to where you are standing",
+            section = "targetingTitle",
+            position = 19
+    )
+    default Button setFightAreaButton()
+    {
+        return new Button();
+    }
+
     @ConfigSection(
             keyName = "eatingTitle",
             name = "Eating",
@@ -112,6 +124,18 @@ public interface AIOFighterConfig extends Config
     default int maxEatHP()
     {
         return 20;
+    }
+
+    @ConfigItem(
+            keyName = "stopWhenOutOfFood",
+            name = "Stop when out of food",
+            description = "Stops and logs out when out of food",
+            section = "eatingTitle",
+            position = 31
+    )
+    default boolean stopWhenOutOfFood()
+    {
+        return false;
     }
 
     @ConfigSection(
@@ -160,6 +184,63 @@ public interface AIOFighterConfig extends Config
     {
         return false;
     }
+
+    @ConfigItem(
+            keyName = "eatForLoot",
+            name = "Eat to make space for loot",
+            description = "Makes the bot eat food to get more inventory space for loot.",
+            section = "lootingTitle",
+            position = 54
+    )
+    default boolean eatForLoot()
+    {
+        return false;
+    }
+
+    @ConfigSection(
+            keyName = "safespotTitle",
+            name = "Safespot",
+            description = "Safespot related settings",
+            position = 70
+    )
+    default boolean safespotTitle()
+    {
+        return false;
+    }
+    @ConfigItem(
+            keyName = "setSafeSpotButton",
+            name = "Set safespot tile",
+            description = "Set safespot tile where you are standing",
+            section = "safespotTitle",
+            position = 71
+    )
+    default Button setSafeSpotButton()
+    {
+        return new Button();
+    }
+    @ConfigItem(
+            keyName = "enableSafeSpot",
+            name = "Use safespot for combat",
+            description = "Run to safespot tile in combat",
+            section = "safespotTitle",
+            position = 72
+    )
+    default boolean enableSafeSpot()
+    {
+        return false;
+    }
+    @ConfigItem(
+            keyName = "exitInSafeSpot",
+            name = "Safespot when stopping",
+            description = "Run to safespot and logout when stopping script",
+            section = "safespotTitle",
+            position = 73
+    )
+    default boolean exitInSafeSpot()
+    {
+        return false;
+    }
+
 
 
     @ConfigItem(

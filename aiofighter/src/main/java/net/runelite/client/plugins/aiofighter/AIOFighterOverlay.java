@@ -43,31 +43,14 @@ public class AIOFighterOverlay extends Overlay
 		if (!config.enableOverlay()) return null;
 
 
+		if (plugin.searchRadiusCenter != null){
+			drawTile(graphics, plugin.searchRadiusCenter, new Color(66, 254, 254, 35), new Color(66, 254, 254, 120));
+		}
+		if (plugin.safeSpot != null){
+			drawTile(graphics, plugin.safeSpot, new Color(0, 255, 0, 35), new Color(0, 255, 0, 120));
+		}
+
 		if (plugin.enemiesToTarget != null && plugin.searchRadiusCenter != null){
-			/*
-			for (int dx = -plugin.searchRadius; dx <= plugin.searchRadius; dx++){
-				for (int dy = -plugin.searchRadius; dy <= plugin.searchRadius; dy++){
-					WorldPoint p = new WorldPoint(
-							plugin.searchRadiusCenter.getX() + dx,
-							plugin.searchRadiusCenter.getY() + dy,
-							   plugin.searchRadiusCenter.getPlane());
-
-					log.info(p.toString());
-					if (p.isInScene(PUtils.getClient()) && p.distanceToHypotenuse(plugin.searchRadiusCenter) <= (double)plugin.searchRadius) {
-						drawTile(graphics, p, new Color(50, 50, 254, 25));
-					}
-				}
-			}
-
-			 */
-
-			/*
-			NPC target = plugin.fightEnemiesState.getNewTarget();
-			if (target != null) {
-				highlightNpc(graphics, target, new Color(150, 0, 0, 35), new Color(150, 0, 0, 120));
-			}
-			*/
-
 			java.util.List<NPC> validTargets = plugin.getValidTargets();
 			if (validTargets != null){
 				for (NPC n : validTargets){
@@ -94,7 +77,7 @@ public class AIOFighterOverlay extends Overlay
 		graphics.setColor(originalColor);
 	}
 
-	private void drawTile(Graphics2D graphics, WorldPoint tile, Color color)
+	private void drawTile(Graphics2D graphics, WorldPoint tile, Color fillColor, Color borderColor)
 	{
 		if (tile.getPlane() != client.getPlane())
 		{
@@ -112,11 +95,12 @@ public class AIOFighterOverlay extends Overlay
 		{
 			return;
 		}
-		graphics.setColor(color);
 		final Stroke originalStroke = graphics.getStroke();
 		graphics.setStroke(new BasicStroke(1));
-		graphics.setColor(color);
+		graphics.setColor(fillColor);
 		graphics.fillPolygon(poly);
+		graphics.setColor(borderColor);
+		graphics.drawPolygon(poly);
 		graphics.setStroke(originalStroke);
 	}
 }
