@@ -1,11 +1,12 @@
 package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.WorldType;
+import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.geometry.Cuboid;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.QueuedMessage;
@@ -78,6 +79,21 @@ public class PUtils {
 
     public static Client getClient() {
         return PaistiSuite.getInstance().client;
+    }
+
+    public static Boolean logout(){
+        return PUtils.clientOnly(() -> {
+            int param1 = (PWidgets.get(WidgetInfo.LOGOUT_BUTTON) != null) ? 11927560 : 4522007;
+            PUtils.getClient().invokeMenuAction(
+                    "",
+                    "",
+                    1,
+                    MenuOpcode.CC_OP.getId(),
+                    -1,
+                    param1
+            );
+            return true;
+        }, "logout");
     }
 
     private static double clamp(double val, int min, int max)
