@@ -7,17 +7,23 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.TileItem;
 import net.runelite.api.events.*;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.NpcLootReceived;
+import net.runelite.client.events.PlayerLootReceived;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.ItemStack;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
+import net.runelite.client.plugins.paistisuite.api.PGroundItems;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentials;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentialsProvider;
+import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.framework.ClientExecutor;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.client.plugins.paistisuite.sidepanel.PaistiSuitePanel;
@@ -27,6 +33,9 @@ import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Extension
@@ -100,6 +109,43 @@ public class PaistiSuite extends Plugin
 			daxSecret = config.daxSecretKey();
 		}
 	}
+	@Subscribe
+	private void onItemSpawned(ItemSpawned event){
+		PGroundItems.onItemSpawned(event);
+	}
+
+	@Subscribe
+	private void onItemDespawned(ItemDespawned event){
+		PGroundItems.onItemDespawned(event);
+	}
+
+	@Subscribe
+	private void onItemQuantityChanged(ItemQuantityChanged event){
+		PGroundItems.onItemQuantityChanged(event);
+	}
+
+	@Subscribe
+	private void onNpcLootReceived(final NpcLootReceived npcLootReceived)
+	{
+		PGroundItems.onNpcLootReceived(npcLootReceived);
+	}
+
+	@Subscribe
+	private void onPlayerLootReceived(final PlayerLootReceived playerLootReceived)
+	{
+		PGroundItems.onPlayerLootReceived(playerLootReceived);
+	}
+
+	@Subscribe
+	private void onGameTick(final GameTick event) {
+		PGroundItems.onGameTick(event);
+	}
+
+	@Subscribe
+	private void onGameStateChanged(final GameStateChanged event)
+	{
+		PGroundItems.onGameStateChanged(event);
+	}
 
 	@Override
 	protected void shutDown() {
@@ -114,6 +160,7 @@ public class PaistiSuite extends Plugin
 	@Subscribe
 	private void onMenuOptionClicked(MenuOptionClicked event){
 		MenuInterceptor.onMenuOptionClicked(event);
+		PGroundItems.onMenuOptionClicked(event);
 	}
 
 	@Subscribe

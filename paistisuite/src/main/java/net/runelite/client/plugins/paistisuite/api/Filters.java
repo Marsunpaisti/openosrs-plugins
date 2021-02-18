@@ -7,6 +7,7 @@ import net.runelite.api.ObjectDefinition;
 import net.runelite.api.TileObject;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
+import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
@@ -56,6 +57,17 @@ public class Filters {
             return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(npc.getTransformedDefinition().getActions())
                     .anyMatch(a -> Arrays.asList(action).contains(a));
         }
+        public static Predicate<NPC> nameOrIdEquals(String ...namesorids){
+            return (NPC n) -> Arrays.stream(namesorids).anyMatch(str -> {
+                if (n.getTransformedDefinition() != null && n.getTransformedDefinition().getName().equalsIgnoreCase(str)) return true;
+                try {
+                    int id = Integer.parseInt(str);
+                    return n.getTransformedDefinition().getId() == id;
+                } catch (NumberFormatException ignored){
+                }
+                return false;
+            });
+        }
     }
 
     public static class Items {
@@ -65,9 +77,48 @@ public class Filters {
         public static Predicate<PItem> nameEquals(String ...names){
             return (PItem pair) -> Arrays.stream(names).anyMatch(str -> pair.getDefinition().getName().equalsIgnoreCase(str));
         }
-
+        public static Predicate<PItem> nameOrIdEquals(String ...namesorids){
+            return (PItem pair) -> Arrays.stream(namesorids).anyMatch(str -> {
+                if (pair.getDefinition().getName().equalsIgnoreCase(str)) return true;
+                try {
+                    int id = Integer.parseInt(str);
+                    return pair.getDefinition().getId() == id;
+                } catch (NumberFormatException ignored){
+                }
+                return false;
+            });
+        }
+        public static Predicate<PItem> nameContainsOrIdEquals(String ...namesorids){
+            return (PItem pair) -> Arrays.stream(namesorids).anyMatch(str -> {
+                if (pair.getDefinition().getName().contains(str)) return true;
+                try {
+                    int id = Integer.parseInt(str);
+                    return pair.getDefinition().getId() == id;
+                } catch (NumberFormatException ignored){
+                }
+                return false;
+            });
+        }
         public static Predicate<PItem> nameContains(String ...s) {
             return (PItem pair) -> Arrays.stream(s).anyMatch(str -> pair.getDefinition().getName().contains(str));
+        }
+    }
+
+
+    public static class GroundItems {
+        public static Predicate<PGroundItem> nameContainsOrIdEquals(String ...namesorids){
+            return (PGroundItem item) -> Arrays.stream(namesorids).anyMatch(str -> {
+                if (item.getName().contains(str)) return true;
+                try {
+                    int id = Integer.parseInt(str);
+                    return item.getId() == id;
+                } catch (NumberFormatException ignored){
+                }
+                return false;
+            });
+        }
+        public static Predicate<PGroundItem> SlotPriceAtLeast(int minValue){
+            return (PGroundItem item) -> item.getPricePerSlot() >= minValue;
         }
     }
 }

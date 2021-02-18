@@ -69,9 +69,11 @@ public class AIOFighterOverlay extends Overlay
 			*/
 
 			java.util.List<NPC> validTargets = plugin.getValidTargets();
-			for (NPC n : validTargets){
-				//if (target != null && n.equals(target)) continue;
-				highlightNpc(graphics, n, new Color(66, 254, 254, 35), new Color(66, 254, 254, 120));
+			if (validTargets != null){
+				for (NPC n : validTargets){
+					//if (target != null && n.equals(target)) continue;
+					highlightNpc(graphics, n, new Color(66, 254, 254, 35), new Color(66, 254, 254, 120));
+				}
 			}
 		}
 

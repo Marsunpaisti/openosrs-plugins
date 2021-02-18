@@ -19,7 +19,7 @@ public interface AIOFighterConfig extends Config
     @ConfigSection(
             keyName = "targetingTitle",
             name = "Targeting",
-            description = "Enter enemy names to target",
+            description = "Enter enemy names or IDs to target",
             position = 15
     )
     default boolean targetingTitle()
@@ -70,12 +70,23 @@ public interface AIOFighterConfig extends Config
     @ConfigSection(
             keyName = "eatingTitle",
             name = "Eating",
-            description = "Eating options",
+            description = "Eating options. Enter food names or IDs to eat.",
             position = 20
     )
     default boolean eatingTitle()
     {
         return false;
+    }
+    @ConfigItem(
+            keyName = "foodNames",
+            name = "",
+            description = "Food names or IDs to eat",
+            section = "eatingTitle",
+            position = 21
+    )
+    default String foodNames()
+    {
+        return "Shrimps, Cabbage";
     }
 
     @ConfigItem(
@@ -102,6 +113,54 @@ public interface AIOFighterConfig extends Config
     {
         return 20;
     }
+
+    @ConfigSection(
+            keyName = "lootingTitle",
+            name = "Looting",
+            description = "Always loot item names whose names contain",
+            position = 50
+    )
+    default boolean lootingTitle()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "lootNames",
+            name = "",
+            description = "",
+            section = "lootingTitle",
+            position = 51
+    )
+    default String lootNames()
+    {
+        return "Clue, champion";
+    }
+
+    @ConfigItem(
+            keyName = "lootGEValue",
+            name = "Loot if value>X",
+            description = "Loot items that are more valuable than X. 0 to disable",
+            section = "lootingTitle",
+            position = 52
+    )
+    default int lootGEValue()
+    {
+        return 0;
+    }
+
+    @ConfigItem(
+            keyName = "lootOwnKills",
+            name = "Only loot your kills",
+            description = "Makes the bot ignore drops from other players.",
+            section = "lootingTitle",
+            position = 53
+    )
+    default boolean lootOwnKills()
+    {
+        return false;
+    }
+
 
     @ConfigItem(
             keyName = "startButton",

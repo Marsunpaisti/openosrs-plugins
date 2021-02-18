@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
@@ -75,6 +76,61 @@ public class PInteraction {
 
             return true;
         }, "interact_tileObject");
+    }
+
+    public static Boolean groundItem(PGroundItem item, String ...actions){
+        return PUtils.clientOnly(() -> {
+            if (item == null) return false;
+            if (item.getDef() == null) return false;
+            if (!item.getLocation().isInScene(PUtils.getClient())) return false;
+            String[] possibleActions = item.getActions();
+            List<String> desiredActions = Arrays.asList(actions);
+            int actionIndex = -1;
+            String action = "";
+            int i = 0;
+            boolean found = false;
+            for (String a : possibleActions) {
+                if (desiredActions.contains(a)) {
+                    action = a;
+                    actionIndex = i;
+                    found = true;
+                    break;
+                }
+                i++;
+            }
+            if (!found) return false;
+            MenuOpcode actionOp = null;
+            switch (actionIndex) {
+                case 0:
+                    actionOp = MenuOpcode.GROUND_ITEM_FIRST_OPTION;
+                    break;
+                case 1:
+                    actionOp = MenuOpcode.GROUND_ITEM_SECOND_OPTION;
+                    break;
+                case 2:
+                    actionOp = MenuOpcode.GROUND_ITEM_THIRD_OPTION;
+                    break;
+                case 3:
+                    actionOp = MenuOpcode.GROUND_ITEM_FOURTH_OPTION;
+                    break;
+                case 4:
+                    actionOp = MenuOpcode.GROUND_ITEM_FIFTH_OPTION;
+                    break;
+                default:
+                    return false;
+            }
+
+            MenuOpcode finalActionOp = actionOp;
+            PUtils.getClient().invokeMenuAction(
+                    "",
+                    "",
+                    item.getId(),
+                    finalActionOp.getId(),
+                    item.getLocation().getX() - PUtils.getClient().getBaseX(),
+                    item.getLocation().getY() - PUtils.getClient().getBaseY());
+
+            return true;
+        }, "interact_GroundItem");
     }
 
     public static Boolean useItemOnItem(PItem item, PItem target){

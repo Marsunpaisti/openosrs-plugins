@@ -21,7 +21,7 @@ public class FightEnemiesState extends State {
 
     @Override
     public String getName() {
-        return "Fighting enemies";
+        return "FightEnemiesState";
     }
 
     @Override
@@ -32,6 +32,7 @@ public class FightEnemiesState extends State {
         if (!inCombat() && !isInteracting() ){
             log.info("No combat - Trying to attack new target");
             PUtils.sleepNormal(500, 3500, 250, 800);
+            if (plugin.isStopRequested()) return;
             attackNewTarget();
             return;
         }
@@ -40,6 +41,7 @@ public class FightEnemiesState extends State {
         if (!inCombat() && isInteracting() && System.currentTimeMillis() - targetAcquiredTimestamp >= 3000 && !PPlayer.isMoving()){
             log.info("Stuck trying to target enemy - Trying to attack new target");
             PUtils.sleepNormal(300, 1500, 250, 400);
+            if (plugin.isStopRequested()) return;
             attackNewTarget();
             return;
         }
@@ -48,6 +50,7 @@ public class FightEnemiesState extends State {
         if (getCurrentTarget() != null && !isCurrentTargetValid() && !getCurrentTarget().isDead()){
             log.info("Current target not valid - Trying to attack new target");
             PUtils.sleepNormal(300, 1500, 250, 400);
+            if (plugin.isStopRequested()) return;
             attackNewTarget();
         }
     }
@@ -83,11 +86,8 @@ public class FightEnemiesState extends State {
         return targets.get(0);
     }
 
-    public double distanceTo(WorldPoint point){
-        return PPlayer.getWorldLocation().distanceToHypotenuse((point));
-    }
-    public double distanceTo(NPC npc){
-        return PPlayer.getWorldLocation().distanceToHypotenuse(npc.getWorldLocation());
+    private double distanceTo(NPC n){
+        return PPlayer.distanceTo(n);
     }
 
     public Comparator<NPC> targetPrioritySorter = (a, b) -> {

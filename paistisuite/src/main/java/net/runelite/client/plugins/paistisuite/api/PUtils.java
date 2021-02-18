@@ -21,6 +21,7 @@ import java.util.EnumSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -127,6 +128,15 @@ public class PUtils {
 
     public static void sleepNormal(int min, int max, double deviation, double mean){
         sleep((int)PUtils.randomNormal(min, max, deviation, mean));
+    }
+
+    public static boolean waitCondition(int timeout, BooleanSupplier condition){
+        long startTime = System.currentTimeMillis();
+        while (!condition.getAsBoolean()){
+            if (System.currentTimeMillis() - startTime > timeout) return false;
+            sleepFlat(40, 70);
+        }
+        return true;
     }
 
     public static boolean isMembersWorld(){

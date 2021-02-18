@@ -12,6 +12,7 @@ import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.aiofighter.states.FightEnemiesState;
+import net.runelite.client.plugins.aiofighter.states.LootItemsState;
 import net.runelite.client.plugins.aiofighter.states.State;
 import net.runelite.client.plugins.paistisuite.PScript;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
@@ -21,16 +22,20 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.BFS;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.RealTimeCollisionTile;
+import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 import org.pf4j.Extension;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
+import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 @Extension
@@ -54,12 +59,16 @@ public class AIOFighter extends PScript {
     public int searchRadius;
     public WorldPoint searchRadiusCenter;
     public String[] enemiesToTarget;
-    public String[] foodsToEat = new String[]{"Shrimps", "Cabbage"};
+    public String[] foodsToEat;
+    public String[] lootNames;
+    public int lootGEValue;
     public Predicate<NPC> validTargetFilter;
-
+    public Predicate<PGroundItem> validLootFilter;
+    public Predicate<PItem> validFoodFilter;
     State currentState;
     List<State> states = new ArrayList<State>();
     public FightEnemiesState fightEnemiesState = new FightEnemiesState(this);
+    public LootItemsState lootItemsState = new LootItemsState(this);
     private String currentStateName;
 
     @Inject
@@ -92,20 +101,28 @@ public class AIOFighter extends PScript {
         readConfig();
         searchRadiusCenter = PPlayer.location();
         DaxWalker.setCredentials(PaistiSuite.getDaxCredentialsProvider());
+        states.add(this.lootItemsState);
         states.add(this.fightEnemiesState);
         overlayManager.add(overlay);
         overlayManager.add(minimapoverlay);
     }
 
     private synchronized void readConfig(){
-        enemiesToTarget = PUtils.parseCommaSeparated(config.enemyNames());
         searchRadius = config.searchRadius();
+        enemiesToTarget = PUtils.parseCommaSeparated(config.enemyNames());
+        foodsToEat = PUtils.parseCommaSeparated(config.foodNames());
+        lootNames = PUtils.parseCommaSeparated(config.lootNames());
         maxEatHp = Math.min(PSkills.getActualLevel(Skill.HITPOINTS), config.maxEatHP());
         minEatHp = Math.min(config.minEatHP(), maxEatHp);
         nextEatAt = (int)PUtils.randomNormal(minEatHp, maxEatHp);
         validTargetFilter = createValidTargetFilter();
+        validLootFilter = createValidLootFilter();
+        validFoodFilter = createValidFoodFilter();
+        lootGEValue = config.lootGEValue();
         log.info("Targeting enemies: " + String.join(", ", enemiesToTarget));
         log.info("Food names: " + String.join(", ", foodsToEat));
+        log.info("Loot names: " + String.join(", ", lootNames));
+        log.info("Loot over value: " + (lootGEValue <= 0 ? "disabled" : lootGEValue));
         log.info("Min eat: " + minEatHp + " max eat: " + maxEatHp + " next eat: " + nextEatAt);
     }
 
@@ -128,6 +145,9 @@ public class AIOFighter extends PScript {
         PUtils.sleepFlat(50, 150);
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
         handleEating();
+        if (isStopRequested()) return;
+        handleRun();
+        if (isStopRequested()) return;
         State prevState = currentState;
         currentState = getValidState();
         if (currentState != null) {
@@ -164,6 +184,7 @@ public class AIOFighter extends PScript {
 
     public boolean eatFood(){
         PItem food = PInventory.findItem(validFoodFilter);
+        if (food != null) log.info("Eating " + food.getName());
         if (PInteraction.item(food, "Eat")){
             log.info("Ate food");
             PUtils.sleepNormal(100, 700);
@@ -172,8 +193,6 @@ public class AIOFighter extends PScript {
         log.info("Failed to eat food!");
         return false;
     }
-
-    public Predicate<PItem> validFoodFilter = Filters.Items.nameEquals(foodsToEat);
 
     public WalkingCondition walkingCondition = () -> {
         if (isStopRequested()) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
@@ -202,7 +221,7 @@ public class AIOFighter extends PScript {
     private synchronized Predicate<NPC> createValidTargetFilter(){
         Predicate<NPC> filter = (NPC n) -> {
             return n.getWorldLocation().distanceToHypotenuse(searchRadiusCenter) <= searchRadius
-                && Filters.NPCs.nameEquals(enemiesToTarget).test(n)
+                && Filters.NPCs.nameOrIdEquals(enemiesToTarget).test(n)
                 && (n.getInteracting() == null || n.getInteracting().equals(PPlayer.get()))
                 && !n.isDead();
         };
@@ -211,21 +230,39 @@ public class AIOFighter extends PScript {
         return filter;
     };
 
-    public Boolean isReachable(NPC n){
+    private synchronized Predicate<PItem> createValidFoodFilter(){
+        return Filters.Items.nameOrIdEquals(foodsToEat);
+    }
+
+    private synchronized Predicate<PGroundItem> createValidLootFilter(){
+        Predicate<PGroundItem> filter = Filters.GroundItems.nameContainsOrIdEquals(lootNames);
+        if (lootGEValue > 0) filter = filter.or(Filters.GroundItems.SlotPriceAtLeast(lootGEValue));
+        filter = filter.and(item -> item.getLocation().distanceToHypotenuse(searchRadiusCenter) <= (searchRadius+2));
+        if (config.lootOwnKills()) filter = filter.and(item -> item.getLootType() == PGroundItem.LootType.PVM);
+        if (config.enablePathfind()) filter = filter.and(item -> isReachable(item.getLocation()));
+        filter = filter.and(item -> PInventory.getEmptySlots() > 0 || (item.isStackable() && PInventory.findItem(Filters.Items.idEquals(item.getId())) != null));
+        return filter;
+    }
+
+    public Boolean isReachable(WorldPoint p){
         return PUtils.clientOnly(() -> {
             if (BFS.isReachable(RealTimeCollisionTile.get(
                     PPlayer.location().getX(),
                     PPlayer.location().getY(),
                     PPlayer.location().getPlane()),
                     RealTimeCollisionTile.get(
-                            n.getWorldLocation().getX(),
-                            n.getWorldLocation().getY(),
-                            n.getWorldLocation().getPlane()), (int)Math.round(Math.PI*searchRadius*searchRadius))) {
+                            p.getX(),
+                            p.getY(),
+                            p.getPlane()), (int)Math.round(Math.PI*(searchRadius*searchRadius*1.5*1.5)))) {
                 return true;
             }
 
             return false;
         }, "isReachable");
+    }
+
+    public Boolean isReachable(NPC n){
+        return isReachable(n.getWorldLocation());
     }
 
 
