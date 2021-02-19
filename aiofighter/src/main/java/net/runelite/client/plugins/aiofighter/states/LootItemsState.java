@@ -21,6 +21,9 @@ public class LootItemsState extends State {
         if (plugin.fightEnemiesState.inCombat()) {
             return false;
         }
+        if (plugin.fightEnemiesState.getCurrentTarget() != null) {
+            return false;
+        }
 
         PGroundItem nextLoot = getNextLootableItem();
         return nextLoot != null && haveSpaceForItem(nextLoot);

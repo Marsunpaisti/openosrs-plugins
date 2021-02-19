@@ -11,7 +11,8 @@ public class PPlayer {
     }
 
     public static Player getPlayer() {
-        return PaistiSuite.getInstance().client.getLocalPlayer();
+        if (PUtils.getClient() == null) return null;
+        return PUtils.getClient().getLocalPlayer();
     }
 
     public static WorldPoint getWorldLocation() {

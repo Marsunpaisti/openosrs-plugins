@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.aiofighter;
 
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.config.*;
 
 @ConfigGroup("AIOFighter")
@@ -265,6 +266,28 @@ public interface AIOFighterConfig extends Config
         return new Button();
     }
 
+    @ConfigItem (
+            keyName = "storedFightTile",
+            hidden = true,
+            name = "Stored fight tile",
+            description = "Used to save last used fight tile",
+            position = 103
+    )
+    default WorldPoint storedFightTile()
+    {
+        return null;
+    }
 
+    @ConfigItem (
+            keyName = "storedSafeSpotTile",
+            hidden = true,
+            name = "Stored safe spot tile",
+            description = "Used to save last used safe spot tile",
+            position = 104
+    )
+    default WorldPoint storedSafeSpotTile()
+    {
+        return null;
+    }
 }
 

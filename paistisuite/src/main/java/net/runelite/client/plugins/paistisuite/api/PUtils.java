@@ -78,6 +78,7 @@ public class PUtils {
     }
 
     public static Client getClient() {
+        if (PaistiSuite.getInstance() == null) return null;
         return PaistiSuite.getInstance().client;
     }
 

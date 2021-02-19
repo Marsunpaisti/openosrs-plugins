@@ -2,7 +2,6 @@ package net.runelite.client.plugins.aiofighter.states;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.aiofighter.AIOFighter;
 import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
@@ -17,7 +16,7 @@ public class FightEnemiesState extends State {
     public FightEnemiesState(AIOFighter plugin){
         super(plugin);
     }
-    public long targetAcquiredTimestamp = System.currentTimeMillis();
+    public long targetClickedTimestamp = System.currentTimeMillis();
     public NPC lastTarget;
 
     @Override
@@ -63,11 +62,14 @@ public class FightEnemiesState extends State {
         }
 
         // No combat and trying to target timeout check
-        if (!inCombat() && isInteracting() && System.currentTimeMillis() - targetAcquiredTimestamp >= 3000 && !PPlayer.isMoving()){
-            log.info("Stuck trying to target enemy - Trying to attack new target");
-            PUtils.sleepNormal(300, 1500, 250, 400);
-            if (plugin.isStopRequested()) return;
-            attackNewTarget();
+        if (!inCombat() && isInteracting()){
+            if (System.currentTimeMillis() - targetClickedTimestamp >= 3000 && !PPlayer.isMoving()){
+                log.info("Stuck trying to target enemy - Trying to attack new target");
+                PUtils.sleepNormal(300, 1500, 250, 400);
+                if (plugin.isStopRequested()) return;
+                attackNewTarget();
+            }
+
             return;
         }
 
@@ -83,7 +85,7 @@ public class FightEnemiesState extends State {
     public boolean attackNewTarget(){
         NPC target = getNewTarget();
         if (PInteraction.npc(target, "Attack")) {
-            targetAcquiredTimestamp = System.currentTimeMillis();
+            targetClickedTimestamp = System.currentTimeMillis();
             lastTarget = target;
             PUtils.sleepNormal(200, 500);
             return true;
@@ -95,6 +97,7 @@ public class FightEnemiesState extends State {
     public boolean attackLastTarget(){
         if (lastTarget == null || !plugin.validTargetFilter.test(lastTarget)) return false;
         if (PInteraction.npc(lastTarget, "Attack")) {
+            targetClickedTimestamp = System.currentTimeMillis();
             PUtils.sleepNormal(200, 500);
             return true;
         }
@@ -116,7 +119,7 @@ public class FightEnemiesState extends State {
         List<NPC> targets = plugin.getValidTargets();
         if (targets.size() < 1) return null;
         targets.sort(targetPrioritySorter);
-        if (targets.size() >= 2 && PUtils.random(1,5) <= 1) {
+        if (targets.size() >= 2 && PUtils.random(1,5) <= 1 && !(targets.get(0).getInteracting() != null && targets.get(0).getInteracting().equals(PPlayer.get()))) {
             return targets.get(1);
         }
         return targets.get(0);
