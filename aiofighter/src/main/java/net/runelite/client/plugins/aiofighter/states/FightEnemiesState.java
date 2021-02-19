@@ -2,11 +2,13 @@ package net.runelite.client.plugins.aiofighter.states;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.aiofighter.AIOFighter;
 import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWalking;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 
 import java.util.Comparator;
 import java.util.List;
@@ -21,7 +23,7 @@ public class FightEnemiesState extends State {
 
     @Override
     public String getName() {
-        return "FightEnemiesState";
+        return "Fight enemies";
     }
 
     @Override
@@ -87,8 +89,7 @@ public class FightEnemiesState extends State {
         if (PInteraction.npc(target, "Attack")) {
             targetClickedTimestamp = System.currentTimeMillis();
             lastTarget = target;
-            PUtils.sleepNormal(200, 500);
-            return true;
+            return PUtils.waitCondition(PUtils.random(700, 1300), this::isInteracting);
         }
 
         return false;
@@ -98,8 +99,7 @@ public class FightEnemiesState extends State {
         if (lastTarget == null || !plugin.validTargetFilter.test(lastTarget)) return false;
         if (PInteraction.npc(lastTarget, "Attack")) {
             targetClickedTimestamp = System.currentTimeMillis();
-            PUtils.sleepNormal(200, 500);
-            return true;
+            return PUtils.waitCondition(PUtils.random(700, 1300), this::isInteracting);
         }
         return false;
     }
@@ -123,6 +123,11 @@ public class FightEnemiesState extends State {
             return targets.get(1);
         }
         return targets.get(0);
+    }
+
+    private int pathedDistanceTo(WorldPoint p){
+        Reachable r = new Reachable();
+        return 1;
     }
 
     private double distanceTo(NPC n){

@@ -21,6 +21,7 @@ import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.BFS;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.RealTimeCollisionTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
@@ -55,6 +56,7 @@ import java.util.stream.Collectors;
 public class AIOFighter extends PScript {
     int nextRunAt = PUtils.random(25,65);
     int nextEatAt;
+    public Instant startedTimestamp;
     boolean usingSavedSafeSpot = false;
     boolean usingSavedFightTile = false;
     public int minEatHp;
@@ -119,6 +121,7 @@ public class AIOFighter extends PScript {
     @Override
     protected synchronized void onStart() {
         PUtils.sendGameMessage("AiO Fighter started!");
+        startedTimestamp = Instant.now();
         readConfig();
         if (usingSavedSafeSpot){
             PUtils.sendGameMessage("Loaded safespot from last config.");
@@ -201,14 +204,16 @@ public class AIOFighter extends PScript {
             if (prevState != currentState){
                 log.info("Entered state: " + currentState.getName());
             }
-            setCurrentStateName(currentState.getName());
+            setCurrentStateName(currentState.chainedName());
             currentState.loop();
+        } else {
+            setCurrentStateName("Looking for state...");
         }
     }
 
     private boolean handleStopConditions(){
-        setCurrentStateName("StopConditionActive");
         if (stopWhenOutOfFood && PInventory.findItem(validFoodFilter) == null) {
+            setCurrentStateName("Stop Condition");
             if (safeSpotForLogout && PPlayer.location().distanceTo(safeSpot) != 0) {
                 if (!PWalking.sceneWalk(safeSpot)) {
                     DaxWalker.getInstance().allowTeleports = false;
@@ -310,30 +315,24 @@ public class AIOFighter extends PScript {
         return filter;
     }
 
-    public Boolean isReachable(WorldPoint p){
-        int iterations = (int)Math.max(650, Math.round(Math.PI*(searchRadius*searchRadius*1.5*1.5)));
-        return isReachable(p, iterations);
+    public int pathFindDistance(WorldPoint p){
+        Reachable r = new Reachable();
+        return r.getDistance(new RSTile(p));
     }
-    public Boolean isReachable(WorldPoint p, int iterations){
-        return PUtils.clientOnly(() -> {
-            if (BFS.isReachable(RealTimeCollisionTile.get(
-                    PPlayer.location().getX(),
-                    PPlayer.location().getY(),
-                    PPlayer.location().getPlane()),
-                    RealTimeCollisionTile.get(
-                            p.getX(),
-                            p.getY(),
-                            p.getPlane()), iterations)) {
-                return true;
-            }
 
-            return false;
-        }, "isReachable");
+    public Boolean isReachable(WorldPoint p){
+        Reachable r = new Reachable();
+        return r.canReach(new RSTile(p));
     }
 
     public Boolean isReachable(NPC n){
+        Reachable r = new Reachable();
+        return r.canReach(new RSTile(n.getWorldLocation()));
+        /*
         int iterations = (int)Math.max(650, Math.round(Math.PI*(searchRadius*searchRadius*1.5*1.5)));
         return isReachable(n.getWorldLocation(), iterations);
+
+         */
     }
 
     @Subscribe
@@ -355,6 +354,7 @@ public class AIOFighter extends PScript {
                 super.start();
             } catch (Exception e){
                 log.error(e.toString());
+                e.printStackTrace();
             }
         } else if (configButtonClicked.getKey().equals("stopButton")){
             requestStop();

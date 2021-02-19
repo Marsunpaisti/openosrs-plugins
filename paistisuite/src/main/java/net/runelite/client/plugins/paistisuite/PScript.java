@@ -12,7 +12,7 @@ public abstract class PScript extends Plugin {
     private boolean stopRequested = false;
     private boolean isRunning = false;
 
-    public synchronized void start() throws Exception {
+    public void start() throws Exception {
         if (scriptRunner != null) log.error("Trying to start an already running script!");
         stopRequested = false;
 
@@ -31,7 +31,7 @@ public abstract class PScript extends Plugin {
         return isRunning;
     }
 
-    protected synchronized void requestStop(){
+    protected void requestStop(){
         stopRequested = true;
         if (scriptRunner != null) scriptRunner.requestStop();
         scriptRunner = null;

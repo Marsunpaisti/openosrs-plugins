@@ -52,11 +52,14 @@ public class AIOFighterOverlay extends Overlay
 
 		if (plugin.enemiesToTarget != null && plugin.searchRadiusCenter != null){
 			java.util.List<NPC> validTargets = plugin.getValidTargets();
-			if (validTargets != null){
+			if (validTargets != null && validTargets.size() > 0){
 				for (NPC n : validTargets){
-					//if (target != null && n.equals(target)) continue;
 					highlightNpc(graphics, n, new Color(66, 254, 254, 35), new Color(66, 254, 254, 120));
 				}
+				OverlayUtil.renderActorTextOverlay(graphics,
+						validTargets.get(0),
+						"D: " + plugin.pathFindDistance(validTargets.get(0).getWorldLocation()),
+						new Color(255, 0, 0));
 			}
 		}
 
@@ -66,6 +69,7 @@ public class AIOFighterOverlay extends Overlay
 
 	private void highlightNpc(Graphics2D graphics, NPC npc, Color fillColor, Color borderColor){
 		Shape hull = npc.getConvexHull();
+		if (hull == null) return;
 		Color originalColor = graphics.getColor();
 		Stroke originalStroke = graphics.getStroke();
 		graphics.setStroke(new BasicStroke(2));

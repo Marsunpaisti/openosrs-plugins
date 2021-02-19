@@ -1,16 +1,22 @@
 package net.runelite.client.plugins.aiofighter;
 
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.PWidgets;
 import net.runelite.client.ui.overlay.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.time.Duration;
+import java.time.Instant;
 
 @Slf4j
 @Singleton
@@ -37,10 +43,42 @@ public class AIOFighterOverlayMinimap extends Overlay
 	{
 		if (!config.enableOverlay()) return null;
 
+		renderInfoBox(graphics);
+
 		if (plugin.searchRadiusCenter != null){
 			renderFightArea(graphics);
 		}
 		return null;
+	}
+
+	public void renderInfoBox(Graphics2D graphics){
+		if (!plugin.isRunning()) return;
+		Widget base = null;
+		if (PWidgets.isSubstantiated(WidgetInfo.CHATBOX)){
+			base = PWidgets.get(WidgetInfo.CHATBOX_PARENT);
+		} else {
+			base = PWidgets.get(WidgetInfo.CHATBOX_BUTTONS);
+		}
+		if (base == null) return;
+		double topOfWidget  = base.getBounds().getY();
+		double infoBoxHeight = 40;
+		double infoBoxWidth = base.getBounds().getWidth();
+		double drawPos = topOfWidget - infoBoxHeight;
+		graphics.setColor(Color.white);
+		graphics.fillRect(0, (int)drawPos, (int)infoBoxWidth, (int)infoBoxHeight);
+		graphics.setColor(Color.black);
+		graphics.setFont(new Font("Arial Bold", Font.PLAIN, 18));
+		int rowHeight = 18;
+		int currentRowPos = (int)drawPos + 16;
+		int horizontalPos1 = (int)base.getBounds().getX() + 3;
+		int horizontalPos2 = (int)base.getBounds().getX() + 3 + (int)infoBoxWidth/2;
+		long d = Duration.between(plugin.startedTimestamp, Instant.now()).getSeconds();
+		String runTimeStr = String.format("%d:%02d:%02d", d / 3600, (d % 3600) / 60, (d % 60));
+		graphics.drawString("Runtime: " + runTimeStr, horizontalPos1, currentRowPos);
+		graphics.drawString("State: " + plugin.getCurrentStateName(), horizontalPos2, currentRowPos);
+		currentRowPos += rowHeight;
+		//graphics.drawString("Runtime: " + runTimeStr, horizontalPos1, currentRowPos);
+		//currentRowPos += rowHeight;
 	}
 
 	public void renderFightArea(Graphics2D graphics)

@@ -27,7 +27,7 @@ public class WalkToFightAreaState extends State {
 
     @Override
     public String getName() {
-        return "WalkToFightAreaState";
+        return "Walk to fight area";
     }
 
     @Override
@@ -36,12 +36,12 @@ public class WalkToFightAreaState extends State {
         WorldPoint target = (plugin.safeSpotForCombat && plugin.safeSpot != null) ? plugin.safeSpot : plugin.searchRadiusCenter;
 
         if (!PPlayer.isMoving()) {
-            if (target.isInScene(PUtils.getClient()) && plugin.isReachable(target, 1400) && PWalking.sceneWalk(target)){
-                PUtils.sleepNormal(500, 1500);
+            if (target.isInScene(PUtils.getClient()) && plugin.isReachable(target) && PWalking.sceneWalk(target)){
+                PUtils.sleepNormal(650, 1500);
             } else if (!DaxWalker.walkTo(new RSTile(target), plugin.walkingCondition)) {
                 log.info("Unable to walk to fight area!");
                 PUtils.sendGameMessage("Unable to walk to fight area!");
-                PUtils.sleepNormal(500, 1500);
+                PUtils.sleepNormal(650, 1500);
             }
         }
     }

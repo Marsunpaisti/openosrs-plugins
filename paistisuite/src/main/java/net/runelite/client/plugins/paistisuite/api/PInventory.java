@@ -176,14 +176,18 @@ public class PInventory
     }
 
     public static List<PItem> findAllEquipmentItems(Predicate<PItem> filter){
-        return getEquipmentItems()
+        List<PItem> eq = getEquipmentItems();
+        if (eq == null) return new ArrayList<PItem>();
+        return eq
                 .stream()
                 .filter(filter)
                 .collect(Collectors.toList());
     }
 
     public static PItem findEquipmentItem(Predicate<PItem> filter){
-        return getEquipmentItems()
+        List<PItem> eq = getEquipmentItems();
+        if (eq == null) return null;
+        return eq
                 .stream()
                 .filter(filter)
                 .findFirst()

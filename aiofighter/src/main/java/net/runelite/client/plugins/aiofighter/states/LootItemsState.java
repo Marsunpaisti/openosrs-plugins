@@ -31,7 +31,7 @@ public class LootItemsState extends State {
 
     @Override
     public String getName() {
-        return "LootItemsState";
+        return "Loot items";
     }
 
     @Override
