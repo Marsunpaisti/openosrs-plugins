@@ -1,4 +1,4 @@
-version = "1.5.2"
+version = "1.5.4"
 
 project.extra["PluginName"] = "PaistiSuite"
 project.extra["PluginDescription"] = "Scripting framework by Paisti"
