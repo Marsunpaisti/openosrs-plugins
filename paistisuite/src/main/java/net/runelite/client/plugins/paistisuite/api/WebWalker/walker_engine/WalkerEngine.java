@@ -127,6 +127,14 @@ public class WalkerEngine{
 
                 CustomConditionContainer conditionContainer = new CustomConditionContainer(walkingCondition);
                 log.info(destinationDetails.toString());
+
+                switch (conditionContainer.getResult()) {
+                    case EXIT_OUT_WALKER_SUCCESS:
+                        return true;
+                    case EXIT_OUT_WALKER_FAIL:
+                        return false;
+                }
+
                 switch (destinationDetails.getState()) {
                     case DISCONNECTED_PATH:
                         if (currentNode.getRSTile().toWorldPoint().distanceToHypotenuse(PPlayer.location()) > 10){

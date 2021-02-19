@@ -11,13 +11,16 @@ import net.runelite.rs.api.RSClient;
 public class CollisionDataCollector {
     private static Client client = PUtils.getClient();
 
-    public static int[][] getCollisionData(){
+    public static synchronized int[][] getCollisionData(){
         //log.info(((RSClient)client).getCollisionMaps().length + " total maps");
         int[][] collisionData = ((RSClient)client).getCollisionMaps()[PUtils.getClient().getPlane()].getFlags();
         return collisionData;
     }
 
-    public static void generateRealTimeCollision(){
+    private static int lastGeneratedTick = -1;
+    public static synchronized void generateRealTimeCollision(){
+        if (lastGeneratedTick == client.getTickCount()) return;
+        lastGeneratedTick = client.getTickCount();
         RealTimeCollisionTile.clearMemory();
 
         RSTile playerPosition = new RSTile(PPlayer.getWorldLocation());
@@ -36,7 +39,7 @@ public class CollisionDataCollector {
         }
     }
 
-    public static void updateRealTimeCollision(){
+    public static synchronized void updateRealTimeCollision(){
         RSTile playerPosition = new RSTile(PPlayer.location());
         int[][] collisionData = getCollisionData();
         if(collisionData == null)
