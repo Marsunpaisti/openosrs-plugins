@@ -9,6 +9,7 @@ import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWalking;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 
 import java.util.Comparator;
 import java.util.List;
@@ -104,8 +105,6 @@ public class FightEnemiesState extends State {
         return false;
     }
 
-
-
     public boolean isCurrentTargetValid(){
         NPC interacting = (NPC)PPlayer.get().getInteracting();
         if (interacting != null){
@@ -125,9 +124,9 @@ public class FightEnemiesState extends State {
         return targets.get(0);
     }
 
-    private int pathedDistanceTo(WorldPoint p){
+    public int pathFindDistanceTo(WorldPoint p){
         Reachable r = new Reachable();
-        return 1;
+        return r.getDistance(new RSTile(p));
     }
 
     private double distanceTo(NPC n){
@@ -139,7 +138,11 @@ public class FightEnemiesState extends State {
         boolean bTargetingUs = b.getInteracting() != null && b.getInteracting().equals(PPlayer.get());
         if (aTargetingUs && !bTargetingUs) return -1;
         if (bTargetingUs && !aTargetingUs) return 1;
-        return (int)Math.round(distanceTo(a)) - (int)Math.round(distanceTo(b));
+        if (plugin.enablePathfind) {
+            return pathFindDistanceTo(a.getWorldLocation()) - pathFindDistanceTo(b.getWorldLocation());
+        } else {
+            return (int)Math.round(distanceTo(a)) - (int)Math.round(distanceTo(b));
+        }
     };
 
     public boolean inCombat(){

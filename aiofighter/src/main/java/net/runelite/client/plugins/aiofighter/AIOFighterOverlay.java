@@ -10,6 +10,9 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.queries.NPCQuery;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.AStarNode;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.ui.overlay.*;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -55,15 +58,10 @@ public class AIOFighterOverlay extends Overlay
 			if (validTargets != null && validTargets.size() > 0){
 				for (NPC n : validTargets){
 					highlightNpc(graphics, n, new Color(66, 254, 254, 35), new Color(66, 254, 254, 120));
+					//OverlayUtil.renderActorTextOverlay(graphics, n, "" + plugin.pathFindDistance(n.getWorldLocation()), new Color(255, 0, 0));
 				}
-				OverlayUtil.renderActorTextOverlay(graphics,
-						validTargets.get(0),
-						"D: " + plugin.pathFindDistance(validTargets.get(0).getWorldLocation()),
-						new Color(255, 0, 0));
 			}
 		}
-
-
 		return null;
 	}
 

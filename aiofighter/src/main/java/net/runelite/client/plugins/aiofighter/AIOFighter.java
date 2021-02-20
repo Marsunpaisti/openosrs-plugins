@@ -20,15 +20,12 @@ import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.bfs.BFS;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.RealTimeCollisionTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.ui.overlay.OverlayManager;
-import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 import org.pf4j.Extension;
 
 import javax.inject.Inject;
@@ -36,9 +33,7 @@ import javax.inject.Singleton;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
-import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 @Extension
@@ -56,6 +51,7 @@ import java.util.stream.Collectors;
 public class AIOFighter extends PScript {
     int nextRunAt = PUtils.random(25,65);
     int nextEatAt;
+    public boolean enablePathfind;
     public Instant startedTimestamp;
     boolean usingSavedSafeSpot = false;
     boolean usingSavedFightTile = false;
@@ -152,6 +148,7 @@ public class AIOFighter extends PScript {
         lootGEValue = config.lootGEValue();
         safeSpotForCombat = config.enableSafeSpot();
         safeSpotForLogout = config.exitInSafeSpot();
+        enablePathfind = config.enablePathfind();
         if (safeSpot == null){
             usingSavedSafeSpot = true;
             safeSpot = config.storedSafeSpotTile();
@@ -315,11 +312,6 @@ public class AIOFighter extends PScript {
         return filter;
     }
 
-    public int pathFindDistance(WorldPoint p){
-        Reachable r = new Reachable();
-        return r.getDistance(new RSTile(p));
-    }
-
     public Boolean isReachable(WorldPoint p){
         Reachable r = new Reachable();
         return r.canReach(new RSTile(p));
@@ -328,11 +320,6 @@ public class AIOFighter extends PScript {
     public Boolean isReachable(NPC n){
         Reachable r = new Reachable();
         return r.canReach(new RSTile(n.getWorldLocation()));
-        /*
-        int iterations = (int)Math.max(650, Math.round(Math.PI*(searchRadius*searchRadius*1.5*1.5)));
-        return isReachable(n.getWorldLocation(), iterations);
-
-         */
     }
 
     @Subscribe
