@@ -62,7 +62,7 @@ public class Filters {
                 if (n.getTransformedDefinition() != null && n.getTransformedDefinition().getName().equalsIgnoreCase(str)) return true;
                 try {
                     int id = Integer.parseInt(str);
-                    return n.getTransformedDefinition().getId() == id;
+                    return n.getTransformedDefinition() != null && n.getTransformedDefinition().getId() == id;
                 } catch (NumberFormatException ignored){
                 }
                 return false;

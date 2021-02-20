@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils;
 
-import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ObjectDefinition;
-import net.runelite.api.TileObject;
 import net.runelite.client.plugins.paistisuite.api.PObjects;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
@@ -80,13 +77,13 @@ public class SpiritTree {
             return false;
         }
 
-        if (!option.click()){
+        if (!option.interact()){
             log.info("Failed to click option");
             return false;
         }
 
         if (WaitFor.condition(PUtils.random(5400, 6500), () -> location.getRSTile().toWorldPoint().distanceToHypotenuse(PPlayer.location()) < 10 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS){
-            WaitFor.milliseconds(250, 500);
+            WaitFor.milliseconds(1200, 3000);
             return true;
         }
         return false;

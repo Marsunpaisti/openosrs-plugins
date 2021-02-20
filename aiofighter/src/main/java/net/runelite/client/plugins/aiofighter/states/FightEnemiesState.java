@@ -47,6 +47,7 @@ public class FightEnemiesState extends State {
             log.info("No combat - Trying to attack new target");
             PUtils.sleepNormal(500, 3500, 250, 800);
             if (plugin.isStopRequested()) return;
+            if (inCombat() || isInteracting()) return;
             attackNewTarget();
 
             // Run to safespot after attack animation starts to play

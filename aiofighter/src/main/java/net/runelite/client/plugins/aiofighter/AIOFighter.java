@@ -218,8 +218,13 @@ public class AIOFighter extends PScript {
                 }
                 return true;
             }
-            if (!fightEnemiesState.inCombat() && PUtils.logout()){
-                requestStop();
+            if (!fightEnemiesState.inCombat()){
+                PUtils.logout();
+                if  (PUtils.waitCondition(1500, () -> PUtils.getClient().getGameState() != GameState.LOGGED_IN)) {
+                    requestStop();
+                } else {
+                    PUtils.sleepNormal(700, 2500);
+                }
                 return true;
             } else if (fightEnemiesState.inCombat()){
                 return true;

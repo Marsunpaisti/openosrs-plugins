@@ -54,8 +54,11 @@ public class RSInterface {
         }, "RSInterface.getActions");
     }
 
-    public boolean click(String ...options){
+    public boolean interact(String ...options){
         return PInteraction.widget(this.widget, options);
+    }
+    public boolean interact(){
+        return PInteraction.clickWidget(this.widget);
     }
 
     public boolean click(){

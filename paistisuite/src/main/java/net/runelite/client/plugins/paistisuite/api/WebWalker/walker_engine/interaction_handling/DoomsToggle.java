@@ -42,7 +42,7 @@ public class DoomsToggle {
             String[] actions = rsInterface.getActions();
             return actions != null && Arrays.stream(option).anyMatch(s -> Arrays.stream(actions).anyMatch(s1 -> s1.equals(s)));
         }).findAny();
-        optional.ifPresent(rsInterface -> rsInterface.click(option));
+        optional.ifPresent(rsInterface -> rsInterface.interact(option));
         WaitFor.milliseconds(500, 1500);
         return true;
     }

@@ -116,7 +116,7 @@ public class FairyRing {
 
     private static boolean pressTeleport(){
         RSInterface iface = getTeleportButton();
-        return iface != null && iface.click();
+        return iface != null && iface.interact();
     }
 
     private static boolean openFairyRing(){

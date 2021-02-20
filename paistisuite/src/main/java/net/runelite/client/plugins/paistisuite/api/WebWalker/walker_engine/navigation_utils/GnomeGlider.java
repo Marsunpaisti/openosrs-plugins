@@ -89,7 +89,7 @@ public class GnomeGlider {
             return false;
         }
 
-        if (!option.click()){
+        if (!option.interact()){
             return false;
         }
 

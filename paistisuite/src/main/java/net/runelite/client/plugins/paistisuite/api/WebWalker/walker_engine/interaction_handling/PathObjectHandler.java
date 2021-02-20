@@ -196,7 +196,7 @@ public class PathObjectHandler {
                 return destinationDetails.getDestination().getRSTile().toWorldPoint().equals(new WorldPoint(2690, 10125, 0))
                         && new NPCQuery()
                         .nameEquals("Boulder")
-                        .filter((npc) -> Arrays.asList(npc.getTransformedDefinition().getActions()).contains("Roll"))
+                        .filter(Filters.NPCs.actionsContains("Roll"))
                         .result(PUtils.getClient())
                         .size() > 0;
 
@@ -400,7 +400,7 @@ public class PathObjectHandler {
                 case BRINE_RAT_CAVE_BOULDER:
                     NPC boulder = new NPCQuery()
                             .nameEquals("Boulder")
-                            .filter((npc) -> Arrays.asList(npc.getTransformedDefinition().getActions()).contains("Roll"))
+                            .filter(Filters.NPCs.actionsContains("Roll"))
                             .result(client)
                             .first();
                     if (boulder == null) return false;
@@ -408,7 +408,7 @@ public class PathObjectHandler {
                         if(WaitFor.condition(12000,
                                 () -> new NPCQuery()
                                         .nameEquals("Boulder")
-                                        .filter((npc) -> Arrays.asList(npc.getTransformedDefinition().getActions()).contains("Roll"))
+                                        .filter(Filters.NPCs.actionsContains("Roll"))
                                         .result(client)
                                         .size() > 0 ?
                                         WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS){

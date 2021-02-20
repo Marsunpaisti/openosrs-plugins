@@ -84,7 +84,8 @@ public class WalkerEngine{
 
             while (true) {
 
-                if (client.getGameState() != GameState.LOGGED_IN && client.getGameState() != GameState.LOADING){
+                GameState gameState = client.getGameState();
+                if (gameState != GameState.LOGGED_IN && gameState != GameState.LOADING) {
                     return false;
                 }
 

@@ -334,8 +334,8 @@ public class PInteraction {
     }
 
     public static Boolean widget(Widget widget, String... actions) {
+        if (widget == null) return false;
         return PUtils.clientOnly(() -> {
-            if (widget == null) return false;
             String[] possibleActions = widget.getActions();
             List<String> desiredActions = Arrays.asList(actions);
             int actionIndex = -1;

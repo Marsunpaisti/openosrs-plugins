@@ -3,6 +3,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navi
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.queries.NPCQuery;
+import net.runelite.client.plugins.paistisuite.api.Filters;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper;
@@ -13,9 +14,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSArea;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,6 +36,7 @@ public class Charter{
         }
         HashMap<LocationProperty, Location> charterLocations = getCharterLocations();
         Location location = charterLocations.get(locationProperty);
+
         if (location == null){
             log.info("Location: " + locationProperty + " is not available. " + charterLocations.keySet());
             return false;
@@ -56,9 +56,7 @@ public class Charter{
         boolean widgetValid = PUtils.getClient().getWidget(CHARTER_INTERFACE_MASTER, 0) != null;
         if (widgetValid) return true;
         NPC charterNpc = new NPCQuery()
-                .filter(npc -> Arrays.stream(npc.getTransformedDefinition().getActions())
-                            .filter(Objects::nonNull)
-                            .anyMatch(a -> a.equalsIgnoreCase("Charter")))
+                .filter(Filters.NPCs.actionsContains("Charter"))
                 .result(PUtils.getClient())
                 .nearestTo(PPlayer.get());
 
@@ -67,16 +65,25 @@ public class Charter{
     }
 
     private static HashMap<LocationProperty, Location> getCharterLocations(){
-        HashMap<LocationProperty, Location> locations = new HashMap<>();
-        InterfaceHelper.getAllChildren(CHARTER_INTERFACE_MASTER).stream().filter(
-                rsInterface -> rsInterface != null
-                        && rsInterface.getWidget().getFontId() == 495
-                        && !rsInterface.getWidget().isHidden()
-                        && rsInterface.getWidget().getTextShadowed())
-                .collect(Collectors.toList())
-                .forEach(rsInterface -> locations.put(
-                        LocationProperty.stringToLocation(rsInterface.getText()), new Location(rsInterface)));
-        return locations;
+        return PUtils.clientOnly(() -> {
+            HashMap<LocationProperty, Location> locations = new HashMap<>();
+            InterfaceHelper.getAllChildren(CHARTER_INTERFACE_MASTER).stream().filter(
+                    rsInterface -> rsInterface != null
+                            && rsInterface.getWidget() != null
+                            && rsInterface.getWidget().getFontId() == 495
+                            && rsInterface.getWidget().getTextShadowed()
+                            && !rsInterface.getWidget().isHidden()
+            )
+                    .collect(Collectors.toList())
+                    .forEach(rsInterface -> {
+                                locations.put(
+                                        LocationProperty.stringToLocation(rsInterface.getText()), new Location(rsInterface));
+                            }
+                    );
+
+
+            return locations;
+        }, "getCharterLocations");
     }
 
     public enum LocationProperty {
@@ -148,9 +155,10 @@ public class Charter{
             return rsInterface;
         }
 
-        public boolean click(String... options){
-            return rsInterface.click(options);
+        public boolean click(){
+            return rsInterface.interact();
         }
+
 
         @Override
         public String toString(){

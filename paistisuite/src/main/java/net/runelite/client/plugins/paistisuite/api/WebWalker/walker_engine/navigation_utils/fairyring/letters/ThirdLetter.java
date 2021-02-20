@@ -57,7 +57,7 @@ public enum ThirdLetter {
             return true;
         RSInterface iface = getClockwise();
         final int value = get();
-        return iface != null && iface.click()
+        return iface != null && iface.interact()
                 && WaitFor.condition(2500, () -> get() != value ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS
                 && turnClockwise(--rotations);
     }
@@ -67,7 +67,7 @@ public enum ThirdLetter {
             return true;
         RSInterface iface = getAntiClockwise();
         final int value = get();
-        return iface != null && iface.click()
+        return iface != null && iface.interact()
                 && WaitFor.condition(2500, () -> get() != value ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS
                 && turnAntiClockwise(--rotations);
     }

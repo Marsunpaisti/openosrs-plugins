@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.letters;
 
 
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWidgets;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
@@ -59,7 +58,7 @@ public enum FirstLetter {
             return true;
         RSInterface iface = getClockwise();
         final int value = get();
-        return iface != null && iface.click()
+        return iface != null && iface.interact()
                 && WaitFor.condition(2500, () -> get() != value ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS
                 && turnClockwise(--rotations);
     }
@@ -69,7 +68,7 @@ public enum FirstLetter {
             return true;
         RSInterface iface = getAntiClockwise();
         final int value = get();
-        return iface != null && iface.click()
+        return iface != null && iface.interact()
                 && WaitFor.condition(2500, () -> get() != value ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS
                 && turnAntiClockwise(--rotations);
     }
