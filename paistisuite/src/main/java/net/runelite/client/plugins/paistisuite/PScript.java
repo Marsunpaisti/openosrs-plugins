@@ -31,7 +31,8 @@ public abstract class PScript extends Plugin {
         return isRunning;
     }
 
-    protected void requestStop(){
+    public void requestStop(){
+        log.info("Requested stop.");
         stopRequested = true;
         if (scriptRunner != null) scriptRunner.requestStop();
         scriptRunner = null;

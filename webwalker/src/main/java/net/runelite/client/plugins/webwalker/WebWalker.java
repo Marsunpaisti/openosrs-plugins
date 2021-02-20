@@ -173,6 +173,9 @@ public class WebWalker extends PScript {
         PUtils.sleepFlat(1500, 3000);
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
 
+        synchronized (this){
+            boolean pathNull = path == null;
+        }
 
         if (path == null){
             PlayerDetails details = PlayerDetails.generate();
@@ -191,13 +194,14 @@ public class WebWalker extends PScript {
                 return;
             }
 
-            path = pathResult.toRSTilePath();
+            synchronized(this){
+                path = pathResult.toRSTilePath();
+            }
         }
 
-        if (WalkerEngine.getInstance().walkPath(path, walkingCondition)) {
-            requestStop();
-            return;
-        }
+        WalkerEngine.getInstance().walkPath(path, walkingCondition);
+        requestStop();
+        return;
     }
 
     public WalkingCondition walkingCondition = () -> {

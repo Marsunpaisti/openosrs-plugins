@@ -42,6 +42,7 @@ public class WalkToFightAreaState extends State {
                 log.info("Unable to walk to fight area!");
                 PUtils.sendGameMessage("Unable to walk to fight area!");
                 PUtils.sleepNormal(650, 1500);
+                plugin.requestStop();
             }
         }
     }

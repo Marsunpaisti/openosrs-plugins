@@ -71,15 +71,18 @@ public class WebWalkerOverlay extends Overlay
 			}
 		}
 
-		List<RSTile> path = plugin.path;
-		if (path == null) return null;
-		for (RSTile tile : path)
-		{
-			if (debugFurthestTile != null){
-				if (tile.equals(debugFurthestTile)) continue;
+		synchronized(plugin){
+			List<RSTile> path = plugin.path;
+			if (path == null) return null;
+			for (RSTile tile : path)
+			{
+				if (debugFurthestTile != null){
+					if (tile.equals(debugFurthestTile)) continue;
+				}
+				drawTile(graphics, tile, Color.cyan);
 			}
-			drawTile(graphics, tile, Color.cyan);
 		}
+
 
 		return null;
 	}

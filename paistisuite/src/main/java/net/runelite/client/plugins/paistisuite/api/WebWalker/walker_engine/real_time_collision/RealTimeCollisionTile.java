@@ -91,7 +91,7 @@ public class RealTimeCollisionTile extends PathFindingNode {
     }
 
     @Override
-    public synchronized Collection<PathFindingNode> getNeighbors() {
+    public Collection<PathFindingNode> getNeighbors() {
         Collection<PathFindingNode> neighbors = new HashSet<>();
         boolean nNeighbor = false, eNeighbor = false, sNeighbor = false, wNeighbor = false;
         RealTimeCollisionTile n = get(getX(), getY() + 1, getZ());
@@ -166,7 +166,7 @@ public class RealTimeCollisionTile extends PathFindingNode {
     private static HashMap<Integer, HashMap<Integer, HashMap<Integer, RealTimeCollisionTile>>> xMap = new HashMap<>();
     private static HashSet<RealTimeCollisionTile> allCached = new HashSet<>();
 
-    public synchronized static RealTimeCollisionTile get(int x, int y, int z){
+    public static RealTimeCollisionTile get(int x, int y, int z){
         HashMap<Integer, HashMap<Integer, RealTimeCollisionTile>> yMap = xMap.get(x);
         if (yMap == null){
             return null;
@@ -178,7 +178,7 @@ public class RealTimeCollisionTile extends PathFindingNode {
         return zMap.get(z);
     }
 
-    public synchronized static RealTimeCollisionTile create(int x, int y, int z, int collision){
+    public static RealTimeCollisionTile create(int x, int y, int z, int collision){
         RealTimeCollisionTile realTimeCollisionTile = new RealTimeCollisionTile(x, y, z, collision);
         if (!realTimeCollisionTile.isInitialized()){
             return null;
