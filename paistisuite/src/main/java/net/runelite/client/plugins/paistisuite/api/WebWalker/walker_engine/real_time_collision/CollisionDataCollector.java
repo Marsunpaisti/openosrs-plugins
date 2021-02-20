@@ -11,7 +11,7 @@ import net.runelite.rs.api.RSClient;
 public class CollisionDataCollector {
     private static Client client = PUtils.getClient();
 
-    public static synchronized int[][] getCollisionData(){
+    public static int[][] getCollisionData(){
         //log.info(((RSClient)client).getCollisionMaps().length + " total maps");
         int[][] collisionData = ((RSClient)client).getCollisionMaps()[PUtils.getClient().getPlane()].getFlags();
         return collisionData;
