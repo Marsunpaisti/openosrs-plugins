@@ -17,6 +17,7 @@ import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.events.PlayerLootReceived;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStack;
+import net.runelite.client.game.NPCManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginType;
@@ -58,6 +59,8 @@ public class PaistiSuite extends Plugin
 	public Client client;
 	@Inject
 	public ChatMessageManager chatMessageManager;
+	@Inject
+	public NPCManager npcManager;
 	@Inject
 	public ItemManager itemManager;
 	@Inject
