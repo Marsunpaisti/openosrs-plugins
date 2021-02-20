@@ -201,8 +201,21 @@ public class PathObjectHandler {
                         .size() > 0;
 
             }
+        }),
+        FALADOR_COWS_WIDE_GATE("Gate", "Open", null, new SpecialCondition() {
+            @Override
+            boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
+                PTileObject gate = PObjects.findObject(Filters.Objects.idEquals(1561).and(g -> g.getWorldLocation().distanceTo(new WorldPoint(3031, 3314, 0)) < 5));
+                return gate != null && gate.getWorldLocation().distanceTo(destinationDetails.getDestination().getRSTile().toWorldPoint()) < 4;
+            }
+        }),
+        FALADOR_COWS_WIDE_GATE_CLOSE("Gate", "Close", null, new SpecialCondition() {
+            @Override
+            boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
+                PTileObject gate = PObjects.findObject(Filters.Objects.idEquals(1563).and(g -> g.getWorldLocation().distanceTo(new WorldPoint(3031, 3314, 0)) < 5));
+                return gate != null && gate.getWorldLocation().distanceTo(destinationDetails.getDestination().getRSTile().toWorldPoint()) < 4;
+            }
         });
-
         private String name, action;
         private WorldPoint location;
         private SpecialCondition specialCondition;
@@ -252,18 +265,19 @@ public class PathObjectHandler {
 
         String action = null;
         SpecialObject specialObject = SpecialObject.getValidSpecialObjects(destinationDetails);
+        if (specialObject != null) log.info("Special: " + specialObject.name());
         if (specialObject == null) {
             if ((interactiveObjects = getInteractiveObjects(start.getX(), start.getY(), start.getZ(), destinationDetails)).size() < 1 && end != null) {
                 interactiveObjects = getInteractiveObjects(end.getX(), end.getY(), end.getZ(), destinationDetails);
             }
         } else {
             action = specialObject.getAction();
-            Predicate<PTileObject> specialObjectFilter = (PTileObject objDefPair) -> {
-                    ObjectDefinition def = objDefPair.getSecond();
+            Predicate<PTileObject> specialObjectFilter = (PTileObject obj) -> {
+                    ObjectDefinition def = obj.getSecond();
                     if (def == null) return false;
                     return def.getName().equals(specialObject.getName()) &&
                             Arrays.asList(def.getActions()).contains(specialObject.getAction()) &&
-                            objDefPair.getFirst().getWorldLocation().distanceToHypotenuse(specialObject.getLocation() != null ? specialObject.getLocation() : destinationDetails.getAssumed().toWorldPoint()) <= 1.5;
+                            obj.getFirst().getWorldLocation().distanceTo(specialObject.getLocation() != null ? specialObject.getLocation() : destinationDetails.getAssumed().toWorldPoint()) <= 3;
             };
             /*
             Filter<GameObject> specialObjectFilter = Filters.Objects.nameEquals(specialObject.getName())
@@ -274,14 +288,13 @@ public class PathObjectHandler {
             interactiveObjects = Objects.findNearest(15, specialObjectFilter);
              */
             Client client = PUtils.getClient();
-            interactiveObjects = PObjects.getAllObjects()
-                    .stream()
-                    .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 15)
-                    .filter(specialObjectFilter)
-                    .collect(Collectors.toList());
+            interactiveObjects = PObjects.findAllObjects(
+                specialObjectFilter
+                .and(obj -> obj.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 15));
         }
 
         if (interactiveObjects.size() == 0) {
+            log.info("No interactive objects found.");
             return false;
         }
 
@@ -322,6 +335,34 @@ public class PathObjectHandler {
             log.info("Detected Special Object: " + specialObject);
             Client client = PUtils.getClient();
             switch (specialObject){
+                case FALADOR_COWS_WIDE_GATE:
+                case FALADOR_COWS_WIDE_GATE_CLOSE:
+                    log.info("Handling gate");
+                    PTileObject gateclose = PObjects.findObject(Filters.Objects.nameEquals("Gate").and(g -> g.getWorldLocation().distanceTo(new WorldPoint(3032, 3314, 0)) < 5));
+                    if (gateclose == null) {
+                        log.info("Unable to find gate!");
+                        return false;
+                    }
+                    if (PWalking.sceneWalk(destinationDetails.getDestination().getRSTile().toWorldPoint())) {
+                        log.info("Walking in front of gate");
+                        PUtils.sleepNormal(700, 1300);
+                        if (PUtils.waitCondition(PUtils.random(6000, 8000), () -> new RSTile(PPlayer.getWorldLocation()).equals(destinationDetails.getDestination().getRSTile()))){
+                            log.info("In front of gate, trying to open");
+                            PUtils.sleepNormal(200, 400);
+                            if(InteractionHelper.click(gateclose, "Open")){
+                                log.info("CLicked gate, waiting for reachable");
+                                if (PUtils.waitCondition(PUtils.random(1300, 1900), () -> new Reachable().canReach(destinationDetails.getAssumed()))){
+                                    successfulClick = true;
+                                    log.info("Destination behind gate is now reachable");
+                                } else {
+                                    log.info("Assumed tile is not reachable");
+                                }
+                            }
+                        } else {
+                            log.info("Timed out when walking in front of gate");
+                        }
+                    }
+                    break;
                 case WEB:
                     List<PTileObject> webs = PObjects.getAllObjects()
                             .stream()
@@ -337,13 +378,6 @@ public class PathObjectHandler {
                         } else {
                             useBladeOnWeb(webs.get(0));
                         }
-
-                        /*
-                        if(Game.isUptext("->")){
-                            Walking.blindWalkTo(PPlayer.location());
-                        }
-                         */
-
                         if (webs.get(0).getWorldLocation().distanceTo(PPlayer.location()) <= 1) {
                             WaitFor.milliseconds((int)PUtils.randomNormal(50, 800, 250, 150));
                         } else {
@@ -367,7 +401,7 @@ public class PathObjectHandler {
                 case ARDY_DOOR_LOCK_SIDE:
                 case YANILLE_DOOR_LOCK_SIDE:
                     for (int i = 0; i < PUtils.random(15, 25); i++) {
-                        if (!clickOnObject(objDefPair, specialObject.getAction())){
+                        if (!clickOnObject(objDefPair, destinationDetails, specialObject.getAction())){
                             continue;
                         }
                         if (PPlayer.location().distanceTo(specialObject.getLocation()) > 1){
@@ -380,7 +414,7 @@ public class PathObjectHandler {
                     }
                     break;
                 case VARROCK_UNDERWALL_TUNNEL:
-                    if(!clickOnObject(objDefPair,specialObject.getAction())){
+                    if(!clickOnObject(objDefPair, destinationDetails, specialObject.getAction())){
                         return false;
                     }
                     successfulClick = true;
@@ -389,7 +423,7 @@ public class PathObjectHandler {
                                     WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
                     break;
                 case EDGEVILLE_UNDERWALL_TUNNEL:
-                    if(!clickOnObject(objDefPair,specialObject.getAction())){
+                    if(!clickOnObject(objDefPair, destinationDetails, specialObject.getAction())){
                         return false;
                     }
                     successfulClick = true;
@@ -423,7 +457,7 @@ public class PathObjectHandler {
             String[] validOptions = action != null ? new String[]{action} : getViableOption(
                     Arrays.stream(objDefPair.getSecond().getActions()).filter(Objects::nonNull).filter(getInstance().sortedOptions::contains).collect(
                             Collectors.toList()), destinationDetails);
-            if (!clickOnObject(objDefPair, validOptions)) {
+            if (!clickOnObject(objDefPair, destinationDetails, validOptions)) {
                 return false;
             }
         }
@@ -583,7 +617,7 @@ public class PathObjectHandler {
         return options;
     }
 
-    private static boolean clickOnObject(PTileObject obj, String... options){
+    private static boolean clickOnObject(PTileObject obj, PathAnalyzer.DestinationDetails destinationDetails,  String... options){
         boolean result;
 
         if (isClosedTrapDoor(obj, options)){
@@ -593,16 +627,21 @@ public class PathObjectHandler {
             log.info("Interacting with (" +  obj.getSecond().getName() + ") at " + obj.getFirst().getWorldLocation() + " with options: " + Arrays.toString(options) + " " + (result ? "SUCCESS" : "FAIL"));
             if ( obj.getWorldLocation().distanceTo(PPlayer.location()) > 1){
                 // Wait for movement start
-                WaitFor.condition(PUtils.random(100, 300), () -> PPlayer.isMoving() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
-                log.info("Move started");
+                WaitFor.condition(PUtils.random(700, 900), () -> PPlayer.isMoving() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+                log.info("Movement started");
+                Reachable r = new Reachable();
+                int dist = r.getDistance(destinationDetails.getDestination().getRSTile());
+                int multiplier = PPlayer.isRunEnabled() ? 300 : 600;
+                int timeout = (dist != Integer.MAX_VALUE) ? (dist * multiplier) + PUtils.random(1300, 1900) : PUtils.random(3700, 5500);
+
                 // Wait for movement to end
-                WaitFor.condition(PUtils.random(2500, 4000), () -> !PPlayer.isMoving() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
-                log.info("Move stopped");
+                WaitFor.condition(timeout, () -> !PPlayer.isMoving() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+                log.info("Movement stopped");
             }
 
             // Wait a little bit more for any animations to end
-            WaitFor.milliseconds(700, 1500);
-            log.info("hard waited");
+            WaitFor.milliseconds(1000, 1900);
+            log.info("Hard waited");
 
         }
 

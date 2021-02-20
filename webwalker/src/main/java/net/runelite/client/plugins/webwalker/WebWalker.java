@@ -78,6 +78,28 @@ public class WebWalker extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
+/*
+
+        PTileObject gate = PObjects.findObject(Filters.Objects.idEquals(1561).and(g -> g.getWorldLocation().distanceTo(PPlayer.location()) < 5));
+        if (gate != null){
+            log.info("Found gate");
+            var actions = gate.getDef().getActions();
+            var name = gate.getDef().getName();
+            if (name == null){
+                log.info("Null name");
+            }else {
+                log.info("Name: " + name);
+            }
+            if (actions == null) {
+                log.info("Null actions");
+            } else {
+                log.info("Actions: " + String.join(", ", actions));
+            }
+        }
+
+ */
+
+
     }
 
     @Subscribe
@@ -90,7 +112,7 @@ public class WebWalker extends PScript {
 
         if (map.getBounds().contains(PUtils.getClient().getMouseCanvasPosition().getX(), PUtils.getClient().getMouseCanvasPosition().getY())) {
             PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan));
-            PMenu.addEntry(event, ColorUtil.wrapWithColorTag("Webwalker", Color.cyan) + " Autowalk");
+            PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan) + " Autowalk");
         }
     }
 
@@ -170,7 +192,6 @@ public class WebWalker extends PScript {
 
     @Override
     protected void loop() {
-        PUtils.sleepFlat(1500, 3000);
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
 
         synchronized (this){

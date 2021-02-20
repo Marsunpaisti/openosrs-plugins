@@ -22,6 +22,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.CollisionDataCollector;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Keyboard;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
@@ -71,7 +72,8 @@ public class AIOFighter extends PScript {
     public boolean eatFoodForLoot;
     public boolean safeSpotForCombat;
     public boolean safeSpotForLogout;
-
+    private long lastAntiAfk = System.currentTimeMillis();
+    private long antiAfkDelay = PUtils.randomNormal(120000, 270000);
     State currentState;
     List<State> states = new ArrayList<State>();
     public FightEnemiesState fightEnemiesState = new FightEnemiesState(this);
@@ -189,6 +191,7 @@ public class AIOFighter extends PScript {
     protected void loop() {
         PUtils.sleepFlat(50, 150);
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
+        handleAntiAfk();
         if (handleStopConditions()) return;
         handleEating();
         if (isStopRequested()) return;
@@ -231,6 +234,14 @@ public class AIOFighter extends PScript {
             }
         }
         return false;
+    }
+
+    private void handleAntiAfk(){
+        if (System.currentTimeMillis() - lastAntiAfk >= antiAfkDelay) {
+            antiAfkDelay = PUtils.randomNormal(120000, 270000);
+            lastAntiAfk = System.currentTimeMillis();
+            Keyboard.pressSpacebar();
+        }
     }
 
     private boolean handleEating(){

@@ -171,6 +171,13 @@ public class WalkerEngine{
 
                         //DO NOT BREAK OUT
                     case OBJECT_BLOCKING:
+                        switch (conditionContainer.getResult()) {
+                            case EXIT_OUT_WALKER_SUCCESS:
+                                return true;
+                            case EXIT_OUT_WALKER_FAIL:
+                                return false;
+                        }
+
                         RSTile walkingTile = Reachable.getBestWalkableTile(destination.getRSTile(), new Reachable());
                         if (isDestinationClose(destination) || (walkingTile != null ? AccurateMouse.walkTo(walkingTile) : clickMinimap(destination))) {
                             log.info("Handling Object...");
@@ -184,6 +191,12 @@ public class WalkerEngine{
                         break;
 
                     case FURTHEST_CLICKABLE_TILE:
+                        switch (conditionContainer.getResult()) {
+                            case EXIT_OUT_WALKER_SUCCESS:
+                                return true;
+                            case EXIT_OUT_WALKER_FAIL:
+                                return false;
+                        }
                         if (clickMinimap(currentNode)) {
                             long offsetWalkingTimeout = System.currentTimeMillis() + PUtils.random(3000, 4500);
                             WaitFor.condition(10000, () -> {
