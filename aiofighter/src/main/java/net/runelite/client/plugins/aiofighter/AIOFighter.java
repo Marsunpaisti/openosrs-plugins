@@ -176,6 +176,7 @@ public class AIOFighter extends PScript {
 
     @Override
     protected void shutDown() {
+        requestStop();
         overlayManager.remove(overlay);
         overlayManager.remove(minimapoverlay);
     }

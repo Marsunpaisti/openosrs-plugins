@@ -17,6 +17,6 @@ public class RSVarBit {
 
     public static RSVarBit get(int varbitId){
         Client client = PUtils.getClient();
-        return new RSVarBit(PVars.getVarbitValue(varbitId));
+        return new RSVarBit(PVars.getVarbit(varbitId));
     }
 }
