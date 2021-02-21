@@ -12,7 +12,6 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.paistisuite.PScript;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.PDialogue;
@@ -35,8 +34,7 @@ import java.util.List;
         name = "Quester",
         enabledByDefault = false,
         description = "Completes quests",
-        tags = {"npcs", "items", "paisti"},
-        type = PluginType.UTILITY
+        tags = {"npcs", "items", "paisti"}
 )
 
 @Slf4j

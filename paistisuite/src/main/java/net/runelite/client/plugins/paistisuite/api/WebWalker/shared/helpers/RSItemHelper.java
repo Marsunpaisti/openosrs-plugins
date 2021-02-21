@@ -7,7 +7,6 @@ import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
-import net.runelite.rs.api.RSItemDefinition;
 
 import java.awt.*;
 import java.util.Arrays;

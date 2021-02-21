@@ -2,8 +2,7 @@ package net.runelite.client.plugins.paistisuite.api.types;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Item;
-import net.runelite.api.ItemDefinition;
-import net.runelite.api.ObjectDefinition;
+import net.runelite.api.ObjectComposition;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.WidgetItem;
@@ -13,28 +12,28 @@ import net.runelite.client.plugins.paistisuite.api.PObjects;
 @Slf4j
 public class PTileObject {
     public TileObject tileObject;
-    public ObjectDefinition objectDefinition;
+    public ObjectComposition ObjectComposition;
 
-    public PTileObject(TileObject tileObject, ObjectDefinition definition){
+    public PTileObject(TileObject tileObject, ObjectComposition definition){
         this.tileObject = tileObject;
-        this.objectDefinition = definition;
+        this.ObjectComposition = definition;
     }
 
     public PTileObject(TileObject tileObject){
         this.tileObject = tileObject;
-        this.objectDefinition = PObjects.getRealDefinition(tileObject.getId());
+        this.ObjectComposition = PObjects.getRealDefinition(tileObject.getId());
     }
 
     public TileObject getFirst(){
         return tileObject;
     }
 
-    public ObjectDefinition getSecond(){
-        return objectDefinition;
+    public ObjectComposition getSecond(){
+        return ObjectComposition;
     }
 
-    public ObjectDefinition getDef(){
-        return objectDefinition;
+    public ObjectComposition getDef(){
+        return ObjectComposition;
     }
 
     public WorldPoint getWorldLocation(){

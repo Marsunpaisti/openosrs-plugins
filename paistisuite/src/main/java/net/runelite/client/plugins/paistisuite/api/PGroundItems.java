@@ -181,9 +181,9 @@ public class PGroundItems {
 
     public static void onMenuOptionClicked(final MenuOptionClicked menuOptionClicked)
     {
-        if (menuOptionClicked.getMenuOpcode() == MenuOpcode.ITEM_DROP)
+        if (menuOptionClicked.getMenuAction() == MenuAction.ITEM_FIFTH_OPTION)
         {
-            final int itemId = menuOptionClicked.getIdentifier();
+            final int itemId = menuOptionClicked.getId();
             // Keep a queue of recently dropped items to better detect
             // item spawns that are drops
             droppedItemQueue.add(itemId);
@@ -195,7 +195,7 @@ public class PGroundItems {
         synchronized (collectedGroundItems) {
             for (PGroundItem item : collectedGroundItems.values()) {
                 PGroundItem copy = PGroundItem.builder()
-                        .itemDefinition(item.getItemDefinition())
+                        .itemComposition(item.getItemComposition())
                         .id(item.getId())
                         .itemId(item.getItemId())
                         .name(item.getName())
@@ -245,9 +245,9 @@ public class PGroundItems {
     {
         // Collect the data for the item
         final int itemId = item.getId();
-        final ItemDefinition itemComposition = PaistiSuite.getInstance().itemManager.getItemDefinition(itemId);
+        final ItemComposition itemComposition = PaistiSuite.getInstance().itemManager.getItemComposition(itemId);
         final int realItemId = itemComposition.getNote() != -1 ? itemComposition.getLinkedNoteId() : itemId;
-        final int alchPrice = PaistiSuite.getInstance().itemManager.getAlchValue(realItemId);
+        final int alchPrice = itemComposition.getHaPrice();
 
         final Player player = PUtils.getClient().getLocalPlayer();
 
@@ -325,6 +325,7 @@ public class PGroundItems {
                 .quantity(item.getQuantity())
                 .name(itemComposition.getName())
                 .haPrice(alchPrice)
+                .gePrice(itemComposition.getPrice())
                 .height(-1)
                 .tradeable(itemComposition.isTradeable())
                 .droppedInstant(Instant.now())
@@ -335,7 +336,7 @@ public class PGroundItems {
                 .lootType(dropped ? PGroundItem.LootType.DROPPED : PGroundItem.LootType.UNKNOWN)
                 .spawnTime(Instant.now())
                 .stackable(itemComposition.isStackable())
-                .itemDefinition(PaistiSuite.getInstance().itemManager.getItemDefinition(itemId))
+                .itemComposition(PaistiSuite.getInstance().itemManager.getItemComposition(itemId))
                 .build();
 
 

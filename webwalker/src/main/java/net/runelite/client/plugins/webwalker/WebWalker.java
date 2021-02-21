@@ -11,7 +11,6 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.paistisuite.PScript;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.*;
@@ -31,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 @Extension
 @PluginDependency(PaistiSuite.class)
@@ -38,8 +38,7 @@ import java.util.ArrayList;
         name = "WebWalker",
         enabledByDefault = false,
         description = "Walks around with DaxWalker. Special thanks to Manhattan, Illumine and Runemoro.",
-        tags = {"npcs", "items", "paisti"},
-        type = PluginType.UTILITY
+        tags = {"npcs", "items", "paisti"}
 )
 
 @Slf4j
@@ -77,6 +76,8 @@ public class WebWalker extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
+        List<PItem> eq = PInventory.getEquipmentItems();
+
     }
 
     @Subscribe
@@ -101,7 +102,7 @@ public class WebWalker extends PScript {
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
 
-        if (event.getOption().contains("Autowalk")) {
+        if (event.getMenuOption().contains("Autowalk")) {
             WorldPoint wp = calculateMapPoint(PUtils.getClient().isMenuOpen() ? lastMenuOpenedPoint : PUtils.getClient().getMouseCanvasPosition());
             allowTeleports = config.allowTeleports();
             targetLocation = new RSTile(wp);
@@ -276,6 +277,7 @@ public class WebWalker extends PScript {
             }
         } else if (configButtonClicked.getKey().equals("stopButton")){
             requestStop();
+            return;
         }
     }
 

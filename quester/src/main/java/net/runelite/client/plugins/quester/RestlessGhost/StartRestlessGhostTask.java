@@ -31,11 +31,13 @@ public class StartRestlessGhostTask implements Task {
     }
 
     public boolean condition() {
-        return PVars.getVarp(VarPlayer.QUEST_THE_RESTLESS_GHOST) == 0;
+        // TODO:
+        return PVars.getVarp(107) == 0;
     }
 
-    public boolean isComplete() {
-        return PVars.getVarp(VarPlayer.QUEST_THE_RESTLESS_GHOST) == 1;
+    public boolean isCompleted() {
+        // TODO:
+        return PVars.getVarp(107) == 1;
     }
 
     public boolean isFailed(){

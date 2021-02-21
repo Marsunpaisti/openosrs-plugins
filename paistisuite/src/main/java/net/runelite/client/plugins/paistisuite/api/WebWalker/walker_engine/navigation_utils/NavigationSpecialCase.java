@@ -4,7 +4,6 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navi
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
-import net.runelite.api.ObjectDefinition;
 import net.runelite.api.Skill;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
@@ -889,7 +888,7 @@ public class NavigationSpecialCase {
         String travelOption = "Travel";
         List<NPC> npcs = PObjects.findAllNPCs(Filters.NPCs.nameEquals("Veos", "Captain Magoro"));
         if(npcs.size() > 0){
-            String[] actions = npcs.get(0).getTransformedDefinition().getActions();
+            String[] actions = npcs.get(0).getTransformedComposition().getActions();
             if(actions != null){
                 List<String> asList = Arrays.asList(actions);
                 if(asList.stream().filter(Objects::nonNull).anyMatch(a -> a.equals("Port Sarim") || a.equals("Land's End"))){

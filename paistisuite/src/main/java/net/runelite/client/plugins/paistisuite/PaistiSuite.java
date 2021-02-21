@@ -20,7 +20,6 @@ import net.runelite.client.game.ItemStack;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.paistisuite.api.PGroundItems;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentials;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentialsProvider;
@@ -43,8 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @PluginDescriptor(
 	name = "PaistiSuite",
 	description = "Scripting framework by Paisti",
-	tags = {"npcs", "items"},
-	type = PluginType.UTILITY
+	tags = {"npcs", "items"}
 )
 
 @Slf4j

@@ -2,7 +2,6 @@ package net.runelite.client.plugins.paistisuite.api;
 
 import net.runelite.api.InventoryID;
 import net.runelite.api.MenuEntry;
-import net.runelite.api.MenuOpcode;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;

@@ -33,7 +33,7 @@ public class QuestTaskRunner {
             return;
         }
 
-        if (currentTask == null || currentTask.isFailed() || currentTask.isComplete()){
+        if (currentTask == null || currentTask.isFailed() || currentTask.isCompleted()){
             currentTask = getNewTask();
         }
 

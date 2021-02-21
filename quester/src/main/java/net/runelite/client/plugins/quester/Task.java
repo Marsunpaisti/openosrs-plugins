@@ -7,7 +7,7 @@ public interface Task {
     public abstract WorldPoint location();
     public abstract boolean execute();
     public abstract boolean condition();
-    public abstract boolean isComplete();
+    public abstract boolean isCompleted();
     public boolean isFailed();
     public int getDistance();
 }

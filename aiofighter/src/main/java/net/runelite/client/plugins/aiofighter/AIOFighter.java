@@ -10,7 +10,6 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.PluginType;
 import net.runelite.client.plugins.aiofighter.states.FightEnemiesState;
 import net.runelite.client.plugins.aiofighter.states.LootItemsState;
 import net.runelite.client.plugins.aiofighter.states.State;
@@ -43,8 +42,7 @@ import java.util.stream.Collectors;
         name = "AiO Fighter",
         enabledByDefault = false,
         description = "Fully configurable all-in-one fighter",
-        tags = {"combat", "magic", "fighter", "paisti"},
-        type = PluginType.PVM
+        tags = {"combat", "magic", "fighter", "paisti"}
 )
 
 @Slf4j

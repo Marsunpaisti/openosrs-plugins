@@ -89,7 +89,7 @@ public class PUtils {
                     "",
                     "",
                     1,
-                    MenuOpcode.CC_OP.getId(),
+                    MenuAction.CC_OP.getId(),
                     -1,
                     param1
             );

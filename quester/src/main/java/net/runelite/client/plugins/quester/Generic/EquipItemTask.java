@@ -67,7 +67,7 @@ public class EquipItemTask implements Task {
         return PInventory.findItem(Filters.Items.nameContains(itemName)) != null;
     }
 
-    public boolean isComplete() {
+    public boolean isCompleted() {
         return PInventory.findEquipmentItem(Filters.Items.nameContains(itemName)) != null;
     }
 

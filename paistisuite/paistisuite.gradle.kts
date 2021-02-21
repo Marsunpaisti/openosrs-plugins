@@ -1,10 +1,10 @@
-version = "1.5.9"
+version = "2.0.0"
 
 project.extra["PluginName"] = "PaistiSuite"
 project.extra["PluginDescription"] = "Scripting framework by Paisti"
 
 dependencies {
-    compileOnly(group = "com.openosrs.rs", name = "runescape-api", version = "3.5.4")
+    compileOnly(group = "com.openosrs.rs", name = "runescape-api", version = "4.0.0")
 }
 
 tasks {

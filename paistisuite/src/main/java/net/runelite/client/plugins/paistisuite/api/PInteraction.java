@@ -34,27 +34,27 @@ public class PInteraction {
                 i++;
             }
             if (!found) return false;
-            MenuOpcode actionOp = null;
+            MenuAction actionOp = null;
             switch (actionIndex) {
                 case 0:
-                    actionOp = MenuOpcode.GAME_OBJECT_FIRST_OPTION;
+                    actionOp = MenuAction.GAME_OBJECT_FIRST_OPTION;
                     break;
                 case 1:
-                    actionOp = MenuOpcode.GAME_OBJECT_SECOND_OPTION;
+                    actionOp = MenuAction.GAME_OBJECT_SECOND_OPTION;
                     break;
                 case 2:
-                    actionOp = MenuOpcode.GAME_OBJECT_THIRD_OPTION;
+                    actionOp = MenuAction.GAME_OBJECT_THIRD_OPTION;
                     break;
                 case 3:
-                    actionOp = MenuOpcode.GAME_OBJECT_FOURTH_OPTION;
+                    actionOp = MenuAction.GAME_OBJECT_FOURTH_OPTION;
                     break;
                 case 4:
-                    actionOp = MenuOpcode.GAME_OBJECT_FIFTH_OPTION;
+                    actionOp = MenuAction.GAME_OBJECT_FIFTH_OPTION;
                     break;
                 default:
                     return false;
             }
-            MenuOpcode finalActionOp = actionOp;
+            MenuAction finalActionOp = actionOp;
             if (to.getFirst() instanceof GameObject){
                 PUtils.getClient().invokeMenuAction(
                         "",
@@ -99,28 +99,28 @@ public class PInteraction {
                 i++;
             }
             if (!found) return false;
-            MenuOpcode actionOp = null;
+            MenuAction actionOp = null;
             switch (actionIndex) {
                 case 0:
-                    actionOp = MenuOpcode.GROUND_ITEM_FIRST_OPTION;
+                    actionOp = MenuAction.GROUND_ITEM_FIRST_OPTION;
                     break;
                 case 1:
-                    actionOp = MenuOpcode.GROUND_ITEM_SECOND_OPTION;
+                    actionOp = MenuAction.GROUND_ITEM_SECOND_OPTION;
                     break;
                 case 2:
-                    actionOp = MenuOpcode.GROUND_ITEM_THIRD_OPTION;
+                    actionOp = MenuAction.GROUND_ITEM_THIRD_OPTION;
                     break;
                 case 3:
-                    actionOp = MenuOpcode.GROUND_ITEM_FOURTH_OPTION;
+                    actionOp = MenuAction.GROUND_ITEM_FOURTH_OPTION;
                     break;
                 case 4:
-                    actionOp = MenuOpcode.GROUND_ITEM_FIFTH_OPTION;
+                    actionOp = MenuAction.GROUND_ITEM_FIFTH_OPTION;
                     break;
                 default:
                     return false;
             }
 
-            MenuOpcode finalActionOp = actionOp;
+            MenuAction finalActionOp = actionOp;
             PUtils.getClient().invokeMenuAction(
                     "",
                     "",
@@ -144,7 +144,7 @@ public class PInteraction {
                     "",
                     "",
                     target.getWidgetItem().getId(),
-                    MenuOpcode.ITEM_USE_ON_WIDGET_ITEM.getId(),
+                    MenuAction.ITEM_USE_ON_WIDGET_ITEM.getId(),
                     target.getWidgetItem().getIndex(),
                     9764864);
             return true;
@@ -183,28 +183,28 @@ public class PInteraction {
 
             if (!found) return false;
 
-            MenuOpcode actionOp = null;
+            MenuAction actionOp = null;
             switch (actionIndex) {
                 case 0:
-                    actionOp = MenuOpcode.ITEM_FIRST_OPTION;
+                    actionOp = MenuAction.ITEM_FIRST_OPTION;
                     break;
                 case 1:
-                    actionOp = MenuOpcode.ITEM_SECOND_OPTION;
+                    actionOp = MenuAction.ITEM_SECOND_OPTION;
                     break;
                 case 2:
-                    actionOp = MenuOpcode.ITEM_THIRD_OPTION;
+                    actionOp = MenuAction.ITEM_THIRD_OPTION;
                     break;
                 case 3:
-                    actionOp = MenuOpcode.ITEM_FOURTH_OPTION;
+                    actionOp = MenuAction.ITEM_FOURTH_OPTION;
                     break;
                 case 4:
-                    actionOp = MenuOpcode.ITEM_FIFTH_OPTION;
+                    actionOp = MenuAction.ITEM_FIFTH_OPTION;
                     break;
                 default:
                     return false;
             }
 
-            MenuOpcode finalActionOp = actionOp;
+            MenuAction finalActionOp = actionOp;
             PUtils.getClient().invokeMenuAction(
                     "",
                     "",
@@ -238,7 +238,7 @@ public class PInteraction {
                         "",
                         "",
                         to.getFirst().getId(),
-                        MenuOpcode.ITEM_USE_ON_GAME_OBJECT.getId(),
+                        MenuAction.ITEM_USE_ON_GAME_OBJECT.getId(),
                         ((GameObject)to.getFirst()).getSceneMinLocation().getX(),
                         ((GameObject)to.getFirst()).getSceneMinLocation().getY());
             } else {
@@ -249,7 +249,7 @@ public class PInteraction {
                         "",
                         "",
                         to.getFirst().getId(),
-                        MenuOpcode.ITEM_USE_ON_GAME_OBJECT.getId(),
+                        MenuAction.ITEM_USE_ON_GAME_OBJECT.getId(),
                         (to.getFirst()).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
                         (to.getFirst()).getWorldLocation().getY() - PUtils.getClient().getBaseY());
             }
@@ -260,11 +260,11 @@ public class PInteraction {
     public static Boolean npc(NPC npc, String... actions) {
         return PUtils.clientOnly(() -> {
             if (npc == null) return false;
-            if (npc.getTransformedDefinition() == null) {
+            if (npc.getTransformedComposition() == null) {
                 log.error("Unable to get transformed def for NPC");
                 return false;
             }
-            String[] possibleActions = npc.getTransformedDefinition().getActions();
+            String[] possibleActions = npc.getTransformedComposition().getActions();
             List<String> desiredActions = Arrays.asList(actions);
             int actionIndex = -1;
             String action = "";
@@ -281,32 +281,32 @@ public class PInteraction {
             }
 
             if (!found) {
-                log.error("Unable to find action: " + action + " on npc " + npc.getTransformedDefinition().getName());
+                log.error("Unable to find action: " + action + " on npc " + npc.getTransformedComposition().getName());
                 return false;
             }
 
-            MenuOpcode actionOp = null;
+            MenuAction actionOp = null;
             switch (actionIndex) {
                 case 0:
-                    actionOp = MenuOpcode.NPC_FIRST_OPTION;
+                    actionOp = MenuAction.NPC_FIRST_OPTION;
                     break;
                 case 1:
-                    actionOp = MenuOpcode.NPC_SECOND_OPTION;
+                    actionOp = MenuAction.NPC_SECOND_OPTION;
                     break;
                 case 2:
-                    actionOp = MenuOpcode.NPC_THIRD_OPTION;
+                    actionOp = MenuAction.NPC_THIRD_OPTION;
                     break;
                 case 3:
-                    actionOp = MenuOpcode.NPC_FOURTH_OPTION;
+                    actionOp = MenuAction.NPC_FOURTH_OPTION;
                     break;
                 case 4:
-                    actionOp = MenuOpcode.NPC_FIFTH_OPTION;
+                    actionOp = MenuAction.NPC_FIFTH_OPTION;
                     break;
                 default:
                     return false;
             }
 
-            MenuOpcode finalActionOp = actionOp;
+            MenuAction finalActionOp = actionOp;
 
             PUtils.getClient().invokeMenuAction(
                     "",
@@ -355,7 +355,7 @@ public class PInteraction {
 
             if (!found) return false;
             int finalActionIndex = actionIndex + 1;
-            MenuOpcode finalActionOp = finalActionIndex > 5 ? MenuOpcode.CC_OP_LOW_PRIORITY : MenuOpcode.CC_OP;
+            MenuAction finalActionOp = finalActionIndex > 5 ? MenuAction.CC_OP_LOW_PRIORITY : MenuAction.CC_OP;
             final int widgetId = widget.getId();
 
             PUtils.getClient().invokeMenuAction(

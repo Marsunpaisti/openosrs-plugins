@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.paistisuite.api;
 
 import kotlin.Pair;
-import net.runelite.api.ItemDefinition;
 import net.runelite.api.NPC;
-import net.runelite.api.ObjectDefinition;
 import net.runelite.api.TileObject;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
@@ -43,26 +41,26 @@ public class Filters {
     }
     public static class NPCs {
         public static Predicate<NPC> nameContains(String ...name) {
-            return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedDefinition().getName().contains(n));
+            return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedComposition().getName().contains(n));
         }
         public static Predicate<NPC> nameEquals(String ...name) {
-            return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedDefinition().getName().equalsIgnoreCase(n));
+            return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedComposition().getName().equalsIgnoreCase(n));
         }
         public static Predicate<NPC> actionsEquals(String ...action) {
-            return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(npc.getTransformedDefinition().getActions())
+            return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
                     .filter(java.util.Objects::nonNull)
                     .allMatch(a -> Arrays.asList(action).contains(a));
         }
         public static Predicate<NPC> actionsContains(String ...action) {
-            return (NPC npc) -> npc.getTransformedDefinition() != null && Arrays.stream(npc.getTransformedDefinition().getActions())
+            return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
                     .anyMatch(a -> Arrays.asList(action).contains(a));
         }
         public static Predicate<NPC> nameOrIdEquals(String ...namesorids){
             return (NPC n) -> Arrays.stream(namesorids).anyMatch(str -> {
-                if (n.getTransformedDefinition() != null && n.getTransformedDefinition().getName().equalsIgnoreCase(str)) return true;
+                if (n.getTransformedComposition() != null && n.getTransformedComposition().getName().equalsIgnoreCase(str)) return true;
                 try {
                     int id = Integer.parseInt(str);
-                    return n.getTransformedDefinition() != null && n.getTransformedDefinition().getId() == id;
+                    return n.getTransformedComposition() != null && n.getTransformedComposition().getId() == id;
                 } catch (NumberFormatException ignored){
                 }
                 return false;

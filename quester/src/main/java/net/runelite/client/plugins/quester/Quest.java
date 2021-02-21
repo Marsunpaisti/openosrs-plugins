@@ -20,7 +20,7 @@ public abstract class Quest implements TaskContainer {
     public Task getTask() {
         Task ret = null;
         for (Task t : tasks){
-            if (!t.isFailed() && ! t.isComplete() && t.condition()){
+            if (!t.isFailed() && !t.isCompleted() && t.condition()){
                 ret = t;
                 break;
             }
@@ -39,7 +39,7 @@ public abstract class Quest implements TaskContainer {
     }
 
     public boolean isComplete(){
-        return this.tasks.get(tasks.size() - 1).isComplete();
+        return this.tasks.get(tasks.size() - 1).isCompleted();
     }
 
     public WorldPoint location(){

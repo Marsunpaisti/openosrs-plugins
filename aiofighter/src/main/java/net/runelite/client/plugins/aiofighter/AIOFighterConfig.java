@@ -17,17 +17,6 @@ public interface AIOFighterConfig extends Config
         return false;
     }
 
-    @ConfigSection(
-            keyName = "targetingTitle",
-            name = "Targeting",
-            description = "Enter enemy names or IDs to target",
-            position = 15
-    )
-    default boolean targetingTitle()
-    {
-        return false;
-    }
-
     @ConfigItem(
             keyName = "enemyNames",
             name = "",
@@ -80,16 +69,6 @@ public interface AIOFighterConfig extends Config
         return new Button();
     }
 
-    @ConfigSection(
-            keyName = "eatingTitle",
-            name = "Eating",
-            description = "Eating options. Enter food names or IDs to eat.",
-            position = 20
-    )
-    default boolean eatingTitle()
-    {
-        return false;
-    }
     @ConfigItem(
             keyName = "foodNames",
             name = "",
@@ -135,17 +114,6 @@ public interface AIOFighterConfig extends Config
             position = 31
     )
     default boolean stopWhenOutOfFood()
-    {
-        return false;
-    }
-
-    @ConfigSection(
-            keyName = "lootingTitle",
-            name = "Looting",
-            description = "Always loot item names whose names contain",
-            position = 50
-    )
-    default boolean lootingTitle()
     {
         return false;
     }
@@ -198,16 +166,6 @@ public interface AIOFighterConfig extends Config
         return false;
     }
 
-    @ConfigSection(
-            keyName = "safespotTitle",
-            name = "Safespot",
-            description = "Safespot related settings",
-            position = 70
-    )
-    default boolean safespotTitle()
-    {
-        return false;
-    }
     @ConfigItem(
             keyName = "setSafeSpotButton",
             name = "Set safespot tile",

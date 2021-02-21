@@ -29,8 +29,8 @@ public class PDialogue {
             log.info("No conversation window to handle!");
             return false;
         }
-
-        int totalChoices = choices.length;
+        if (choices != null && choices.length == 1 && choices[0] == "") choices = null;
+        int totalChoices = choices != null ? choices.length : 0;
         int nextChoice = 0;
         while (isConversationWindowUp()){
             List<Widget> options = getDialogueOptions();
@@ -76,7 +76,7 @@ public class PDialogue {
             PUtils.sleepNormal(400, 1500);
         }
 
-        if (nextChoice != choices.length) {
+        if (nextChoice != totalChoices) {
             log.info("Conversation closed without selecting all choices!");
             return false;
         }

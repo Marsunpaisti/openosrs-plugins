@@ -11,9 +11,7 @@ public interface PaistiSuiteConfig extends Config {
             name = "Dax API Key",
             description = "Key to use for dax's webwalker requests",
             position = 110,
-            hidden = false,
-            unhide = "category",
-            unhideValue = "CUSTOM"
+            hidden = false
     )
     default String daxApiKey()
     {
@@ -25,9 +23,7 @@ public interface PaistiSuiteConfig extends Config {
             name = "Dax API key secret",
             description = "Secret to use for dax's webwalker requests",
             position = 135,
-            hidden = false,
-            unhide = "category",
-            unhideValue = "CUSTOM"
+            hidden = false
     )
     default String daxSecretKey()
     {

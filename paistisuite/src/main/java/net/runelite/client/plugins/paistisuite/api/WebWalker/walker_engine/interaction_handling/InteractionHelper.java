@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling;
 
 import kotlin.Pair;
-import net.runelite.api.ItemDefinition;
 import net.runelite.api.NPC;
-import net.runelite.api.ObjectDefinition;
 import net.runelite.api.TileObject;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PInteraction;

@@ -3,7 +3,7 @@ package net.runelite.client.plugins.paistisuite.api;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
-import net.runelite.api.ObjectDefinition;
+import net.runelite.api.ObjectComposition;
 import net.runelite.api.TileObject;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.GroundObjectQuery;
@@ -23,19 +23,19 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PObjects {
 
-    public static ObjectDefinition getRealDefinition(int id) {
-        ObjectDefinition def = PUtils.getClient().getObjectDefinition(id);
-        ObjectDefinition impostor = def.getImpostorIds() != null ? def.getImpostor() : null;
+    public static ObjectComposition getRealDefinition(int id) {
+        ObjectComposition def = PUtils.getClient().getObjectDefinition(id);
+        ObjectComposition impostor = def.getImpostorIds() != null ? def.getImpostor() : null;
         if (impostor != null) return impostor;
         return def;
     }
 
-    public static ObjectDefinition getObjectDef(TileObject go) {
+    public static ObjectComposition getObjectDef(TileObject go) {
         if (go == null) return null;
         return PUtils.clientOnly(() -> getRealDefinition(go.getId()), "getObjectDef");
     }
 
-    private static Future<ObjectDefinition> getFutureObjectDef(TileObject go) {
+    private static Future<ObjectComposition> getFutureObjectDef(TileObject go) {
         if (go == null) return null;
         return PaistiSuite.getInstance().clientExecutor.schedule(() ->  getRealDefinition(go.getId()), "getObjectDef");
     }

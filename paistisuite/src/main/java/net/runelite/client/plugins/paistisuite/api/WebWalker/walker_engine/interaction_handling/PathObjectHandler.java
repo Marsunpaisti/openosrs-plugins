@@ -273,7 +273,7 @@ public class PathObjectHandler {
         } else {
             action = specialObject.getAction();
             Predicate<PTileObject> specialObjectFilter = (PTileObject obj) -> {
-                    ObjectDefinition def = obj.getSecond();
+                    ObjectComposition def = obj.getSecond();
                     if (def == null) return false;
                     return def.getName().equals(specialObject.getName()) &&
                             Arrays.asList(def.getActions()).contains(specialObject.getAction()) &&
@@ -564,7 +564,7 @@ public class PathObjectHandler {
     private static Predicate<PTileObject> interactiveObjectFilter(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
         final WorldPoint position = new WorldPoint(x, y, z);
         return (PTileObject pair) -> {
-            ObjectDefinition def = pair.getSecond();
+            ObjectComposition def = pair.getSecond();
             if (def == null){
                 return false;
             }
@@ -749,11 +749,11 @@ public class PathObjectHandler {
         if (object == null){
             return list;
         }
-        ObjectDefinition objectDefinition = object.getDef();
-        if (objectDefinition == null){
+        ObjectComposition ObjectComposition = object.getDef();
+        if (ObjectComposition == null){
             return list;
         }
-        String[] actions = objectDefinition.getActions();
+        String[] actions = ObjectComposition.getActions();
         if (actions == null){
             return list;
         }

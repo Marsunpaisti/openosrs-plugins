@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.Synchronized;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ItemDefinition;
+import net.runelite.api.ItemComposition;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.mixins.Inject;
-import net.runelite.client.game.WorldLocation;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.http.api.osbuddy.OSBGrandExchangeClient;
 import net.runelite.http.api.osbuddy.OSBGrandExchangeResult;
@@ -32,7 +31,7 @@ public class PGroundItem
         PVP,
         PVM
     }
-    private ItemDefinition itemDefinition;
+    private ItemComposition itemComposition;
     private int id;
     private int itemId;
     private String name;
@@ -68,11 +67,11 @@ public class PGroundItem
     }
 
     public String[] getActions(){
-        return this.itemDefinition.getGroundActions();
+        return this.itemComposition.getGroundActions();
     }
 
-    public ItemDefinition getDef(){
-        return getItemDefinition();
+    public ItemComposition getDef(){
+        return getItemComposition();
     }
 
     public boolean isAlwaysPrivate(){

@@ -2,7 +2,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.mag
 
 
 import kotlin.Pair;
-import net.runelite.api.ItemDefinition;
+import net.runelite.api.ItemComposition;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
@@ -72,7 +72,7 @@ public enum RuneElement {
      * @return item name. Never null. "null" if no name.
      */
     private static String getItemName(PItem item) {
-        ItemDefinition definition = item.getSecond();
+        ItemComposition definition = item.getSecond();
         String name;
         return definition == null || (name = definition.getName()) == null ? "null" : name;
     }

@@ -16,18 +16,18 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PInventory
 {
-    public static ItemDefinition getItemDef(WidgetItem item){
-        return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
+    public static ItemComposition getItemDef(WidgetItem item){
+        return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemComposition(item.getId()), "getItemDef");
     }
 
-    public static ItemDefinition getItemDef(Item item){
-        return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
+    public static ItemComposition getItemDef(Item item){
+        return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemComposition(item.getId()), "getItemDef");
     }
 
-    private static Future<ItemDefinition> getFutureItemDef(WidgetItem item){
+    private static Future<ItemComposition> getFutureItemDef(WidgetItem item){
         if (item == null) return null;
 
-        return PaistiSuite.getInstance().clientExecutor.schedule(() ->  PaistiSuite.getInstance().itemManager.getItemDefinition(item.getId()), "getItemDef");
+        return PaistiSuite.getInstance().clientExecutor.schedule(() ->  PaistiSuite.getInstance().itemManager.getItemComposition(item.getId()), "getItemDef");
     }
 
     public static boolean isFull()

@@ -2,7 +2,8 @@ package net.runelite.client.plugins.paistisuite.api.types;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Item;
-import net.runelite.api.ItemDefinition;
+import net.runelite.api.ItemComposition;
+import net.runelite.api.PlayerComposition;
 import net.runelite.api.kit.KitType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -13,38 +14,53 @@ import net.runelite.client.plugins.paistisuite.api.PWidgets;
 
 @Slf4j
 public class PItem {
+    WidgetInfo[] slotToWidget = new WidgetInfo[]{
+            WidgetInfo.EQUIPMENT_HELMET,
+            WidgetInfo.EQUIPMENT_CAPE,
+            WidgetInfo.EQUIPMENT_AMULET,
+            WidgetInfo.EQUIPMENT_WEAPON,
+            WidgetInfo.EQUIPMENT_BODY,
+            WidgetInfo.EQUIPMENT_SHIELD,
+            null,
+            WidgetInfo.EQUIPMENT_LEGS,
+            null,
+            WidgetInfo.EQUIPMENT_GLOVES,
+            WidgetInfo.EQUIPMENT_BOOTS,
+            null,
+            WidgetInfo.EQUIPMENT_RING,
+            WidgetInfo.EQUIPMENT_AMMO
+    };
+
     public WidgetItem widgetItem;
     public Widget equipmentWidget;
     private Item item;
-    public ItemDefinition itemDefinition;
+    public ItemComposition ItemComposition;
     public boolean isEquipmentItem;
     private String slotName;
     private int quantity;
     private int id;
 
-    public PItem(WidgetItem widgetItem, ItemDefinition itemDefinition){
+    public PItem(WidgetItem widgetItem, ItemComposition ItemComposition){
         this.isEquipmentItem = false;
         this.widgetItem = widgetItem;
-        this.itemDefinition = itemDefinition;
+        this.ItemComposition = ItemComposition;
     }
 
     public PItem(WidgetItem widgetItem){
         this.isEquipmentItem = false;
         this.widgetItem = widgetItem;
-        this.itemDefinition = PInventory.getItemDef(widgetItem);
+        this.ItemComposition = PInventory.getItemDef(widgetItem);
     }
 
     public PItem(Item item, int slot) {
         this.isEquipmentItem = true;
         this.item = item;
-        this.itemDefinition = PInventory.getItemDef(item);
-
-        // THe enum is missing one index in the middle for some reason
-        int index = slot >= 7 ? (slot-1) : slot;
-        KitType k = KitType.values()[index];
+        this.ItemComposition = PInventory.getItemDef(item);
+        KitType k = KitType.values()[slot];
         this.slotName = k.getName();
         this.widgetItem = null;
-        this.equipmentWidget = PWidgets.get(k.getWidgetInfo());
+        PlayerComposition p;
+        this.equipmentWidget = PWidgets.get(slotToWidget[slot]);
         //log.info(getName() + " in slot " + slot + "(" + slotName + ")");
     }
 
@@ -82,11 +98,11 @@ public class PItem {
         }, "PItem.getActions");
     }
 
-    public ItemDefinition getItemDefinition() {
-        return itemDefinition;
+    public ItemComposition getItemComposition() {
+        return ItemComposition;
     }
-    public ItemDefinition getDefinition() {
-        return itemDefinition;
+    public ItemComposition getDefinition() {
+        return ItemComposition;
     }
 
     public WidgetItem getWidgetItem(){
@@ -97,8 +113,8 @@ public class PItem {
         return widgetItem;
     }
 
-    public ItemDefinition getSecond(){
-        return itemDefinition;
+    public ItemComposition getSecond(){
+        return ItemComposition;
     }
 
     @Override

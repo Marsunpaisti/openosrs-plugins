@@ -12,98 +12,86 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Play
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Point3D;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 import net.runelite.client.plugins.quester.Quester;
 import net.runelite.client.plugins.quester.Task;
 
+import java.util.function.BooleanSupplier;
+
 @Slf4j
-public class TalkToNpcTask implements Task {
-    String npcName;
-    WorldPoint location;
-    String talkAction;
-    String[] choices;
-    String[] backupChoices;
+public class InteractWithObjectTask implements Task {
+    String objectName;
+    String[] options;
+    WorldPoint objectLoc;
+    Quester plugin;
+    BooleanSupplier successCondition;
     boolean isCompleted;
     boolean failed;
     boolean walkedToDestination = false;
-    private Quester plugin;
-    int talkAttempts = 0;
+    int interactAttempts = 0;
 
-    public TalkToNpcTask(Quester plugin, String npcName, WorldPoint location, String talkAction, String[] choices, String[] backupChoices){
-        this.npcName = npcName;
-        this.location = location;
-        this.talkAction = talkAction;
-        this.choices = choices;
-        this.backupChoices = backupChoices;
+    public InteractWithObjectTask(Quester plugin, String objectName, String[] options, WorldPoint objectLoc, BooleanSupplier successCondition){
+        this.objectName = objectName;
+        this.objectLoc = objectLoc;
         this.plugin = plugin;
-    }
-
-    public TalkToNpcTask(Quester plugin, String npcName, WorldPoint location, String talkAction, String[] choices){
-        this.npcName = npcName;
-        this.location = location;
-        this.talkAction = talkAction;
-        this.choices = choices;
-        this.backupChoices = null;
-        this.plugin = plugin;
+        this.options = options;
+        this.successCondition = successCondition;
     }
 
     public String name() {
-        return "Talk to " + this.npcName;
+        return "Interact with " + this.objectName;
     }
 
     public WorldPoint location() {
-        return this.location;
+        return this.objectLoc;
     }
 
     public boolean execute() {
-        if (talkAttempts >= 3){
-            log.info("Failed talk to npc task. Too many attempts to talk to npc.");
+        if (interactAttempts >= 5){
+            log.info("Failed interact with object task. Too many attempts.");
             this.failed = true;
             return false;
         }
-        NPC npc = PObjects.findNPC(Filters.NPCs.nameContains(npcName));
-        if (npc == null || (!walkedToDestination && !Reachable.getMap().canReach(new RSTile(npc.getWorldLocation())))) {
-            if (!walkedToDestination && DaxWalker.walkTo(new RSTile(this.location))){
+
+        PTileObject object = PObjects.findObject(
+                Filters.Objects.nameEquals("Coffin")
+                .and(Filters.Objects.actionsContains(options)));
+        if (object == null || (!walkedToDestination && !Reachable.getMap().canReach(new RSTile(location())))) {
+            if (!walkedToDestination && DaxWalker.walkTo(new RSTile(location()))){
                 walkedToDestination = true;
                 PUtils.waitCondition(PUtils.random(2500, 3100), () -> !PPlayer.isMoving());
-                log.info("Walked to NPC");
+                log.info("Walked to object");
                 return true;
             } else {
                 this.failed = true;
-                log.info("Unable to walk to NPC!");
+                log.info("Unable to walk to object!");
                 return false;
             }
         } else {
-            if (!PInteraction.npc(npc, talkAction)) {
-                log.info("Unable to intaract with NPC!");
+            if (!PInteraction.tileObject(object, options)) {
+                log.info("Unable to intaract with object! Looking for options: " + String.join(", ", options));
                 this.failed = true;
                 return false;
             } else {
                 PUtils.waitCondition(PUtils.random(800, 1400), () -> PPlayer.isMoving());
-                int distance = Reachable.getMap().getDistance(new RSTile(npc.getWorldLocation()));
-                if (distance == Integer.MAX_VALUE) distance = (int)Math.round(PPlayer.distanceTo(npc) * 1.5);
-                int multiplier = PPlayer.isRunEnabled() ? 300 : 600;
-                int timeout = distance * multiplier + (int)PUtils.randomNormal(1300, 1900);
+                int distance = (int)Math.round(PPlayer.distanceTo(object.getWorldLocation()));
+                int multiplier = PPlayer.isRunEnabled() ? 400 : 800;
+                int timeout = distance * multiplier + (int)PUtils.randomNormal(1900, 2800);
                 PUtils.waitCondition(timeout, () -> !PPlayer.isMoving());
-                if (!PUtils.waitCondition(PUtils.random(1300, 1900), PDialogue::isConversationWindowUp)){
-                    talkAttempts++;
-                    log.info("Timed out while waiting for conversation window!");
+                if (!PUtils.waitCondition(PUtils.random(3100, 3800), successCondition)){
+                    interactAttempts++;
+                    log.info("Timed out while waiting interaction success!");
                     return true;
                 } else {
-                    if (PDialogue.handleDialogueInOrder(choices) || (this.backupChoices != null && PDialogue.handleDialogueInOrder(backupChoices))){
-                        this.isCompleted = true;
-                        return true;
-                    } else {
-                        log.info("Failed at handling talk to npc dialogue!");
-                        this.failed = true;
-                        return false;
-                    }
+                    this.isCompleted = true;
+                    return true;
                 }
             }
         }
     };
 
     public boolean condition() {
-        return !isCompleted && !isFailed();
+        return !isCompleted;
     }
 
     public boolean isCompleted() {

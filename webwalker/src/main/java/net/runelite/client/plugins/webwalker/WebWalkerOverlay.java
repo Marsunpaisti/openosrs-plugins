@@ -107,7 +107,7 @@ public class WebWalkerOverlay extends Overlay
 			return;
 		}
 
-		OverlayUtil.renderPolygonThin(graphics, poly, color);
+		OverlayUtil.renderPolygon(graphics, poly, color);
 		//OverlayUtil.renderPolygon(graphics, poly, color);
 	}
 }

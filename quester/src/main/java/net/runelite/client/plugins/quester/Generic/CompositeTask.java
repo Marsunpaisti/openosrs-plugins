@@ -10,10 +10,10 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-public class LinkedTask implements Task, TaskContainer {
+public class CompositeTask implements Task, TaskContainer {
     List<Task> tasks;
 
-    public LinkedTask(Task ...tasks){
+    public CompositeTask(Task ...tasks){
         this.tasks = new ArrayList<Task>();
         Collections.addAll(this.tasks, tasks);
     }
@@ -39,8 +39,8 @@ public class LinkedTask implements Task, TaskContainer {
     }
 
     @Override
-    public boolean isComplete() {
-        return tasks.stream().allMatch(t -> t.isComplete());
+    public boolean isCompleted() {
+        return tasks.stream().allMatch(t -> t.isCompleted());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class LinkedTask implements Task, TaskContainer {
     public Task getTask() {
         Task ret = null;
         for (Task t : tasks){
-            if (!t.isFailed() && !t.isComplete() && t.condition()){
+            if (!t.isFailed() && !t.isCompleted() && t.condition()){
                 ret = t;
                 break;
             }
