@@ -17,7 +17,7 @@ public class PDialogue {
             WidgetInfo.DIALOG_NPC,
             WidgetInfo.DIALOG_PLAYER,
             WidgetInfo.DIALOG_SPRITE,
-            WidgetInfo.DIALOG_NOTIFICATION_CONTINUE
+            WidgetInfo.DIALOG_NOTIFICATION_TEXT
     };
 
     /**
@@ -38,7 +38,7 @@ public class PDialogue {
                 PUtils.sleepNormal(200, 1000, 200, 400);
                 continue;
             }
-            if (options.size() == 1 && options.get(0).getText().contains("Click here to continue")){
+            if (options.stream().anyMatch(o -> o.getText().contains("Click here to continue"))){
                 clickHereToContinue();
                 continue;
             }
@@ -120,7 +120,7 @@ public class PDialogue {
         }, "getDialogueOptions");
     }
 
-    private static List<Widget> getAllChildren(WidgetInfo widgetInfo) {
+    public static List<Widget> getAllChildren(WidgetInfo widgetInfo) {
         return PUtils.clientOnly(() -> {
             ArrayList<Widget> interfaces = new ArrayList<>();
             Queue<Widget> nestedSearch = new LinkedList<Widget>();

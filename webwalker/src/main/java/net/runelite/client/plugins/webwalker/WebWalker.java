@@ -55,7 +55,6 @@ public class WebWalker extends PScript {
 
     @Inject
     private OverlayManager overlayManager;
-
     @Inject
     private WebWalkerOverlay overlay;
 
@@ -78,28 +77,6 @@ public class WebWalker extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
-/*
-
-        PTileObject gate = PObjects.findObject(Filters.Objects.idEquals(1561).and(g -> g.getWorldLocation().distanceTo(PPlayer.location()) < 5));
-        if (gate != null){
-            log.info("Found gate");
-            var actions = gate.getDef().getActions();
-            var name = gate.getDef().getName();
-            if (name == null){
-                log.info("Null name");
-            }else {
-                log.info("Name: " + name);
-            }
-            if (actions == null) {
-                log.info("Null actions");
-            } else {
-                log.info("Actions: " + String.join(", ", actions));
-            }
-        }
-
- */
-
-
     }
 
     @Subscribe
