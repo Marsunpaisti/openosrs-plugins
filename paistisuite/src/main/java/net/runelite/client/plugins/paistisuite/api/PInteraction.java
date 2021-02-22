@@ -73,7 +73,7 @@ public class PInteraction {
                         (to.getFirst()).getWorldLocation().getY() - PUtils.getClient().getBaseY()
                 );
             }
-
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
         }, "interact_tileObject");
     }
@@ -128,7 +128,7 @@ public class PInteraction {
                     finalActionOp.getId(),
                     item.getLocation().getX() - PUtils.getClient().getBaseX(),
                     item.getLocation().getY() - PUtils.getClient().getBaseY());
-
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
         }, "interact_GroundItem");
     }
@@ -147,6 +147,7 @@ public class PInteraction {
                     MenuAction.ITEM_USE_ON_WIDGET_ITEM.getId(),
                     target.getWidgetItem().getIndex(),
                     9764864);
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
         }, "interact_useItemOnItem");
     }
@@ -212,6 +213,7 @@ public class PInteraction {
                     finalActionOp.getId(),
                     item.getWidgetItem().getIndex(),
                     9764864);
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
         }, "interact_item");
     }
@@ -222,6 +224,7 @@ public class PInteraction {
             if (item.isEquipmentItem) return false;
             if (item.getWidgetItem() == null) return false;
             PMouse.clickShape(item.getWidgetItem().getCanvasBounds());
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
         }, "clickItem");
     }
@@ -253,6 +256,7 @@ public class PInteraction {
                         (to.getFirst()).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
                         (to.getFirst()).getWorldLocation().getY() - PUtils.getClient().getBaseY());
             }
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
         }, "interact_useItemOnItem");
     }
@@ -315,6 +319,7 @@ public class PInteraction {
                     finalActionOp.getId(),
                     0,
                     0);
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
 
         }, "interact_npc");
@@ -329,6 +334,7 @@ public class PInteraction {
         return PUtils.clientOnly(() -> {
             if (widget == null) return false;
             PMouse.clickShape(widget.getBounds());
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
         }, "clickWidget");
     }
@@ -376,6 +382,7 @@ public class PInteraction {
                     finalActionOp.getId(),
                     childIndex,
                     widgetId);
+            PUtils.getClient().setMouseIdleTicks(0);
             return true;
         }, "interact_widget");
     }

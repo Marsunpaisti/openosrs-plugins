@@ -190,7 +190,6 @@ public class AIOFighter extends PScript {
     protected void loop() {
         PUtils.sleepFlat(50, 150);
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
-        handleAntiAfk();
         if (handleStopConditions()) return;
         handleEating();
         if (isStopRequested()) return;
@@ -233,14 +232,6 @@ public class AIOFighter extends PScript {
             }
         }
         return false;
-    }
-
-    private void handleAntiAfk(){
-        if (System.currentTimeMillis() - lastAntiAfk >= antiAfkDelay) {
-            antiAfkDelay = PUtils.randomNormal(120000, 270000);
-            lastAntiAfk = System.currentTimeMillis();
-            Keyboard.pressSpacebar();
-        }
     }
 
     private boolean handleEating(){
