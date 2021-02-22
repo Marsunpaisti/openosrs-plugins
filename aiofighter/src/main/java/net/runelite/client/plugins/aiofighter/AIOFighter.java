@@ -271,7 +271,7 @@ public class AIOFighter extends PScript {
 
     public WalkingCondition walkingCondition = () -> {
         if (isStopRequested()) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
-        if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
+        if (PUtils.getClient().getGameState() != GameState.LOGGED_IN && PUtils.getClient().getGameState() != GameState.LOADING) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
         handleRun();
         handleEating();
         return WalkingCondition.State.CONTINUE_WALKER;

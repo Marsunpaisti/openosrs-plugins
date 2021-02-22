@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameState;
 import net.runelite.api.Player;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ConfigButtonClicked;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.WidgetInfo;
@@ -12,16 +13,21 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.paistisuite.PScript;
+import net.runelite.client.plugins.paistisuite.PShopping;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
+import net.runelite.client.plugins.quester.CooksAssistant.CooksAssistantQuest;
 import net.runelite.client.plugins.quester.RestlessGhost.RestlessGhostQuest;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.pf4j.Extension;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
 
 @Extension
 @PluginDependency(PaistiSuite.class)
@@ -47,11 +53,15 @@ public class Quester extends PScript {
     private int nextRunAt = PUtils.random(25, 65);
     public WalkingCondition walkingCondition = () -> {
         if (isStopRequested()) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
-        if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
+        if (PUtils.getClient().getGameState() != GameState.LOGGED_IN && PUtils.getClient().getGameState() != GameState.LOADING) return WalkingCondition.State.EXIT_OUT_WALKER_FAIL;
         handleRun();
         handleEating();
         return WalkingCondition.State.CONTINUE_WALKER;
     };
+
+    public boolean daxWalkTo(WorldPoint loc){
+        return DaxWalker.walkTo(new RSTile(loc), walkingCondition);
+    }
 
     public void handleRun(){
         if (!PWalking.isRunEnabled() && PWalking.getRunEnergy() > nextRunAt){
@@ -83,12 +93,11 @@ public class Quester extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
-        QuestTextReader.getQuestText("Cook");
     }
 
     @Override
     protected void loop() {
-        PUtils.sleepNormal(40, 70);
+        PUtils.sleepNormal(40, 60);
         questTaskRunner.loop();
     }
 
@@ -97,7 +106,8 @@ public class Quester extends PScript {
         DaxWalker.getInstance().allowTeleports = false;
         DaxWalker.setCredentials(PaistiSuite.getDaxCredentialsProvider());
         questTaskRunner = new QuestTaskRunner(
-                new RestlessGhostQuest(this)
+                new CooksAssistantQuest(this)
+                //new RestlessGhostQuest(this)
         );
     }
 

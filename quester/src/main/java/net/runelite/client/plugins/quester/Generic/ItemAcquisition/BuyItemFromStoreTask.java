@@ -1,10 +1,11 @@
-package net.runelite.client.plugins.quester.Generic;
+package net.runelite.client.plugins.quester.Generic.ItemAcquisition;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.PShopping;
 import net.runelite.client.plugins.paistisuite.api.*;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.PathResult;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.PathStatus;
@@ -12,44 +13,34 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Play
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Point3D;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.quester.Quester;
 import net.runelite.client.plugins.quester.Task;
 
 @Slf4j
-public class TalkToNpcTask implements Task {
-    String npcName;
-    WorldPoint location;
-    String talkAction;
-    String[] choices;
-    String[] backupChoices;
-    boolean isCompleted;
+public class BuyItemFromStoreTask implements Task {
     boolean failed;
-    int walkAttempts = 0;
+    private String itemName;
     private Quester plugin;
-    int talkAttempts = 0;
+    private WorldPoint location;
+    private int price;
+    private int quantity;
+    private boolean isCompleted = false;
+    int walkAttempts = 0;
+    int tradeAttempts = 0;
     int cachedDistance = -1;
     int cachedDistanceTick = -1;
 
-    public TalkToNpcTask(Quester plugin, String npcName, WorldPoint location, String talkAction, String[] choices, String[] backupChoices){
-        this.npcName = npcName;
-        this.location = location;
-        this.talkAction = talkAction;
-        this.choices = choices;
-        this.backupChoices = backupChoices;
+    public BuyItemFromStoreTask(Quester plugin, String itemName, int quantity, int price, WorldPoint location){
         this.plugin = plugin;
-    }
-
-    public TalkToNpcTask(Quester plugin, String npcName, WorldPoint location, String talkAction, String[] choices){
-        this.npcName = npcName;
+        this.itemName = itemName;
         this.location = location;
-        this.talkAction = talkAction;
-        this.choices = choices;
-        this.backupChoices = null;
-        this.plugin = plugin;
+        this.price = price;
+        this.quantity = quantity;
     }
 
     public String name() {
-        return "Talk to " + this.npcName;
+        return "Buy " + this.itemName + " from shop.";
     }
 
     public WorldPoint location() {
@@ -57,12 +48,12 @@ public class TalkToNpcTask implements Task {
     }
 
     public boolean execute() {
-        if (talkAttempts >= 3){
-            log.info("Failed talk to npc task. Too many attempts to talk to npc.");
+        if (tradeAttempts >= 3){
+            log.info("Failed buy item from store task. Too many attempts to trade npc.");
             this.failed = true;
             return false;
         }
-        NPC npc = PObjects.findNPC(Filters.NPCs.nameContains(npcName));
+        NPC npc = PObjects.findNPC(Filters.NPCs.actionsContains("Trade"));
         if (npc == null || (walkAttempts < 3 && !Reachable.getMap().canReach(new RSTile(npc.getWorldLocation())))) {
             if (walkAttempts < 3 && plugin.daxWalkTo(location())){
                 walkAttempts++;
@@ -75,8 +66,8 @@ public class TalkToNpcTask implements Task {
                 return false;
             }
         } else {
-            if (!PInteraction.npc(npc, talkAction)) {
-                log.info("Unable to intaract with NPC!");
+            if (!PInteraction.npc(npc, "Trade")) {
+                log.info("Unable to trade with NPC!");
                 this.failed = true;
                 return false;
             } else {
@@ -86,32 +77,34 @@ public class TalkToNpcTask implements Task {
                 int multiplier = PPlayer.isRunEnabled() ? 300 : 600;
                 int timeout = distance * multiplier + (int)PUtils.randomNormal(1300, 1900);
                 PUtils.waitCondition(timeout, () -> !PPlayer.isMoving());
-                if (!PUtils.waitCondition(PUtils.random(1300, 1900), PDialogue::isConversationWindowUp)){
-                    talkAttempts++;
-                    log.info("Timed out while waiting for conversation window!");
+                if (!PUtils.waitCondition(PUtils.random(1300, 1900), () -> PShopping.isShopOpen())){
+                    tradeAttempts++;
+                    log.info("Timed out while waiting for trade window!");
                     return true;
                 } else {
-                    if (PDialogue.handleDialogueInOrder(choices) || (this.backupChoices != null && PDialogue.handleDialogueInOrder(backupChoices))){
-                        this.isCompleted = true;
+                    int currentCount = PInventory.getCount(itemName);
+                    int bought = PShopping.buyItemFromShop(itemName, quantity - currentCount);
+                    if (bought < quantity) {
+                        walkAttempts = 0;
+                        tradeAttempts = 0;
                         return true;
-                    } else {
-                        log.info("Failed at handling talk to npc dialogue!");
-                        this.failed = true;
-                        return false;
                     }
+                    this.isCompleted = true;
+                    return true;
                 }
             }
         }
-
         return true;
     };
 
     public boolean condition() {
-        return !isCompleted() && !isFailed();
+        int money = PInventory.getCount("Coins");
+        int currentCount = PInventory.getCount(itemName);
+        return !isCompleted() && !isFailed() && money > (quantity - currentCount) * price;
     }
 
     public boolean isCompleted() {
-        return isCompleted;
+        return this.isCompleted;
     }
 
     public boolean isFailed(){
@@ -136,3 +129,4 @@ public class TalkToNpcTask implements Task {
         }
     };
 }
+

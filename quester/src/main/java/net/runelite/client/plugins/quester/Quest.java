@@ -27,7 +27,9 @@ public abstract class Quest implements TaskContainer {
         }
 
         if (!isComplete() && !isFailed() && ret == null){
-            log.info("Warning: Quest " + getName() + " is not completed, but getTask() returned null");
+            log.info("Warning: Quest " + getName() + " is not completed/failed, but getTask() returned null");
+            Task next = tasks.stream().filter(t -> !t.isFailed() && !t.isCompleted() && !t.condition()).findFirst().orElse(null);
+            log.info("Next task would have been: " + (next != null ? next.name() : "NULL"));
         }
         return ret;
     }
@@ -44,11 +46,6 @@ public abstract class Quest implements TaskContainer {
 
     public void addTask(Task t){
         this.tasks.add(t);
-    }
-
-    public WorldPoint location(){
-        if (getTask() == null) return null;
-        return getTask().location();
     }
 
     public int currentDistance(){

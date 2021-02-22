@@ -27,8 +27,10 @@ public class InteractWithObjectTask implements Task {
     BooleanSupplier successCondition;
     boolean isCompleted;
     boolean failed;
-    boolean walkedToDestination = false;
+    int walkAttempts = 0;
     int interactAttempts = 0;
+    int cachedDistance = -1;
+    int cachedDistanceTick = -1;
 
     public InteractWithObjectTask(Quester plugin, String objectName, String[] options, WorldPoint objectLoc, BooleanSupplier successCondition){
         this.objectName = objectName;
@@ -54,15 +56,15 @@ public class InteractWithObjectTask implements Task {
         }
 
         PTileObject object = PObjects.findObject(
-                Filters.Objects.nameEquals("Coffin")
+                Filters.Objects.nameEquals(objectName)
                 .and(Filters.Objects.actionsContains(options)));
-        if (object == null || (!walkedToDestination && !Reachable.getMap().canReach(new RSTile(location())))) {
-            if (!walkedToDestination && DaxWalker.walkTo(new RSTile(location()))){
-                walkedToDestination = true;
-                PUtils.waitCondition(PUtils.random(2500, 3100), () -> !PPlayer.isMoving());
+        if (object == null || (walkAttempts < 3 && !Reachable.getMap().canReach(new RSTile(location())))) {
+            if (walkAttempts < 3 && plugin.daxWalkTo(location())){
+                walkAttempts++;
+                PUtils.waitCondition(PUtils.random(2500, 3100), () -> !PPlayer.isMoving() && PPlayer.distanceTo(location()) <= 2);
                 log.info("Walked to object");
                 return true;
-            } else {
+            } else if (walkAttempts >= 3){
                 this.failed = true;
                 log.info("Unable to walk to object!");
                 return false;
@@ -83,15 +85,18 @@ public class InteractWithObjectTask implements Task {
                     log.info("Timed out while waiting interaction success!");
                     return true;
                 } else {
+                    PUtils.sleepNormal(200, 600);
                     this.isCompleted = true;
                     return true;
                 }
             }
         }
+
+        return true;
     };
 
     public boolean condition() {
-        return !isCompleted;
+        return !isCompleted() && !isFailed();
     }
 
     public boolean isCompleted() {
@@ -103,15 +108,20 @@ public class InteractWithObjectTask implements Task {
     }
 
     public int getDistance(){
+        if (PUtils.getClient().getTickCount() == cachedDistanceTick) return cachedDistance;
         WorldPoint playerLoc = PPlayer.getWorldLocation();
         Point3D playerLocPoint = new Point3D(playerLoc.getX(), playerLoc.getY(), playerLoc.getPlane());
         WorldPoint taskLoc = location();
         Point3D taskLocPoint = new Point3D(taskLoc.getX(), taskLoc.getY(), taskLoc.getPlane());
         PathResult path = WebWalkerServerApi.getInstance().getPath(playerLocPoint, taskLocPoint, PlayerDetails.generate());
         if (path.getPathStatus() == PathStatus.SUCCESS) {
-            return path.getCost();
+            cachedDistance = path.getCost();
+            cachedDistanceTick = PUtils.getClient().getTickCount();
+            return cachedDistance;
         } else {
-            return Integer.MAX_VALUE;
+            cachedDistance = Integer.MAX_VALUE;
+            cachedDistanceTick = PUtils.getClient().getTickCount();
+            return cachedDistance;
         }
     };
 }

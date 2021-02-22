@@ -18,6 +18,7 @@ import net.runelite.client.events.PlayerLootReceived;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStack;
 import net.runelite.client.game.NPCManager;
+import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.paistisuite.api.PGroundItems;
@@ -67,6 +68,8 @@ public class PaistiSuite extends Plugin
 	protected Injector injector;
 	@Inject
 	private ConfigManager configManager;
+	@Inject
+	public WorldService worldService;
 
 	private PaistiSuitePanel panel;
 	private NavigationButton navButton;

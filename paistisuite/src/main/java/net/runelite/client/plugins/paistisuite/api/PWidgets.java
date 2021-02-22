@@ -23,6 +23,10 @@ public class PWidgets {
         return PUtils.clientOnly(() -> isValid(id, 0) && !get(id, 0).isHidden(), "widgetIsSubstantiated");
     }
 
+    public static Boolean isSubstantiated(int id, int child) {
+        return PUtils.clientOnly(() -> isValid(id, child) && !get(id, child).isHidden(), "widgetIsSubstantiated");
+    }
+
     public static Boolean isSubstantiated(WidgetInfo widgetInfo) {
         return PUtils.clientOnly(() -> isValid(widgetInfo) && !get(widgetInfo).isHidden(), "widgetIsSubstantiated");
     }

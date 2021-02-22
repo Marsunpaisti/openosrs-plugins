@@ -9,6 +9,7 @@ import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWidgets;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -42,11 +43,14 @@ public class QuestTextReader {
 
         questTexts.stream().forEach(t -> log.info("" + t));
 
+        Widget xButton = PWidgets.get(119, 180);
+        PInteraction.widget(xButton, "Close");
         return questTexts;
     }
 
     private static boolean openQuestText(String questName){
         Widget questNames = PWidgets.get(WidgetInfo.QUESTLIST_FREE_CONTAINER);
+        Widget questNames2 = PWidgets.get(WidgetInfo.QUESTLIST_MEMBERS_CONTAINER);
 
         if (PWidgets.get(WidgetInfo.DIARY_QUEST_WIDGET_TITLE) != null){
             if (PWidgets.get(WidgetInfo.DIARY_QUEST_WIDGET_TITLE).getText().contains(questName)) {
@@ -54,10 +58,14 @@ public class QuestTextReader {
             }
         }
 
-        if (questNames != null){
+        if (questNames != null && questNames2 != null){
             Widget[] children = questNames.getChildren();
-            if (children != null) {
-                for (Widget child : children){
+            Widget[] children2 = questNames2.getChildren();
+            if (children != null && children2 != null) {
+                List<Widget> allChildren = new ArrayList<Widget>();
+                Collections.addAll(allChildren, children);
+                Collections.addAll(allChildren, children2);
+                for (Widget child : allChildren){
                     if (child.getText().contains(questName)){
                         log.info("Found quest name widget");
                         if (PInteraction.widget(child, "Read Journal:")){
@@ -86,11 +94,16 @@ public class QuestTextReader {
 
     public static QuestStage getQuestStage(String questName){
         Widget questNames = PWidgets.get(WidgetInfo.QUESTLIST_FREE_CONTAINER);
+        Widget questNames2 = PWidgets.get(WidgetInfo.QUESTLIST_MEMBERS_CONTAINER);
 
-        if (questNames != null){
+        if (questNames != null && questNames2 != null){
             Widget[] children = questNames.getChildren();
-            if (children != null) {
-                for (Widget child : children){
+            Widget[] children2 = questNames2.getChildren();
+            if (children != null && children2 != null) {
+                List<Widget> allChildren = new ArrayList<Widget>();
+                Collections.addAll(allChildren, children);
+                Collections.addAll(allChildren, children2);
+                for (Widget child : allChildren){
                     if (child.getText().contains(questName)){
                         if (child.getTextColor() == 16711680) return QuestStage.NOT_STARTED;
                         if (child.getTextColor() == 16776960) return QuestStage.IN_PROGRESS;;

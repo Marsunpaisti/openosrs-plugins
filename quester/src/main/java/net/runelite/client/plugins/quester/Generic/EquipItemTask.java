@@ -50,7 +50,7 @@ public class EquipItemTask implements Task {
 
             if (PUtils.waitCondition((int)PUtils.randomNormal(1300, 1900), () -> PInventory.findEquipmentItem(Filters.Items.nameContains(itemName)) != null)){
                 log.info("Successfully equipped " + itemName);
-                PUtils.sleepNormal(300, 800);
+                PUtils.sleepNormal(200, 600);
                 return true;
             }
         } else {
@@ -64,7 +64,7 @@ public class EquipItemTask implements Task {
     };
 
     public boolean condition() {
-        return PInventory.findItem(Filters.Items.nameContains(itemName)) != null;
+        return !isCompleted() && !isFailed() && PInventory.findItem(Filters.Items.nameContains(itemName)) != null;
     }
 
     public boolean isCompleted() {

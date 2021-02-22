@@ -73,6 +73,7 @@ public class PObjects {
         return getAllObjects()
                 .stream()
                 .filter(filter)
+                .sorted((a,b) -> (int)Math.round(PPlayer.distanceTo(a) - PPlayer.distanceTo(b)))
                 .findFirst()
                 .orElse(null);
     }

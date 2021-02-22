@@ -2,8 +2,10 @@ package net.runelite.client.plugins.paistisuite.api;
 
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
+import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 public class PPlayer {
     public static Player get() {
@@ -36,6 +38,10 @@ public class PPlayer {
 
     public static double distanceTo(NPC npc){
         return PPlayer.getWorldLocation().distanceToHypotenuse(npc.getWorldLocation());
+    }
+
+    public static double distanceTo(PTileObject to){
+        return PPlayer.getWorldLocation().distanceToHypotenuse(to.getWorldLocation());
     }
 
     public static boolean isRunEnabled()

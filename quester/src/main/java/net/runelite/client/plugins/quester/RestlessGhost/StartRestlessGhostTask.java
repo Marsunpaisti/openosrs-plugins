@@ -1,15 +1,18 @@
 package net.runelite.client.plugins.quester.RestlessGhost;
 
-import net.runelite.api.VarPlayer;
+import com.google.common.collect.ImmutableMap;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.paistisuite.api.PPlayer;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.PVars;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
+import net.runelite.client.plugins.paistisuite.api.PrayerMap;
 import net.runelite.client.plugins.quester.Generic.TalkToNpcTask;
 import net.runelite.client.plugins.quester.Quester;
 import net.runelite.client.plugins.quester.Task;
+
+import java.util.Arrays;
+import java.util.Map;
 
 public class StartRestlessGhostTask implements Task {
     TalkToNpcTask talkTask;
@@ -31,13 +34,11 @@ public class StartRestlessGhostTask implements Task {
     }
 
     public boolean condition() {
-        // TODO:
-        return PVars.getVarp(107) == 0;
+        return !isFailed() && !isCompleted();
     }
 
     public boolean isCompleted() {
-        // TODO:
-        return PVars.getVarp(107) == 1;
+        return PVars.getVarp(107) >= 1;
     }
 
     public boolean isFailed(){

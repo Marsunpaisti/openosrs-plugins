@@ -20,6 +20,10 @@ public class PInventory
         return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemComposition(item.getId()), "getItemDef");
     }
 
+    public static ItemComposition getItemDef(int id){
+        return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemComposition(id), "getItemDef");
+    }
+
     public static ItemComposition getItemDef(Item item){
         return PUtils.clientOnly(() -> PaistiSuite.getInstance().itemManager.getItemComposition(item.getId()), "getItemDef");
     }
@@ -204,6 +208,7 @@ public class PInventory
                 items = PaistiSuite.getInstance().clientExecutor.scheduleAndWait(() -> {
                     return PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
                 }, "getEquippedItems");
+            } catch (NullPointerException ignored){
             } catch (Exception e){
                 log.error("Error in getEquippedItems: " + e.toString());
             }

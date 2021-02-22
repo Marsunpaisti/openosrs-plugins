@@ -1,10 +1,10 @@
-package net.runelite.client.plugins.quester.Generic;
+package net.runelite.client.plugins.quester.Generic.ItemAcquisition;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.paistisuite.PShopping;
 import net.runelite.client.plugins.paistisuite.api.*;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.PathResult;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.PathStatus;
@@ -12,44 +12,37 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Play
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Point3D;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.quester.Quester;
 import net.runelite.client.plugins.quester.Task;
 
+import java.util.List;
+
 @Slf4j
-public class TalkToNpcTask implements Task {
-    String npcName;
-    WorldPoint location;
-    String talkAction;
-    String[] choices;
-    String[] backupChoices;
-    boolean isCompleted;
+public class PickFromGroundTask implements Task {
     boolean failed;
-    int walkAttempts = 0;
+    private String itemName;
     private Quester plugin;
-    int talkAttempts = 0;
+    private WorldPoint location;
+    private int quantity;
+    boolean checkReachable;
+    private boolean isCompleted = false;
+    int walkAttempts = 0;
+    int grabAttempts = 0;
     int cachedDistance = -1;
     int cachedDistanceTick = -1;
+    int hopAttempts = 0;
 
-    public TalkToNpcTask(Quester plugin, String npcName, WorldPoint location, String talkAction, String[] choices, String[] backupChoices){
-        this.npcName = npcName;
-        this.location = location;
-        this.talkAction = talkAction;
-        this.choices = choices;
-        this.backupChoices = backupChoices;
+    public PickFromGroundTask(Quester plugin, String itemName, int quantity, WorldPoint location, boolean checkReachable){
         this.plugin = plugin;
-    }
-
-    public TalkToNpcTask(Quester plugin, String npcName, WorldPoint location, String talkAction, String[] choices){
-        this.npcName = npcName;
+        this.itemName = itemName;
         this.location = location;
-        this.talkAction = talkAction;
-        this.choices = choices;
-        this.backupChoices = null;
-        this.plugin = plugin;
+        this.quantity = quantity;
+        this.checkReachable = checkReachable;
     }
 
     public String name() {
-        return "Talk to " + this.npcName;
+        return "Pick " + this.itemName + " from the ground.";
     }
 
     public WorldPoint location() {
@@ -57,61 +50,67 @@ public class TalkToNpcTask implements Task {
     }
 
     public boolean execute() {
-        if (talkAttempts >= 3){
-            log.info("Failed talk to npc task. Too many attempts to talk to npc.");
+        if (grabAttempts > 3 || hopAttempts > 8){
             this.failed = true;
+            log.info("Too many tries trying to grab item " + itemName + " from ground!");
             return false;
         }
-        NPC npc = PObjects.findNPC(Filters.NPCs.nameContains(npcName));
-        if (npc == null || (walkAttempts < 3 && !Reachable.getMap().canReach(new RSTile(npc.getWorldLocation())))) {
+        List<PGroundItem> items = PGroundItems.findGroundItems(
+                Filters.GroundItems.nameContainsOrIdEquals(itemName)
+        .and(item -> !checkReachable || Reachable.getMap().canReach(new RSTile(item.getLocation()))));
+
+        if (items.size() == 0) {
+            if (PPlayer.getWorldLocation().distanceTo(location()) <= 5){
+                PWorldHopper.hop();
+                hopAttempts++;
+                PUtils.sleepNormal(1500, 3000);
+            }
             if (walkAttempts < 3 && plugin.daxWalkTo(location())){
                 walkAttempts++;
                 PUtils.waitCondition(PUtils.random(2500, 3100), () -> !PPlayer.isMoving() && PPlayer.distanceTo(location()) <= 2);
-                log.info("Walked to NPC");
+                log.info("Walked to item location");
                 return true;
             } else if (walkAttempts >= 3){
                 this.failed = true;
-                log.info("Unable to walk to NPC!");
+                log.info("Unable to item location");
                 return false;
             }
         } else {
-            if (!PInteraction.npc(npc, talkAction)) {
-                log.info("Unable to intaract with NPC!");
+            int countBefore = PInventory.getCount(itemName);
+            if (!PInteraction.groundItem(items.get(0), "Take")) {
+                log.info("Unable take " + itemName + " from the ground!");
                 this.failed = true;
                 return false;
             } else {
+                int distance = checkReachable ? Reachable.getMap().getDistance(new RSTile(items.get(0).getLocation())) : 10;
+                if (checkReachable && distance == Integer.MAX_VALUE) {
+                    grabAttempts++;
+                    return true;
+                }
                 PUtils.waitCondition(PUtils.random(800, 1400), () -> PPlayer.isMoving());
-                int distance = Reachable.getMap().getDistance(new RSTile(npc.getWorldLocation()));
-                if (distance == Integer.MAX_VALUE) distance = (int)Math.round(PPlayer.distanceTo(npc) * 1.5);
                 int multiplier = PPlayer.isRunEnabled() ? 300 : 600;
-                int timeout = distance * multiplier + (int)PUtils.randomNormal(1300, 1900);
-                PUtils.waitCondition(timeout, () -> !PPlayer.isMoving());
-                if (!PUtils.waitCondition(PUtils.random(1300, 1900), PDialogue::isConversationWindowUp)){
-                    talkAttempts++;
-                    log.info("Timed out while waiting for conversation window!");
+                int timeout = distance * multiplier + (int)PUtils.randomNormal(1800, 2500);
+                if (PUtils.waitCondition(timeout, () -> PInventory.getCount(itemName) > countBefore)){
+                    if (PInventory.getCount(itemName) > quantity) this.isCompleted = true;
+                    grabAttempts = 0;
+                    walkAttempts = 0;
                     return true;
                 } else {
-                    if (PDialogue.handleDialogueInOrder(choices) || (this.backupChoices != null && PDialogue.handleDialogueInOrder(backupChoices))){
-                        this.isCompleted = true;
-                        return true;
-                    } else {
-                        log.info("Failed at handling talk to npc dialogue!");
-                        this.failed = true;
-                        return false;
-                    }
+                    grabAttempts++;
+                    return true;
                 }
             }
         }
-
         return true;
     };
 
     public boolean condition() {
-        return !isCompleted() && !isFailed();
+        int currentCount = PInventory.getCount(itemName);
+        return !isCompleted() && !isFailed() && currentCount < quantity;
     }
 
     public boolean isCompleted() {
-        return isCompleted;
+        return this.isCompleted || PInventory.getCount(itemName) >= quantity;
     }
 
     public boolean isFailed(){
