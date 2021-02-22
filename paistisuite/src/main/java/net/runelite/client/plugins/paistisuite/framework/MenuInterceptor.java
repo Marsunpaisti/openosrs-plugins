@@ -14,6 +14,13 @@ public class MenuInterceptor {
     }
 
     public static void onMenuOptionClicked(MenuOptionClicked event) {
+        log.info("Menu: " + event.getMenuOption()
+                + " TAR: " + event.getMenuTarget()
+                + " ID: " + event.getId()
+                + " OP: " + event.getMenuAction()
+                + " P0: " + event.getActionParam()
+                + " P1: " + event.getWidgetId());
+
         if (nextEntry == null) return;
 
         event.consume();

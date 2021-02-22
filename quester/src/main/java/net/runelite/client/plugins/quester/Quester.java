@@ -6,7 +6,6 @@ import net.runelite.api.GameState;
 import net.runelite.api.Player;
 import net.runelite.api.events.ConfigButtonClicked;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -14,10 +13,7 @@ import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.paistisuite.PScript;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
-import net.runelite.client.plugins.paistisuite.api.PDialogue;
-import net.runelite.client.plugins.paistisuite.api.PPlayer;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
-import net.runelite.client.plugins.paistisuite.api.PWalking;
+import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.quester.RestlessGhost.RestlessGhostQuest;
@@ -26,7 +22,6 @@ import org.pf4j.Extension;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.List;
 
 @Extension
 @PluginDependency(PaistiSuite.class)
@@ -88,28 +83,7 @@ public class Quester extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
-        /*
-        List<Widget> options = PDialogue.getAllChildren(WidgetInfo.DIALOG_SPRITE);
-        if (options.size() == 0) {
-            log.info("No widgets");
-        } else {
-            log.info(options.size() + " total widgets");
-            options.forEach(o -> {
-                if (o.getText() != null && o.getText().length() > 0) log.info(o.getText());
-            });
-        }
-        List<Widget> options = PDialogue.getDialogueOptions();
-        if (options.size() == 0) {
-            log.info("No widgets");
-        } else {
-            log.info(options.size() + " total widgets");
-            options.forEach(o -> {
-                log.info(o.getText());
-            });
-        }
-         */
-
-
+        QuestTextReader.getQuestText("Cook");
     }
 
     @Override

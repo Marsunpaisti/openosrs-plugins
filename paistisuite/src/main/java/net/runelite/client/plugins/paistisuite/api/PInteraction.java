@@ -317,7 +317,7 @@ public class PInteraction {
                     0);
             return true;
 
-        }, "interact_widget");
+        }, "interact_npc");
     }
 
     /***
@@ -357,13 +357,24 @@ public class PInteraction {
             int finalActionIndex = actionIndex + 1;
             MenuAction finalActionOp = finalActionIndex > 5 ? MenuAction.CC_OP_LOW_PRIORITY : MenuAction.CC_OP;
             final int widgetId = widget.getId();
-
+            int childIndex = -1;
+            int searchIndex = 0;
+            if (widget.getParent() != null && widget.getParent().getChildren() != null){
+                for (Widget c : widget.getParent().getChildren()){
+                    if (c.equals(widget)) {
+                        childIndex = searchIndex;
+                        break;
+                    } else {
+                        searchIndex++;
+                    }
+                }
+            }
             PUtils.getClient().invokeMenuAction(
                     "",
                     "",
                     finalActionIndex,
                     finalActionOp.getId(),
-                    -1,
+                    childIndex,
                     widgetId);
             return true;
         }, "interact_widget");

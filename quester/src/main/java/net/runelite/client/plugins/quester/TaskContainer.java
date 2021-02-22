@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface TaskContainer {
     public Task getTask();
+    public void addTask(Task t);
 }

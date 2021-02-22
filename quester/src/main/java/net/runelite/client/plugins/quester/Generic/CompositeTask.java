@@ -48,6 +48,10 @@ public class CompositeTask implements Task, TaskContainer {
         return tasks.stream().anyMatch(t -> t.isFailed());
     }
 
+    public void addTask(Task t){
+        this.tasks.add(t);
+    }
+
     @Override
     public int getDistance() {
         // Return first nonzero distance

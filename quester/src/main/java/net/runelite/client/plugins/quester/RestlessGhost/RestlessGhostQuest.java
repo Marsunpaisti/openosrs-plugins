@@ -72,6 +72,31 @@ public class RestlessGhostQuest extends Quest{
                                 new String[]{""},
                                 new String[]{"tell me what the"}
                         )
+                ),
+                new InteractWithObjectTask(
+                        null,
+                        "Altar",
+                        new String[]{"Search"},
+                        new WorldPoint(3117, 9565, 0),
+                        () -> PObjects.findNPC(Filters.NPCs.nameContains("Restless ghost")) != null
+                ),
+                new CompositeTask(
+                        new EquipItemTask(plugin, "Ghostspeak amulet"),
+                        new InteractWithObjectTask(
+                                null,
+                                "Coffin",
+                                new String[]{"Open", "Close"},
+                                new WorldPoint(3248, 3194, 0),
+                                () -> PObjects.findNPC(Filters.NPCs.nameContains("Restless ghost")) != null
+                        ),
+                        new TalkToNpcTask(
+                                plugin,
+                                "Restless ghost",
+                                new WorldPoint(3248, 3194, 0),
+                                "Talk-to",
+                                new String[]{""},
+                                null
+                        )
                 )
         );
     }

@@ -42,6 +42,10 @@ public abstract class Quest implements TaskContainer {
         return this.tasks.get(tasks.size() - 1).isCompleted();
     }
 
+    public void addTask(Task t){
+        this.tasks.add(t);
+    }
+
     public WorldPoint location(){
         if (getTask() == null) return null;
         return getTask().location();
