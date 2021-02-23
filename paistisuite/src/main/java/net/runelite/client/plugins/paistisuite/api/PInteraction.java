@@ -343,6 +343,7 @@ public class PInteraction {
         if (widget == null) return false;
         return PUtils.clientOnly(() -> {
             String[] possibleActions = widget.getActions();
+            if (possibleActions == null) return false;
             List<String> desiredActions = Arrays.asList(actions);
             int actionIndex = -1;
             String action = "";

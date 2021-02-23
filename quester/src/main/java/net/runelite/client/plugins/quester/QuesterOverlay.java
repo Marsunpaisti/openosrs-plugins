@@ -31,7 +31,6 @@ import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WebWalkerDebugRenderer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.PathAnalyzer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.ui.overlay.*;
@@ -65,7 +64,96 @@ public class WebWalkerOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		WebWalkerDebugRenderer.render(graphics);
+		if (!WalkerEngine.getInstance().isNavigating()) return null;
+		PathAnalyzer.DestinationDetails destinationDetails = WalkerEngine.getInstance().getDebugFurthestTile();
+		WorldPoint debugFurthestTile = null;
+		WorldPoint debugAssumedNext = null;
+		if (destinationDetails != null) {
+			debugFurthestTile = destinationDetails.getDestination().getRSTile().toWorldPoint();
+			debugAssumedNext = destinationDetails.getAssumed().toWorldPoint();
+			if (debugFurthestTile != null){
+				drawTile(graphics, debugFurthestTile, Color.green);
+			}
+			if (debugAssumedNext != null && destinationDetails.getState() != PathAnalyzer.PathState.FURTHEST_CLICKABLE_TILE){
+				drawTile(graphics, debugAssumedNext, Color.yellow);
+			}
+		}
+
+		List<WorldPoint> path = WalkerEngine.getInstance().getCurrentPathWorldPoints();
+		if (path == null) return null;
+		WorldPoint previous = null;
+		for (WorldPoint tile : path)
+		{
+			if (previous != null){
+				if (previous.equals(debugFurthestTile) && tile.equals(debugAssumedNext) && destinationDetails.getState() != PathAnalyzer.PathState.FURTHEST_CLICKABLE_TILE) {
+					lineBetweenTiles(graphics, previous, tile, Color.yellow, 6);
+				} else{
+					lineBetweenTiles(graphics, previous, tile, Color.cyan, 3);
+				}
+			}
+			previous = tile;
+			//drawTile(graphics, tile, Color.cyan);
+		}
+
+
+
 		return null;
+	}
+
+	private void lineBetweenTiles(Graphics2D graphics, WorldPoint tile1, WorldPoint tile2, Color color, int width)
+	{
+		if (tile1.getPlane() != client.getPlane())
+		{
+			return;
+		}
+
+		if (tile2.getPlane() != client.getPlane())
+		{
+			return;
+		}
+
+		LocalPoint lp1 = LocalPoint.fromWorld(client, tile1);
+		LocalPoint lp2 = LocalPoint.fromWorld(client, tile2);
+		if (lp1 == null || lp2 == null)
+		{
+			return;
+		}
+
+		Polygon poly1 = Perspective.getCanvasTilePoly(client, lp1);
+		Polygon poly2 = Perspective.getCanvasTilePoly(client, lp2);
+		if (poly1 == null || poly2 == null)
+		{
+			return;
+		}
+
+		graphics.setStroke(new BasicStroke(width));
+		graphics.setColor(color);
+		graphics.drawLine(
+				(int)Math.round(poly1.getBounds().getCenterX()), (int)Math.round(poly1.getBounds().getCenterY()),
+				(int)Math.round(poly2.getBounds().getCenterX()), (int)Math.round(poly2.getBounds().getCenterY()));
+	}
+
+	private void drawTile(Graphics2D graphics, WorldPoint tile, Color color)
+	{
+		WorldPoint point = tile;
+		if (point.getPlane() != client.getPlane())
+		{
+			return;
+		}
+
+		LocalPoint lp = LocalPoint.fromWorld(client, point);
+		if (lp == null)
+		{
+			return;
+		}
+
+		Polygon poly = Perspective.getCanvasTilePoly(client, lp);
+		if (poly == null)
+		{
+			return;
+		}
+
+		OverlayUtil.renderPolygon(graphics, poly, color);
+		//OverlayUtil.renderPolygon(graphics, poly, color);
 	}
 }

@@ -308,7 +308,7 @@ public class PathObjectHandler {
 
     private static boolean handle(List<RSTile> path, PTileObject objDefPair, PathAnalyzer.DestinationDetails destinationDetails, String action, SpecialObject specialObject){
         PathAnalyzer.DestinationDetails current = PathAnalyzer.furthestReachableTile(path);
-        WalkerEngine.getInstance().debugFurthestReachable = current;
+        WalkerEngine.getInstance().setDebugFurthestReachable(current);
 
         if (current == null){
             return false;
@@ -640,9 +640,7 @@ public class PathObjectHandler {
             }
 
             // Wait a little bit more for any animations to end
-            WaitFor.milliseconds(1000, 1900);
-            log.info("Hard waited");
-
+            PUtils.waitCondition((int)PUtils.randomNormal(1900, 2500), () -> Reachable.getMap().canReach(destinationDetails.getAssumed()) && PPlayer.get().getAnimation() == -1);
         }
 
         return result;

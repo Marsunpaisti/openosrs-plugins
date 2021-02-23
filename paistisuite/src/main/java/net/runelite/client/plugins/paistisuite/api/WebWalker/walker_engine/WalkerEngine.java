@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -25,6 +26,8 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -35,8 +38,10 @@ public class WalkerEngine{
     private int clickAfterSteps = (int)PUtils.randomNormal(5, 10);
     private final int failThreshold;
     private boolean navigating;
+    private final ReentrantLock pathLock = new ReentrantLock();
+    private final ReentrantLock furthestReachableTileLock = new ReentrantLock();
     private List<RSTile> currentPath;
-    public PathAnalyzer.DestinationDetails debugFurthestReachable = null;
+    private PathAnalyzer.DestinationDetails debugFurthestReachable = null;
 
     public static WalkerEngine getInstance(){
         return walkerEngine != null ? walkerEngine : (walkerEngine = new WalkerEngine());
@@ -45,8 +50,10 @@ public class WalkerEngine{
     private WalkerEngine(){
         attemptsForAction = 0;
         failThreshold = 3;
-        navigating = false;
-        currentPath = null;
+        synchronized (pathLock){
+            navigating = false;
+            currentPath = null;
+        }
     }
 
     public boolean walkPath(List<RSTile> path){
@@ -54,7 +61,28 @@ public class WalkerEngine{
     }
 
     public List<RSTile> getCurrentPath() {
-        return currentPath;
+        synchronized (pathLock){
+            return currentPath;
+        }
+    }
+
+    public void setDebugFurthestReachable(PathAnalyzer.DestinationDetails val){
+        synchronized (furthestReachableTileLock){
+            debugFurthestReachable = val;
+        }
+    }
+
+    public List<WorldPoint> getCurrentPathWorldPoints() {
+        synchronized (pathLock){
+            if (currentPath == null) return null;
+            return currentPath.stream().map(RSTile::toWorldPoint).collect(Collectors.toList());
+        }
+    }
+
+    public PathAnalyzer.DestinationDetails getDebugFurthestTile(){
+        synchronized (furthestReachableTileLock){
+            return this.debugFurthestReachable;
+        }
     }
 
     /**
@@ -76,8 +104,10 @@ public class WalkerEngine{
             }
         }
 
-        navigating = true;
-        currentPath = path;
+        synchronized (pathLock){
+            navigating = true;
+            currentPath = path;
+        }
         try {
             PathAnalyzer.DestinationDetails destinationDetails;
             resetAttempts();
@@ -105,7 +135,9 @@ public class WalkerEngine{
                 }
 
                 destinationDetails = PathAnalyzer.furthestReachableTile(path);
-                debugFurthestReachable = destinationDetails;
+                synchronized (furthestReachableTileLock){
+                    debugFurthestReachable = destinationDetails;
+                }
                 if (destinationDetails == null) {
                     log.info("Could not grab destination details.");
                     failedAttempt();
@@ -207,7 +239,9 @@ public class WalkerEngine{
                                 }
 
                                 PathAnalyzer.DestinationDetails furthestReachable = PathAnalyzer.furthestReachableTile(path);
-                                debugFurthestReachable = furthestReachable;
+                                synchronized (furthestReachableTileLock){
+                                    debugFurthestReachable = furthestReachable;
+                                }
                                 PathFindingNode currentDestination = BFS.bfsClosestToPath(path, RealTimeCollisionTile.get(destination.getX(), destination.getY(), destination.getZ()));
                                 if (currentDestination == null) {
                                     log.info("Could not walk to closest tile in path.");
@@ -257,12 +291,16 @@ public class WalkerEngine{
 
             }
         } finally {
-            navigating = false;
+            synchronized(pathLock){
+                navigating = false;
+            }
         }
     }
 
-    boolean isNavigating() {
-        return navigating;
+    public boolean isNavigating() {
+        synchronized ( pathLock ){
+            return navigating;
+        }
     }
 
     boolean isDestinationClose(PathFindingNode pathFindingNode){

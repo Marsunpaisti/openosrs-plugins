@@ -142,7 +142,7 @@ public class PInventory
         int count = 0;
         List<PItem> items = getAllItems();
         for (PItem i : items){
-            if (i.getDefinition().getName().equals(name)) {
+            if (i.getDefinition().getName().equalsIgnoreCase(name)) {
                 count += i.getQuantity();
             }
         }
@@ -208,9 +208,7 @@ public class PInventory
                 items = PaistiSuite.getInstance().clientExecutor.scheduleAndWait(() -> {
                     return PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
                 }, "getEquippedItems");
-            } catch (NullPointerException ignored){
             } catch (Exception e){
-                log.error("Error in getEquippedItems: " + e.toString());
             }
         }
 
