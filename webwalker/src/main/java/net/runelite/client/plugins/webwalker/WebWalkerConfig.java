@@ -6,17 +6,19 @@ import net.runelite.client.plugins.webwalker.farming.*;
 @ConfigGroup("WebWalker")
 public interface WebWalkerConfig extends Config
 {
-    default boolean instructionsTitle()
-    {
-        return false;
-    }
+    @ConfigTitle(
+            name = "Instructions",
+            description = "",
+            position = 17
+    )
+    String instructionsTitle = "Instructions";
 
     @ConfigItem(
             keyName = "instructions",
             name = "",
             description = "Instructions. Don't enter anything into this field",
             position = 18,
-            section = "instructionsTitle"
+            section = instructionsTitle
     )
     default String instructions()
     {
@@ -39,7 +41,6 @@ public interface WebWalkerConfig extends Config
     {
         return "Paste custom co-ords that you want to save for frequent use";
     }
-
     @ConfigItem(
             keyName = "category",
             name = "Category",
@@ -56,7 +57,9 @@ public interface WebWalkerConfig extends Config
             name = "Location",
             description = "Select the location to walk to",
             position = 101,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "BANKS"
     )
     default Banks catBanks()
     {
@@ -68,7 +71,9 @@ public interface WebWalkerConfig extends Config
             name = "Location",
             description = "Select the location to walk to",
             position = 102,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "BARCRAWL"
     )
     default Barcrawl catBarcrawl()
     {
@@ -80,7 +85,9 @@ public interface WebWalkerConfig extends Config
             name = "Location",
             description = "Select the location to walk to",
             position = 103,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "CITIES"
     )
     default Cities catCities()
     {
@@ -92,7 +99,9 @@ public interface WebWalkerConfig extends Config
             name = "Patch Type",
             description = "Select the Farming category you want",
             position = 110,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "FARMING"
     )
     default Farming catFarming()
     {
@@ -104,7 +113,9 @@ public interface WebWalkerConfig extends Config
             name = "Patch",
             description = "Select the location to walk to",
             position = 111,
-            hidden = true
+            hidden = true,
+            unhide = "catFarming",
+            unhideValue = "ALLOTMENTS"
     )
     default Allotments catFarmAllotments()
     {
@@ -116,7 +127,9 @@ public interface WebWalkerConfig extends Config
             name = "Patch",
             description = "Select the location to walk to",
             position = 112,
-            hidden = true
+            hidden = true,
+            unhide = "catFarming",
+            unhideValue = "BUSHES"
     )
     default Bushes catFarmBushes()
     {
@@ -128,7 +141,9 @@ public interface WebWalkerConfig extends Config
             name = "Patch",
             description = "Select the location to walk to",
             position = 113,
-            hidden = true
+            hidden = true,
+            unhide = "catFarming",
+            unhideValue = "FRUIT_TREES"
     )
     default FruitTrees catFarmFruitTrees()
     {
@@ -140,7 +155,9 @@ public interface WebWalkerConfig extends Config
             name = "Patch",
             description = "Select the location to walk to",
             position = 114,
-            hidden = true
+            hidden = true,
+            unhide = "catFarming",
+            unhideValue = "HERBS"
     )
     default Herbs catFarmHerbs()
     {
@@ -152,7 +169,9 @@ public interface WebWalkerConfig extends Config
             name = "Patch",
             description = "Select the location to walk to",
             position = 115,
-            hidden = true
+            hidden = true,
+            unhide = "catFarming",
+            unhideValue = "HOPS"
     )
     default Hops catFarmHops()
     {
@@ -164,7 +183,9 @@ public interface WebWalkerConfig extends Config
             name = "Patch",
             description = "Select the location to walk to",
             position = 116,
-            hidden = true
+            hidden = true,
+            unhide = "catFarming",
+            unhideValue = "TREES"
     )
     default Trees catFarmTrees()
     {
@@ -176,7 +197,9 @@ public interface WebWalkerConfig extends Config
             name = "Location",
             description = "Select the location to walk to",
             position = 103,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "GUILDS"
     )
     default Guilds catGuilds()
     {
@@ -188,7 +211,9 @@ public interface WebWalkerConfig extends Config
             name = "Location",
             description = "Select the location to walk to",
             position = 104,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "SKILLING"
     )
     default Skilling catSkilling()
     {
@@ -200,7 +225,9 @@ public interface WebWalkerConfig extends Config
             name = "Location",
             description = "Select the location to walk to",
             position = 105,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "SLAYER"
     )
     default Slayer catSlayer()
     {
@@ -212,7 +239,9 @@ public interface WebWalkerConfig extends Config
             name = "Location",
             description = "Select the location to walk to",
             position = 106,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "MISC"
     )
     default Misc catMisc()
     {
@@ -224,7 +253,9 @@ public interface WebWalkerConfig extends Config
             name = "Custom Location",
             description = "Enter a Coordinate to walk to. Co-ordinate format should be x,y,z. \nTurn on Location or Tile Location in Developer Tools to obtain coordinates.",
             position = 135,
-            hidden = true
+            hidden = true,
+            unhide = "category",
+            unhideValue = "CUSTOM"
     )
     default String customLocation()
     {

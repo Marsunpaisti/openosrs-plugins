@@ -1,7 +1,10 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding;
 
+import net.runelite.api.TileObject;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 import java.util.*;
 
@@ -29,6 +32,10 @@ public class Reachable {
             return true;
         }
         return getParent(position.toLocalTile()) != null;
+    }
+
+    public boolean canReach(WorldPoint position) {
+        return canReach(new RSTile(position));
     }
 
     public boolean canReach(int x, int y) {
@@ -62,6 +69,40 @@ public class Reachable {
     public RSTile getParent(int x, int y) {
         RSTile position = convertToLocal(x, y);
         return getParent(position);
+    }
+
+    public static WorldPoint getNearestReachableTile(WorldPoint target, int radius){
+        Reachable r = new Reachable();
+        if (r.canReach(target)) return target;
+        List<WorldPoint> reachableTiles = new ArrayList<WorldPoint>();
+        for (int dx = -radius; dx <= radius; dx++){
+            for (int dy = -radius; dy <= radius; dy++){
+                WorldPoint eval = target.dx(dx).dy(dy);
+                if (!r.canReach(eval)) continue;
+                reachableTiles.add(eval);
+            }
+        }
+
+        return reachableTiles
+                .stream()
+                .sorted((a,b) -> {
+                    // First sort by distance from target
+                    int aObjDist = target.distanceTo(a);
+                    int bObjDist = target.distanceTo(b);
+                    if (aObjDist < bObjDist) return -1;
+                    if (bObjDist > aObjDist) return 1;
+
+                    // Then sort by distance from us
+                    int aPlayerDist = r.getDistance(a);
+                    int bPlayerDist = r.getDistance(b);
+                    return aPlayerDist - bPlayerDist;
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static WorldPoint getNearestReachableTile(PTileObject to, int radius){
+        return getNearestReachableTile(to.getWorldLocation(), radius);
     }
 
     public RSTile getParent(RSTile tile) {
@@ -124,6 +165,10 @@ public class Reachable {
         }
         Collections.reverse(path);
         return path;
+    }
+
+    public int getDistance(WorldPoint position) {
+        return getDistance(new RSTile(position));
     }
 
     public int getDistance(RSTile localPos) {

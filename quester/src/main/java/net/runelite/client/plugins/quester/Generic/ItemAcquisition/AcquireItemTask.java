@@ -35,7 +35,7 @@ public class AcquireItemTask implements Task, TaskContainer {
         this.quantity = quantity;
         this.handlers = new ArrayList<Task>();
         List<Task> generatedHandlers = AcquisitionTasks.getHandlers(plugin, itemName, quantity);
-        if (generatedHandlers == null) {
+        if (generatedHandlers == null || generatedHandlers.size() == 0) {
             log.error("No handlers were generated for AcquireItemTask: " + itemName);
         } else {
             this.handlers.addAll(generatedHandlers);
@@ -43,15 +43,17 @@ public class AcquireItemTask implements Task, TaskContainer {
     }
 
     public String name() {
-        return getHandler().name();
+        if (this.handler == null) return "Acquire item: " + itemName;
+        return this.handler.name();
     }
 
     public WorldPoint location() {
+        if (this.handler == null) return null;
         return getHandler().location();
     }
 
     public boolean execute() {
-        if (getHandler() == null) {
+        if (!isCompleted() && getHandler() == null) {
             this.failed = true;
             return false;
         }
@@ -62,19 +64,22 @@ public class AcquireItemTask implements Task, TaskContainer {
     };
 
     public Task getHandler(){
-        if (this.handler == null || this.handler.isFailed()) this.handler = getTask();
+        if (this.handler == null || this.handler.isFailed()) {
+            Task get = getTask();
+            if (get != null) this.handler = get;
+        }
         return this.handler;
     }
 
     public boolean condition() {
-        return !isCompleted() && !isFailed() && getHandler() != null &&
-                (PInventory.findAllItems(Filters.Items.nameContains(itemName)).size()
-                        + PInventory.findAllEquipmentItems(Filters.Items.nameContains(itemName)).size() < quantity);
+        return !isCompleted()
+                && !isFailed()
+                && getHandler() != null
+                && PInventory.getCount(itemName) < quantity;
     }
 
     public boolean isCompleted() {
-        return this.isCompleted || (PInventory.findAllItems(Filters.Items.nameContains(itemName)).size()
-                + PInventory.findAllEquipmentItems(Filters.Items.nameContains(itemName)).size() >= quantity);
+        return this.isCompleted || PInventory.getCount(itemName) >= quantity;
     }
 
     public boolean isFailed(){

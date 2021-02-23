@@ -3,7 +3,6 @@ package net.runelite.client.plugins.quester.Generic.ItemAcquisition;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.PShopping;
 import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
@@ -13,7 +12,6 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Play
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Point3D;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
-import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.quester.Quester;
 import net.runelite.client.plugins.quester.Task;
 
@@ -28,6 +26,7 @@ public class BuyItemFromStoreTask implements Task {
     private boolean isCompleted = false;
     int walkAttempts = 0;
     int tradeAttempts = 0;
+    int hopAttempts = 0;
     int cachedDistance = -1;
     int cachedDistanceTick = -1;
 
@@ -47,53 +46,68 @@ public class BuyItemFromStoreTask implements Task {
         return this.location;
     }
 
+    public NPC findTarget(){
+        return PObjects.findNPC(Filters.NPCs.actionsContains("Trade")
+        .and(n -> n.getWorldLocation().distanceTo(location()) < 10)
+        .and(n -> Reachable.getNearestReachableTile(n.getWorldLocation(), 2) != null));
+    }
     public boolean execute() {
-        if (tradeAttempts >= 3){
-            log.info("Failed buy item from store task. Too many attempts to trade npc.");
+        if (tradeAttempts >= 5){
+            log.info("Failed talk to npc task. Too many attempts to talk to npc.");
             this.failed = true;
             return false;
         }
-        NPC npc = PObjects.findNPC(Filters.NPCs.actionsContains("Trade"));
-        if (npc == null || (walkAttempts < 3 && !Reachable.getMap().canReach(new RSTile(npc.getWorldLocation())))) {
-            if (walkAttempts < 3 && plugin.daxWalkTo(location())){
-                walkAttempts++;
+        NPC npc = findTarget();
+        WorldPoint nearestReachable = npc != null ? Reachable.getNearestReachableTile(npc.getWorldLocation(), 2) : null;
+        if (npc == null || nearestReachable == null) {
+            if (walkAttempts >= 5 || hopAttempts > 8){
+                this.failed = true;
+                log.info("Unable to walk to npc! Too many attempts!");
+                return false;
+            }
+            walkAttempts++;
+            if (plugin.webWalkTo(location())){
                 PUtils.waitCondition(PUtils.random(2500, 3100), () -> !PPlayer.isMoving() && PPlayer.distanceTo(location()) <= 2);
-                log.info("Walked to NPC");
-                return true;
-            } else if (walkAttempts >= 3){
-                this.failed = true;
-                log.info("Unable to walk to NPC!");
-                return false;
-            }
-        } else {
-            if (!PInteraction.npc(npc, "Trade")) {
-                log.info("Unable to trade with NPC!");
-                this.failed = true;
-                return false;
+                log.info("Walked to npc");
             } else {
-                PUtils.waitCondition(PUtils.random(800, 1400), () -> PPlayer.isMoving());
-                int distance = Reachable.getMap().getDistance(new RSTile(npc.getWorldLocation()));
-                if (distance == Integer.MAX_VALUE) distance = (int)Math.round(PPlayer.distanceTo(npc) * 1.5);
-                int multiplier = PPlayer.isRunEnabled() ? 300 : 600;
-                int timeout = distance * multiplier + (int)PUtils.randomNormal(1300, 1900);
-                PUtils.waitCondition(timeout, () -> !PPlayer.isMoving());
-                if (!PUtils.waitCondition(PUtils.random(1300, 1900), () -> PShopping.isShopOpen())){
-                    tradeAttempts++;
-                    log.info("Timed out while waiting for trade window!");
-                    return true;
-                } else {
-                    int currentCount = PInventory.getCount(itemName);
-                    int bought = PShopping.buyItemFromShop(itemName, quantity - currentCount);
-                    if (bought < quantity) {
-                        walkAttempts = 0;
-                        tradeAttempts = 0;
-                        return true;
-                    }
-                    this.isCompleted = true;
-                    return true;
-                }
+                log.info("Failed webwalk to npc location! (Attempt " + walkAttempts + ")");
             }
+            return true;
         }
+
+        if (!PInteraction.npc(npc, "Trade")) {
+            log.info("Unable to trade with NPC!");
+            this.failed = true;
+            return false;
+        }
+
+        int distance = (int)Math.round(Reachable.getMap().getDistance(nearestReachable));
+        if (distance > 1) PUtils.waitCondition(PUtils.random(800, 1400), PPlayer::isMoving);
+        int multiplier = PPlayer.isRunEnabled() ? 300 : 600;
+        int timeout = distance * multiplier + (int)PUtils.randomNormal(1900, 2800);
+        PUtils.waitCondition(timeout, () -> !PPlayer.isMoving() || PPlayer.location().distanceTo(npc.getWorldLocation()) <= 1);
+
+        if (!PUtils.waitCondition(PUtils.random(1300, 1900), PShopping::isShopOpen)){
+            tradeAttempts++;
+            log.info("Timed out while waiting for trade window!");
+            return true;
+        }
+
+        int currentCount = PInventory.getCount(itemName);
+        int bought = PShopping.buyItemFromShop(itemName, quantity - currentCount);
+        if (bought != 0 ) {
+            walkAttempts = 0;
+            tradeAttempts = 0;
+            return true;
+        }
+        if (bought < quantity - currentCount){
+            PWorldHopper.hop();
+            hopAttempts++;
+            PUtils.sleepNormal(2000, 3000);
+            return true;
+        }
+
+        this.isCompleted = true;
         return true;
     };
 
@@ -112,7 +126,7 @@ public class BuyItemFromStoreTask implements Task {
     }
 
     public int getDistance(){
-        if (PUtils.getClient().getTickCount() == cachedDistanceTick) return cachedDistance;
+        if (PUtils.getClient().getTickCount() <= cachedDistanceTick+30) return cachedDistance;
         WorldPoint playerLoc = PPlayer.getWorldLocation();
         Point3D playerLocPoint = new Point3D(playerLoc.getX(), playerLoc.getY(), playerLoc.getPlane());
         WorldPoint taskLoc = location();

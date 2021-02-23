@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.quester;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,17 +19,17 @@ public abstract class Quest implements TaskContainer {
     public Task getTask() {
         Task ret = null;
         for (Task t : tasks){
-            if (!t.isFailed() && !t.isCompleted() && t.condition()){
+            if (!t.isFailed() && !t.isCompleted()){
+                if (!t.condition()) {
+                    log.info("Next task in Quest cannot be accomplished!");
+                    log.info("Next task would have been " + t.name());
+                    return null;
+                }
                 ret = t;
                 break;
             }
         }
 
-        if (!isComplete() && !isFailed() && ret == null){
-            log.info("Warning: Quest " + getName() + " is not completed/failed, but getTask() returned null");
-            Task next = tasks.stream().filter(t -> !t.isFailed() && !t.isCompleted() && !t.condition()).findFirst().orElse(null);
-            log.info("Next task would have been: " + (next != null ? next.name() : "NULL"));
-        }
         return ret;
     }
 
@@ -40,7 +39,7 @@ public abstract class Quest implements TaskContainer {
         return this.tasks.stream().anyMatch(Task::isFailed);
     }
 
-    public boolean isComplete(){
+    public boolean isCompleted(){
         return this.tasks.get(tasks.size() - 1).isCompleted();
     }
 

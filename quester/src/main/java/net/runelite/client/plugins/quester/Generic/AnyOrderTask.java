@@ -8,6 +8,7 @@ import net.runelite.client.plugins.quester.TaskContainer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class AnyOrderTask implements Task, TaskContainer {
@@ -20,22 +21,25 @@ public class AnyOrderTask implements Task, TaskContainer {
 
     @Override
     public String name() {
+        if (getTask() == null) return "AnyOrderTask (" + this.tasks.stream().map(t -> t.name()).collect(Collectors.joining(", ")) + ")";
         return getTask().name();
     }
 
     @Override
     public WorldPoint location() {
+        if (getTask() == null) return null;
         return getTask().location();
     }
 
     @Override
     public boolean execute() {
+        if (getTask() == null) return false;
         return getTask().execute();
     }
 
     @Override
     public boolean condition() {
-        return getTask().condition();
+        return getTask() != null && getTask().condition();
     }
 
     @Override

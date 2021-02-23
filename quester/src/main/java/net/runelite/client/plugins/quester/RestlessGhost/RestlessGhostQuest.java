@@ -8,10 +8,7 @@ import net.runelite.client.plugins.paistisuite.api.Filters;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PObjects;
 import net.runelite.client.plugins.paistisuite.api.PVars;
-import net.runelite.client.plugins.quester.Generic.EquipItemTask;
-import net.runelite.client.plugins.quester.Generic.CompositeTask;
-import net.runelite.client.plugins.quester.Generic.InteractWithObjectTask;
-import net.runelite.client.plugins.quester.Generic.TalkToNpcTask;
+import net.runelite.client.plugins.quester.Generic.*;
 import net.runelite.client.plugins.quester.Quest;
 import net.runelite.client.plugins.quester.Quester;
 
@@ -73,8 +70,8 @@ public class RestlessGhostQuest extends Quest{
                             "Restless ghost",
                             new WorldPoint(3248, 3194, 0),
                             "Talk-to",
-                            new String[]{""},
-                            new String[]{"tell me what the"}
+                            new String[]{"tell me what the"},
+                            new String[]{""}
                     )
         ){
             @Override
@@ -114,7 +111,19 @@ public class RestlessGhostQuest extends Quest{
                     new InteractWithObjectTask(
                             plugin,
                             "Coffin",
-                            new String[]{"Open", "Close"},
+                            new String[]{"Open"},
+                            new WorldPoint(3248, 3194, 0),
+                            () -> PObjects.findObject(Filters.Objects.nameEquals("Coffin").and(Filters.Objects.actionsContains("Open"))) == null
+                    ){
+                        @Override
+                        public boolean isCompleted(){
+                            return PObjects.findObject(Filters.Objects.nameEquals("Coffin").and(Filters.Objects.actionsContains("Open"))) == null;
+                        }
+                    },
+                    new UseItemOnObjectTask(
+                            plugin,
+                            "Ghost's Skull",
+                            "Coffin",
                             new WorldPoint(3248, 3194, 0),
                             () -> getQuestStage().getVarp() >= RestlessGhostStage.COMPLETED.getVarp()
                     )

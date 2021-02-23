@@ -17,11 +17,18 @@ public interface AIOFighterConfig extends Config
         return false;
     }
 
+    @ConfigTitle(
+            name = "Targeting",
+            description = "Enter enemy names/ids to target",
+            position = 15
+    )
+    String targetingTitle = "Targeting";
+
     @ConfigItem(
             keyName = "enemyNames",
             name = "",
             description = "",
-            section = "targetingTitle",
+            title = targetingTitle,
             position = 16
     )
     default String enemyNames()
@@ -37,7 +44,7 @@ public interface AIOFighterConfig extends Config
             keyName = "searchRadius",
             name = "Search radius",
             description = "The distance (in tiles) to search for targets.",
-            section = "targetingTitle",
+            title = targetingTitle,
             position = 17
     )
     default int searchRadius()
@@ -49,7 +56,7 @@ public interface AIOFighterConfig extends Config
             keyName = "enablePathfind",
             name = "Check pathfinding",
             description = "Enable to also check that a valid path to target can be found. May impact performance.",
-            section = "targetingTitle",
+            title = targetingTitle,
             position = 18
     )
     default boolean enablePathfind()
@@ -61,7 +68,7 @@ public interface AIOFighterConfig extends Config
             keyName = "setFightAreaButton",
             name = "Set fighting area",
             description = "Set fighting area to where you are standing",
-            section = "targetingTitle",
+            title = targetingTitle,
             position = 19
     )
     default Button setFightAreaButton()
@@ -69,11 +76,18 @@ public interface AIOFighterConfig extends Config
         return new Button();
     }
 
+    @ConfigTitle(
+            name = "Eating",
+            description = "Enter food names/ids to eat",
+            position = 15
+    )
+    String eatingTitle = "Eating";
+
     @ConfigItem(
             keyName = "foodNames",
             name = "",
             description = "Food names or IDs to eat",
-            section = "eatingTitle",
+            title = eatingTitle,
             position = 21
     )
     default String foodNames()
@@ -85,7 +99,7 @@ public interface AIOFighterConfig extends Config
             keyName = "minEatHP",
             name = "Minimum Eat HP",
             description = "Minimum HP to eat. Bot will always eat below this value.",
-            section = "eatingTitle",
+            title = eatingTitle,
             position = 25
 
     )
@@ -98,7 +112,7 @@ public interface AIOFighterConfig extends Config
             keyName = "maxEatHP",
             name = "Maximum Eat HP",
             description = "Highest HP that bot sometimes eats at (random between min and max eat hp)",
-            section = "eatingTitle",
+            title = eatingTitle,
             position = 30
     )
     default int maxEatHP()
@@ -110,7 +124,7 @@ public interface AIOFighterConfig extends Config
             keyName = "stopWhenOutOfFood",
             name = "Stop when out of food",
             description = "Stops and logs out when out of food",
-            section = "eatingTitle",
+            title = eatingTitle,
             position = 31
     )
     default boolean stopWhenOutOfFood()
@@ -118,11 +132,18 @@ public interface AIOFighterConfig extends Config
         return false;
     }
 
+    @ConfigTitle(
+            name = "Looting",
+            description = "Enter loot names/ids to pick up",
+            position = 15
+    )
+    String lootingTitle = "Looting";
+
     @ConfigItem(
             keyName = "lootNames",
             name = "",
             description = "",
-            section = "lootingTitle",
+            title = lootingTitle,
             position = 51
     )
     default String lootNames()
@@ -134,7 +155,7 @@ public interface AIOFighterConfig extends Config
             keyName = "lootGEValue",
             name = "Loot if value>X",
             description = "Loot items that are more valuable than X. 0 to disable",
-            section = "lootingTitle",
+            title = lootingTitle,
             position = 52
     )
     default int lootGEValue()
@@ -146,7 +167,7 @@ public interface AIOFighterConfig extends Config
             keyName = "lootOwnKills",
             name = "Only loot your kills",
             description = "Makes the bot ignore drops from other players.",
-            section = "lootingTitle",
+            title = lootingTitle,
             position = 53
     )
     default boolean lootOwnKills()
@@ -158,7 +179,7 @@ public interface AIOFighterConfig extends Config
             keyName = "eatForLoot",
             name = "Eat to make space for loot",
             description = "Makes the bot eat food to get more inventory space for loot.",
-            section = "lootingTitle",
+            title = lootingTitle,
             position = 54
     )
     default boolean eatForLoot()
@@ -166,11 +187,18 @@ public interface AIOFighterConfig extends Config
         return false;
     }
 
+    @ConfigTitle(
+            name = "Safe spotting",
+            description = "Enter enemy names/ids to target",
+            position = 15
+    )
+    String safespotTitle = "Safe spotting";
+
     @ConfigItem(
             keyName = "setSafeSpotButton",
             name = "Set safespot tile",
             description = "Set safespot tile where you are standing",
-            section = "safespotTitle",
+            title = safespotTitle,
             position = 71
     )
     default Button setSafeSpotButton()
@@ -181,7 +209,7 @@ public interface AIOFighterConfig extends Config
             keyName = "enableSafeSpot",
             name = "Use safespot for combat",
             description = "Run to safespot tile in combat",
-            section = "safespotTitle",
+            title = safespotTitle,
             position = 72
     )
     default boolean enableSafeSpot()
@@ -192,7 +220,7 @@ public interface AIOFighterConfig extends Config
             keyName = "exitInSafeSpot",
             name = "Safespot when stopping",
             description = "Run to safespot and logout when stopping script",
-            section = "safespotTitle",
+            title = safespotTitle,
             position = 73
     )
     default boolean exitInSafeSpot()

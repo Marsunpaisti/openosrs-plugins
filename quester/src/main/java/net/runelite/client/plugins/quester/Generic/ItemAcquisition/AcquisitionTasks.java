@@ -1,9 +1,14 @@
 package net.runelite.client.plugins.quester.Generic.ItemAcquisition;
 
+import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.paistisuite.api.Filters;
-import net.runelite.client.plugins.paistisuite.api.PInventory;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.api.*;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Keyboard;
 import net.runelite.client.plugins.quester.Generic.CompositeTask;
+import net.runelite.client.plugins.quester.Generic.DropAllItemsTask;
+import net.runelite.client.plugins.quester.Generic.InteractWithNpcTask;
 import net.runelite.client.plugins.quester.Generic.InteractWithObjectTask;
 import net.runelite.client.plugins.quester.Quester;
 import net.runelite.client.plugins.quester.Task;
@@ -31,7 +36,7 @@ public class AcquisitionTasks {
     }
 
     public AcquisitionTasks() {
-        factories.put("Bucket of Milk", new ItemAcquisitionHandlerFactory() {
+        factories.put("Bucket of milk", new ItemAcquisitionHandlerFactory() {
             @Override
             public List<Task> getHandlers(Quester plugin, int quantity) {
                 List<Task> handlers = new ArrayList<Task>();
@@ -39,8 +44,7 @@ public class AcquisitionTasks {
                 milkCowTask = new CompositeTask() {
                     @Override
                     public boolean condition(){
-                        return PInventory.findAllItems(Filters.Items.nameEquals("Bucket")).size()
-                                >= quantity - PInventory.findAllItems(Filters.Items.nameEquals("Bucket of Milk")).size();
+                        return PInventory.getCount("Bucket") >= quantity - PInventory.getCount("Bucket of milk");
                     }
                 };
                 for (int i = 1; i <= quantity; i++){
@@ -51,10 +55,10 @@ public class AcquisitionTasks {
                             "Dairy cow",
                             new String[]{"Milk"},
                             new WorldPoint(3255, 3270, 0),
-                            () -> PInventory.findAllItems(Filters.Items.nameEquals("Bucket of Milk")).size() >= targetQuantity){
+                            () -> PInventory.getCount("Bucket of milk") >= targetQuantity){
                         @Override
                         public boolean isCompleted(){
-                            return PInventory.findAllItems(Filters.Items.nameEquals("Bucket of Milk")).size() >= targetQuantity;
+                            return PInventory.getCount("Bucket of milk") >= targetQuantity;
                         }
                         @Override
                         public boolean condition(){
@@ -102,10 +106,108 @@ public class AcquisitionTasks {
             @Override
             public List<Task> getHandlers(Quester plugin, int quantity) {
                 List<Task> handlers = new ArrayList<Task>();
-                PickFromGroundTask pickEggTask = new PickFromGroundTask(plugin, "Shears", quantity, new WorldPoint(3191, 3272, 0), false);
+                PickFromGroundTask pickEggTask = new PickFromGroundTask(plugin, "Shears", quantity, new WorldPoint(3190, 3272, 0), false);
                 handlers.add(pickEggTask);
                 return handlers;
             }
         });
+
+        factories.put("Wool", new ItemAcquisitionHandlerFactory() {
+            @Override
+            public List<Task> getHandlers(Quester plugin, int quantity) {
+                List<Task> handlers = new ArrayList<Task>();
+                CompositeTask shearSheepTask;
+
+                shearSheepTask = new CompositeTask(){
+                    @Override
+                    public boolean condition() {
+                        return PInventory.getEmptySlots() >= quantity + 1 - PInventory.getCount("Shears") - PInventory.getCount("Wool");
+                    }
+                    public boolean isCompleted(){
+                        if (PInventory.getCount("Wool") >= quantity) this.isCompleted = true;
+                        return this.isCompleted;
+                    }
+                };
+                shearSheepTask.addTask(
+                        new AcquireItemTask(plugin, "Shears", 1)
+                );
+                for (int i = 1; i <= quantity; i++){
+                    final int targetQuantity;
+                    targetQuantity = i;
+                    shearSheepTask.addTask(new InteractWithNpcTask(
+                            plugin,
+                            "Sheep",
+                            new String[]{"Shear"},
+                            new WorldPoint(3202, 3266, 0),
+                            () -> PInventory.getCount("Wool") >= targetQuantity){
+                        @Override
+                        public NPC findTarget(){
+                            return PObjects.findNPC(
+                                    Filters.NPCs.nameEquals("Sheep")
+                                            .and(Filters.NPCs.actionsContains("Shear"))
+                                            .and(Filters.NPCs.actionsDontContain("Talk-to"))
+                                            .and(tar -> tar.getWorldLocation().distanceTo(location()) < 10));
+                        }
+                        @Override
+                        public boolean isCompleted(){
+                            return PInventory.getCount("Wool") >= targetQuantity;
+                        }
+                        @Override
+                        public boolean condition(){
+                            return PInventory.getCount("Shears") >= 1;
+                        }
+                    });
+                }
+                shearSheepTask.addTask(
+                        new DropAllItemsTask(plugin, "Shears")
+                );
+
+                handlers.add(shearSheepTask);
+                return handlers;
+            }
+        });
+
+        factories.put("Ball of wool", new ItemAcquisitionHandlerFactory() {
+            @Override
+            public List<Task> getHandlers(Quester plugin, int quantity) {
+                List<Task> handlers = new ArrayList<Task>();
+                CompositeTask spinWoolTask;
+
+                spinWoolTask = new CompositeTask(){
+                    @Override
+                    public boolean condition(){
+                        return PInventory.getEmptySlots() >= quantity - PInventory.getCount("Wool") - PInventory.getCount("Ball of Wool");
+                    }
+                    public boolean isCompleted(){
+                        return PInventory.getCount("Ball of wool") >= quantity;
+                    }
+                };
+                spinWoolTask.addTask(
+                        new AcquireItemTask(plugin, "Wool", quantity - PInventory.getCount("Ball of Wool"))
+                );
+
+                spinWoolTask.addTask(
+                        new InteractWithObjectTask(
+                                plugin,
+                                "Spinning wheel",
+                                new String[]{"Spin"},
+                                new WorldPoint(3209, 3214, 1),
+                                () -> {
+                                    Widget w = PWidgets.get(WidgetInfo.MULTI_SKILL_MENU);
+                                    if (w == null) return false;
+                                    PUtils.sleepNormal(400, 1000);
+                                    Keyboard.pressSpacebar();
+                                    PUtils.sleepNormal(400, 1000);
+                                    PUtils.waitCondition(15000, () -> PInventory.getCount("Ball of wool") >= quantity);
+                                    return PInventory.getCount("Ball of wool") >= quantity;
+                                }
+                        )
+                );
+
+                handlers.add(spinWoolTask);
+                return handlers;
+            }
+        });
+
     }
 }

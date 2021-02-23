@@ -23,34 +23,38 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.webwalker;
+package net.runelite.client.plugins.quester;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.api.PWidgets;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WebWalkerDebugRenderer;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.PathAnalyzer;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.ui.overlay.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
-public class WebWalkerOverlay extends Overlay
+public class QuesterOverlay extends Overlay
 {
 	private final Client client;
-	private final WebWalker plugin;
-	private final WebWalkerConfig config;
+	private final Quester plugin;
+	private final QuesterConfig config;
 
 	@Inject
-	private WebWalkerOverlay(final Client client, final WebWalker plugin, final WebWalkerConfig config)
+	private QuesterOverlay(final Client client, final Quester plugin, final QuesterConfig config)
 	{
 		this.client = client;
 		this.plugin = plugin;
@@ -64,96 +68,47 @@ public class WebWalkerOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!WalkerEngine.getInstance().isNavigating()) return null;
-		PathAnalyzer.DestinationDetails destinationDetails = WalkerEngine.getInstance().getDebugFurthestTile();
-		WorldPoint debugFurthestTile = null;
-		WorldPoint debugAssumedNext = null;
-		if (destinationDetails != null) {
-			debugFurthestTile = destinationDetails.getDestination().getRSTile().toWorldPoint();
-			debugAssumedNext = destinationDetails.getAssumed().toWorldPoint();
-			if (debugFurthestTile != null){
-				drawTile(graphics, debugFurthestTile, Color.green);
-			}
-			if (debugAssumedNext != null && destinationDetails.getState() != PathAnalyzer.PathState.FURTHEST_CLICKABLE_TILE){
-				drawTile(graphics, debugAssumedNext, Color.yellow);
-			}
-		}
-
-		List<WorldPoint> path = WalkerEngine.getInstance().getCurrentPathWorldPoints();
-		if (path == null) return null;
-		WorldPoint previous = null;
-		for (WorldPoint tile : path)
-		{
-			if (previous != null){
-				if (previous.equals(debugFurthestTile) && tile.equals(debugAssumedNext) && destinationDetails.getState() != PathAnalyzer.PathState.FURTHEST_CLICKABLE_TILE) {
-					lineBetweenTiles(graphics, previous, tile, Color.yellow, 6);
-				} else{
-					lineBetweenTiles(graphics, previous, tile, Color.cyan, 3);
-				}
-			}
-			previous = tile;
-			//drawTile(graphics, tile, Color.cyan);
-		}
-
-
-
+		WebWalkerDebugRenderer.render(graphics);
+		renderInfoBox(graphics);
 		return null;
 	}
 
-	private void lineBetweenTiles(Graphics2D graphics, WorldPoint tile1, WorldPoint tile2, Color color, int width)
-	{
-		if (tile1.getPlane() != client.getPlane())
-		{
-			return;
+	public void renderInfoBox(Graphics2D graphics){
+		if (!plugin.isRunning()) return;
+		Widget base = null;
+		if (PWidgets.isSubstantiated(WidgetInfo.CHATBOX)){
+			base = PWidgets.get(WidgetInfo.CHATBOX_PARENT);
+		} else {
+			base = PWidgets.get(WidgetInfo.CHATBOX_BUTTONS);
 		}
+		if (base == null) return;
+		double topOfWidget  = base.getBounds().getY();
+		double infoBoxHeight = 40;
+		double infoBoxWidth = base.getBounds().getWidth();
+		double drawPos = topOfWidget - infoBoxHeight;
+		graphics.setColor(Color.white);
+		graphics.fillRect(0, (int)drawPos, (int)infoBoxWidth, (int)infoBoxHeight);
+		graphics.setColor(Color.black);
+		graphics.setFont(new Font("Arial Bold", Font.PLAIN, 18));
+		int rowHeight = 18;
+		int currentRowPos = (int)drawPos + 16;
+		int horizontalPos1 = (int)base.getBounds().getX() + 3;
+		int horizontalPos2 = (int)base.getBounds().getX() + 3 + (int)infoBoxWidth/2;
+		long d = Duration.between(plugin.startedTimestamp, Instant.now()).getSeconds();
+		String runTimeStr = String.format("%d:%02d:%02d", d / 3600, (d % 3600) / 60, (d % 60));
 
-		if (tile2.getPlane() != client.getPlane())
-		{
-			return;
-		}
+		graphics.drawString("Runtime: " + runTimeStr, horizontalPos1, currentRowPos);
+		currentRowPos += rowHeight;
 
-		LocalPoint lp1 = LocalPoint.fromWorld(client, tile1);
-		LocalPoint lp2 = LocalPoint.fromWorld(client, tile2);
-		if (lp1 == null || lp2 == null)
-		{
-			return;
-		}
+		if (plugin.getQuestTaskRunner() == null) return;
+		String taskName = plugin.getQuestTaskRunner().getCurrentTaskName();
+		String questName = plugin.getQuestTaskRunner().getCurrentQuestName();
+		if (questName == null || taskName == null) return;
+		graphics.drawString(questName + " > " + taskName, horizontalPos1, currentRowPos);
+		currentRowPos += rowHeight;
 
-		Polygon poly1 = Perspective.getCanvasTilePoly(client, lp1);
-		Polygon poly2 = Perspective.getCanvasTilePoly(client, lp2);
-		if (poly1 == null || poly2 == null)
-		{
-			return;
-		}
-
-		graphics.setStroke(new BasicStroke(width));
-		graphics.setColor(color);
-		graphics.drawLine(
-				(int)Math.round(poly1.getBounds().getCenterX()), (int)Math.round(poly1.getBounds().getCenterY()),
-				(int)Math.round(poly2.getBounds().getCenterX()), (int)Math.round(poly2.getBounds().getCenterY()));
+		//graphics.drawString("Runtime: " + runTimeStr, horizontalPos1, currentRowPos);
+		//currentRowPos += rowHeight;
 	}
 
-	private void drawTile(Graphics2D graphics, WorldPoint tile, Color color)
-	{
-		WorldPoint point = tile;
-		if (point.getPlane() != client.getPlane())
-		{
-			return;
-		}
-
-		LocalPoint lp = LocalPoint.fromWorld(client, point);
-		if (lp == null)
-		{
-			return;
-		}
-
-		Polygon poly = Perspective.getCanvasTilePoly(client, lp);
-		if (poly == null)
-		{
-			return;
-		}
-
-		OverlayUtil.renderPolygon(graphics, poly, color);
-		//OverlayUtil.renderPolygon(graphics, poly, color);
-	}
 }

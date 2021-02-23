@@ -10,79 +10,76 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Path
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.PlayerDetails;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Point3D;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 import net.runelite.client.plugins.quester.Quester;
 import net.runelite.client.plugins.quester.Task;
 
+import java.util.function.BooleanSupplier;
+
 @Slf4j
-public class TalkToNpcTask implements Task {
-    String npcName;
-    WorldPoint location;
-    String talkAction;
-    String[] choices;
-    String[] backupChoices;
+public class InteractWithNpcTask implements Task {
+    String objectName;
+    String[] options;
+    WorldPoint objectLoc;
+    Quester plugin;
+    BooleanSupplier successCondition;
     boolean isCompleted;
     boolean failed;
     int walkAttempts = 0;
-    private Quester plugin;
-    int talkAttempts = 0;
+    int interactAttempts = 0;
     int cachedDistance = -1;
     int cachedDistanceTick = -1;
 
-    public TalkToNpcTask(Quester plugin, String npcName, WorldPoint location, String talkAction, String[] choices, String[] backupChoices){
-        this.npcName = npcName;
-        this.location = location;
-        this.talkAction = talkAction;
-        this.choices = choices;
-        this.backupChoices = backupChoices;
+    public InteractWithNpcTask(Quester plugin, String objectName, String[] options, WorldPoint objectLoc, BooleanSupplier successCondition){
+        this.objectName = objectName;
+        this.objectLoc = objectLoc;
         this.plugin = plugin;
-    }
-
-    public TalkToNpcTask(Quester plugin, String npcName, WorldPoint location, String talkAction, String[] choices){
-        this.npcName = npcName;
-        this.location = location;
-        this.talkAction = talkAction;
-        this.choices = choices;
-        this.backupChoices = null;
-        this.plugin = plugin;
+        this.options = options;
+        this.successCondition = successCondition;
     }
 
     public String name() {
-        return "Talk to " + this.npcName;
+        return "Interact with " + this.objectName;
     }
 
     public WorldPoint location() {
-        return this.location;
+        return this.objectLoc;
     }
 
     public NPC findTarget(){
-        return PObjects.findNPC(Filters.NPCs.nameContains(npcName));
+        return PObjects.findNPC(
+                Filters.NPCs.nameEquals(objectName)
+                        .and(Filters.NPCs.actionsContains(options))
+                        .and(tar -> tar.getWorldLocation().distanceTo(location()) < 10));
     }
+
     public boolean execute() {
-        if (talkAttempts >= 5){
-            log.info("Failed talk to npc task. Too many attempts to talk to npc.");
+        if (interactAttempts >= 5){
+            log.info("Failed interact with object task. Too many attempts.");
             this.failed = true;
             return false;
         }
-        NPC npc = findTarget();
-        WorldPoint nearestReachable = npc != null ? Reachable.getNearestReachableTile(npc.getWorldLocation(), 1) : null;
-        if (npc == null || nearestReachable == null) {
+
+        NPC target = findTarget();
+        WorldPoint nearestReachable = target != null ? Reachable.getNearestReachableTile(target.getWorldLocation(), 1) : null;
+        if (target == null || nearestReachable == null) {
             if (walkAttempts >= 5){
                 this.failed = true;
-                log.info("Unable to walk to npc! Too many attempts!");
+                log.info("Unable to walk to object! Too many attempts!");
                 return false;
             }
             walkAttempts++;
             if (plugin.webWalkTo(location())){
                 PUtils.waitCondition(PUtils.random(2500, 3100), () -> !PPlayer.isMoving() && PPlayer.distanceTo(location()) <= 2);
-                log.info("Walked to npc");
+                log.info("Walked to object");
             } else {
-                log.info("Failed webwalk to npc location! (Attempt " + walkAttempts + ")");
+                log.info("Failed webwalk to object location! (Attempt " + walkAttempts + ")");
             }
             return true;
         }
-        if (!PInteraction.npc(npc, talkAction)) {
-            log.info("Unable to intaract with NPC!");
+
+        if (!PInteraction.npc(target, options)) {
+            log.info("Unable to intaract with object! Looking for options: " + String.join(", ", options));
             this.failed = true;
             return false;
         }
@@ -91,34 +88,16 @@ public class TalkToNpcTask implements Task {
         if (distance > 1) PUtils.waitCondition(PUtils.random(800, 1400), PPlayer::isMoving);
         int multiplier = PPlayer.isRunEnabled() ? 300 : 600;
         int timeout = distance * multiplier + (int)PUtils.randomNormal(1900, 2800);
-        PUtils.waitCondition(timeout, () -> !PPlayer.isMoving() || PPlayer.location().distanceTo(npc.getWorldLocation()) <= 1);
-
-        if (!PUtils.waitCondition(PUtils.random(1300, 1900), PDialogue::isConversationWindowUp)){
-            talkAttempts++;
-            log.info("Timed out while waiting for conversation window!");
+        PUtils.waitCondition(timeout, () -> !PPlayer.isMoving() || PPlayer.location().distanceTo(target.getWorldLocation()) <= 1);
+        if (!PUtils.waitCondition(PUtils.random(6800, 8000), successCondition)){
+            interactAttempts++;
+            log.info("Timed out while waiting interaction success!");
             return true;
         }
 
-        if (PDialogue.handleDialogueInOrder(choices)){
-            this.isCompleted = true;
-            return true;
-        } else if (this.backupChoices != null) {
-            log.info("Using backup dialogue options");
-            if (!PInteraction.npc(npc, talkAction)) {
-                log.info("Unable to intaract with NPC!");
-                this.failed = true;
-                return false;
-            }
-            PUtils.sleepNormal(1900, 2800);
-            if (PDialogue.handleDialogueInOrder(backupChoices)){
-                this.isCompleted = true;
-                return true;
-            }
-        }
-
-        log.info("Failed at handling talk to npc dialogue!");
-        this.failed = true;
-        return false;
+        PUtils.sleepNormal(200, 600);
+        this.isCompleted = true;
+        return true;
     };
 
     public boolean condition() {

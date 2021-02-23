@@ -8,10 +8,12 @@ import net.runelite.client.plugins.quester.TaskContainer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class CompositeTask implements Task, TaskContainer {
     List<Task> tasks;
+    public boolean isCompleted;
 
     public CompositeTask(Task ...tasks){
         this.tasks = new ArrayList<Task>();
@@ -20,27 +22,30 @@ public class CompositeTask implements Task, TaskContainer {
 
     @Override
     public String name() {
+        if (getTask() == null) return "CompositeTask (" + this.tasks.stream().map(t -> t.name()).collect(Collectors.joining(", ")) + ")";
         return getTask().name();
     }
 
     @Override
     public WorldPoint location() {
+        if (getTask() == null) return null;
         return getTask().location();
     }
 
     @Override
     public boolean execute() {
+        if (getTask() == null) return false;
         return getTask().execute();
     }
 
     @Override
     public boolean condition() {
-        return getTask().condition();
+        return getTask() != null && getTask().condition();
     }
 
     @Override
     public boolean isCompleted() {
-        return tasks.stream().allMatch(t -> t.isCompleted());
+        return this.isCompleted || tasks.stream().allMatch(t -> t.isCompleted());
     }
 
     @Override
@@ -58,7 +63,7 @@ public class CompositeTask implements Task, TaskContainer {
         // (equip tasks are 0 distance for example)
         for (Task t : tasks){
             int distance = t.getDistance();
-            if (distance != 0) return distance;
+            if (distance > 0) return distance;
         }
         return 0;
     }
@@ -67,7 +72,12 @@ public class CompositeTask implements Task, TaskContainer {
     public Task getTask() {
         Task ret = null;
         for (Task t : tasks){
-            if (!t.isFailed() && !t.isCompleted() && t.condition()){
+            if (!t.isFailed() && !t.isCompleted()){
+                if (!t.condition()) {
+                    log.info("Next task in CompositeTask cannot be accomplished!");
+                    log.info("Next task would have been " + t.name());
+                    return null;
+                }
                 ret = t;
                 break;
             }

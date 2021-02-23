@@ -119,12 +119,16 @@ public class PWorldHopper {
         }
         log.info("Hopping to world: " + world.getId());
 
-        if (PWidgets.get(WidgetInfo.WORLD_SWITCHER_LIST) == null) {
+        if (!PWidgets.isSubstantiated(WidgetInfo.WORLD_SWITCHER_LIST)) {
             PUtils.clientOnly(() -> {
                 PUtils.getClient().openWorldHopper();
                 return null;
             }, "openWorldHopper");
-            PUtils.waitCondition(1900, () -> PWidgets.isSubstantiated(WidgetInfo.WORLD_SWITCHER_LIST));
+            if (PUtils.waitCondition(1900, () -> PWidgets.isSubstantiated(WidgetInfo.WORLD_SWITCHER_LIST))){
+                log.info("World hopper opened");
+            } else {
+                log.info("Failed to open world hopper!");
+            }
             PUtils.sleepNormal(700, 1200);
         }
 

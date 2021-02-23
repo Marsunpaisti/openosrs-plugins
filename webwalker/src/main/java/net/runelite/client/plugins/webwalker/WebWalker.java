@@ -9,6 +9,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.paistisuite.PScript;
@@ -246,6 +247,17 @@ public class WebWalker extends PScript {
             path = null;
         }
         PUtils.sendGameMessage("WebWalker stopped!");
+    }
+
+    @Subscribe
+    private synchronized void onConfigChanged(ConfigChanged event){
+        if (!event.getGroup().equalsIgnoreCase("WebWalker")) return;
+        log.info("New val: " + event.getNewValue());
+        if (event.getKey().equalsIgnoreCase("category")){
+            if (!event.getNewValue().equalsIgnoreCase("FARMING")){
+                configManager.setConfiguration("WebWalker", "catFarming", Farming.NONE);
+            }
+        }
     }
 
     @Subscribe

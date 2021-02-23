@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.RenderOverview;
@@ -17,10 +18,13 @@ import java.awt.*;
 import java.awt.geom.Area;
 import java.util.List;
 
+@Slf4j
 public class WebWalkerDebugRenderer {
     private static Area mapClipArea;
     public static void render(Graphics2D graphics){
-        if (!WalkerEngine.getInstance().isNavigating()) return;
+        if (!WalkerEngine.getInstance().isNavigating()){
+            return;
+        }
         PathAnalyzer.DestinationDetails destinationDetails = WalkerEngine.getInstance().getDebugFurthestTile();
         WorldPoint debugFurthestTile = null;
         WorldPoint debugAssumedNext = null;
@@ -30,7 +34,9 @@ public class WebWalkerDebugRenderer {
             if (debugFurthestTile != null){
                 drawTile(graphics, debugFurthestTile, Color.green);
             }
-            if (debugAssumedNext != null && destinationDetails.getState() != PathAnalyzer.PathState.FURTHEST_CLICKABLE_TILE){
+            if (debugAssumedNext != null
+                    && destinationDetails.getState() != PathAnalyzer.PathState.FURTHEST_CLICKABLE_TILE
+                    && destinationDetails.getState() != PathAnalyzer.PathState.END_OF_PATH){
                 drawTile(graphics, debugAssumedNext, Color.yellow);
             }
         }

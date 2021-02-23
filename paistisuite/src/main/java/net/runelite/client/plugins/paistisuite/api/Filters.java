@@ -55,6 +55,10 @@ public class Filters {
             return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
                     .anyMatch(a -> Arrays.asList(action).contains(a));
         }
+        public static Predicate<NPC> actionsDontContain(String ...action) {
+            return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
+                    .noneMatch(a -> Arrays.asList(action).contains(a));
+        }
         public static Predicate<NPC> nameOrIdEquals(String ...namesorids){
             return (NPC n) -> Arrays.stream(namesorids).anyMatch(str -> {
                 if (n.getTransformedComposition() != null && n.getTransformedComposition().getName().equalsIgnoreCase(str)) return true;
