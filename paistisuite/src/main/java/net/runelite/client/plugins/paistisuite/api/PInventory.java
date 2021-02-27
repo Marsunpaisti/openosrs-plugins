@@ -128,7 +128,7 @@ public class PInventory
     public static List<PItem> getAllItems(){
        return PUtils.clientOnly(() -> {
             Widget inventoryWidget = PUtils.getClient().getWidget(WidgetInfo.INVENTORY);
-            if (inventoryWidget == null) return null;
+            if (inventoryWidget == null) return new ArrayList<PItem>();
             Collection<WidgetItem> widgetItems = inventoryWidget.getWidgetItems();
             List<PItem> pItems = widgetItems
                     .stream()
@@ -172,7 +172,7 @@ public class PInventory
             List<PItem> equippedPItems = new ArrayList<PItem>();
             int slot = 0;
             for (Item i : eqitems){
-                if (i.getId() != -1) equippedPItems.add(new PItem(i, slot));
+                if (i.getId() != -1) equippedPItems.add(PItem.fromEquipmentItem(i, slot));
                 slot++;
             }
             return equippedPItems;

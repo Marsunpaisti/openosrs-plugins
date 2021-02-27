@@ -8,12 +8,9 @@ import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
-import java.awt.*;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 
 public class RSItemHelper {
@@ -25,7 +22,7 @@ public class RSItemHelper {
     }
 
     public static boolean clickMatch(PItem item, String regex){
-        String[] actions = item.getActions();
+        String[] actions = item.getCurrentActions();
         String action = Arrays.stream(actions).filter(a -> a != null && a.matches(regex)).findFirst().orElse(null);
         if (action == null) return false;
         return click(item, action);
@@ -69,7 +66,7 @@ public class RSItemHelper {
     }
 
     public static String[] getItemActions(PItem item){
-        return item.getActions();
+        return item.getCurrentActions();
     }
 
     public static String getItemName(PItem item){

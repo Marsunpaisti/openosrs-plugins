@@ -8,13 +8,15 @@ import net.runelite.api.kit.KitType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.plugins.paistisuite.PShopping;
+import net.runelite.client.plugins.paistisuite.api.PBanking;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWidgets;
 
 @Slf4j
 public class PItem {
-    WidgetInfo[] slotToWidget = new WidgetInfo[]{
+    static WidgetInfo[] slotToWidget = new WidgetInfo[]{
             WidgetInfo.EQUIPMENT_HELMET,
             WidgetInfo.EQUIPMENT_CAPE,
             WidgetInfo.EQUIPMENT_AMULET,
@@ -31,44 +33,80 @@ public class PItem {
             WidgetInfo.EQUIPMENT_AMMO
     };
 
+    public enum PItemType {
+        INVENTORY,
+        EQUIPMENT,
+        BANK,
+        SHOP
+    }
+
     public WidgetItem widgetItem;
-    public Widget equipmentWidget;
+    private Widget widget;
     private Item item;
     public ItemComposition ItemComposition;
-    public boolean isEquipmentItem;
-    private String slotName;
-    private int quantity;
-    private int id;
+    private String equipmentSlotName;
+    private int slotIndex;
+    public PItemType itemType;
+
+    public static PItem fromShopItem(Item shopItem, int slot){
+        PItem item = new PItem(null);
+        item.item = shopItem;
+        item.ItemComposition = PInventory.getItemDef(shopItem);
+        item.slotIndex = slot;
+        item.widgetItem = null;
+        if (PWidgets.get(WidgetInfo.SHOP_ITEMS_CONTAINER) != null) item.widget = PWidgets.get(WidgetInfo.SHOP_ITEMS_CONTAINER).getChild(slot);;
+        item.itemType = PItemType.SHOP;
+        return item;
+    }
+
+    public static PItem fromBankItem(Item bankItem, int slot){
+        PItem item = new PItem(null);
+        item.item = bankItem;
+        item.ItemComposition = PInventory.getItemDef(bankItem);
+        item.slotIndex = slot;
+        item.widgetItem = null;
+        if (PWidgets.get(WidgetInfo.BANK_ITEM_CONTAINER) != null) item.widget = PWidgets.get(WidgetInfo.BANK_ITEM_CONTAINER).getChild(slot);;
+        item.itemType = PItemType.BANK;
+        return item;
+    }
+
+    public static PItem fromEquipmentItem(Item equipmentItem, int slot){
+        PItem item = new PItem(null);
+        item.itemType = PItemType.EQUIPMENT;
+        item.item = equipmentItem;
+        item.ItemComposition = PInventory.getItemDef(equipmentItem);
+        KitType k = KitType.values()[slot];
+        item.equipmentSlotName = k.getName();
+        item.widget = PWidgets.get(slotToWidget[slot]);
+        item.slotIndex = slot;
+        item.widgetItem = null;
+        return item;
+    }
 
     public PItem(WidgetItem widgetItem, ItemComposition ItemComposition){
-        this.isEquipmentItem = false;
+        this.itemType = PItemType.INVENTORY;
         this.widgetItem = widgetItem;
         this.ItemComposition = ItemComposition;
     }
 
     public PItem(WidgetItem widgetItem){
-        this.isEquipmentItem = false;
+        this.itemType = PItemType.INVENTORY;
         this.widgetItem = widgetItem;
-        this.ItemComposition = PInventory.getItemDef(widgetItem);
-    }
-
-    public PItem(Item item, int slot) {
-        this.isEquipmentItem = true;
-        this.item = item;
-        this.ItemComposition = PInventory.getItemDef(item);
-        KitType k = KitType.values()[slot];
-        this.slotName = k.getName();
-        this.widgetItem = null;
-        PlayerComposition p;
-        this.equipmentWidget = PWidgets.get(slotToWidget[slot]);
-        //log.info(getName() + " in slot " + slot + "(" + slotName + ")");
+        if (widgetItem != null) this.ItemComposition = PInventory.getItemDef(widgetItem);
     }
 
     public String getSlotName(){
-        if (this.isEquipmentItem) {
-            return this.slotName;
-        } else {
-            return "Inventory";
+        switch (this.itemType){
+            case INVENTORY:
+                return "Inventory";
+            case EQUIPMENT:
+                return this.equipmentSlotName;
+            case BANK:
+                return "Bank";
+            case SHOP:
+                return "Shop";
+            default:
+                return null;
         }
     }
     public int getId(){
@@ -89,18 +127,47 @@ public class PItem {
         return this.getDefinition().getName();
     }
 
-    public String[] getActions(){
+    public String[] getCurrentActions(){
         return PUtils.clientOnly(() -> {
-            if (isEquipmentItem){
-                return equipmentWidget.getActions();
+            switch (this.itemType){
+                case INVENTORY:
+                    if (PBanking.isBankOpen() || PBanking.isDepositBoxOpen()){
+                        return getDepositInventoryWidget().getActions();
+                    } else if (PShopping.isShopOpen()){
+                        return getShopInventoryWidget().getActions();
+                    }
+                    return getDefinition().getInventoryActions();
+                case EQUIPMENT:
+                    return getWidget().getActions();
+                case BANK:
+                    return getWidget().getActions();
+                case SHOP:
+                    return getWidget().getActions();
+                default:
+                    return null;
             }
+
+        }, "PItem.getCurrentActions");
+    }
+
+    public String[] getInventoryActions(){
+        return PUtils.clientOnly(() -> {
             return getDefinition().getInventoryActions();
-        }, "PItem.getActions");
+        }, "PItem.getInventoryActions");
+    }
+
+    public int getInventorySlotIndex(){
+        if (getWidgetItem() != null){
+            return getWidgetItem().getIndex();
+        }
+
+        return -1;
     }
 
     public ItemComposition getItemComposition() {
         return ItemComposition;
     }
+
     public ItemComposition getDefinition() {
         return ItemComposition;
     }
@@ -109,12 +176,55 @@ public class PItem {
         return widgetItem;
     }
 
+    public Widget getWidget(){
+        switch (this.itemType){
+            case INVENTORY:
+                if (PBanking.isBankOpen() || PBanking.isDepositBoxOpen()){
+                    return getDepositInventoryWidget();
+                } else if (PShopping.isShopOpen()){
+                    return getShopInventoryWidget();
+                }
+                return widgetItem.getWidget();
+            case EQUIPMENT:
+                return this.widget != null ? this.widget : PWidgets.get(slotToWidget[slotIndex]);
+            case BANK:
+                return this.widget != null ? this.widget : PWidgets.get(WidgetInfo.BANK_ITEM_CONTAINER).getChild(slotIndex);
+            case SHOP:
+                return this.widget != null ? this.widget : PWidgets.get(WidgetInfo.SHOP_ITEMS_CONTAINER).getChild(slotIndex);
+            default:
+                return null;
+    }
+
+    }
+
     public WidgetItem getFirst(){
         return widgetItem;
     }
 
     public ItemComposition getSecond(){
         return ItemComposition;
+    }
+
+    public Widget getShopInventoryWidget(){
+        if (PShopping.isShopOpen()) {
+            return PWidgets.get(WidgetInfo.SHOP_INVENTORY_ITEMS_CONTAINER).getChild(getInventorySlotIndex());
+        }
+        return null;
+    }
+
+    public Widget getDepositInventoryWidget(){
+        if (PBanking.isBankOpen()) {
+            return PWidgets.get(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER).getChild(getInventorySlotIndex());
+        }
+        if (PBanking.isDepositBoxOpen()){
+            return PWidgets.get(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER).getChild(getInventorySlotIndex());
+        }
+        return null;
+    }
+
+    @Override
+    public String toString(){
+        return getName() + " x " + getQuantity() + " Type: " + itemType;
     }
 
     @Override

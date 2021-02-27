@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.PShopping;
 import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
@@ -153,19 +154,41 @@ public class PInteraction {
     }
 
     private static Boolean equippedItem(PItem item, String ...actions){
+        if (item == null) return false;
         return PUtils.clientOnly(() -> {
-            if (item == null) return false;
-            if (!item.isEquipmentItem) return false;
-            if (item.equipmentWidget == null) return false;
-            return PInteraction.widget(item.equipmentWidget, actions);
+            if (item.getWidget() == null) return false;
+            return PInteraction.widget(item.getWidget(), actions);
         }, "interact_equippedItem");
     }
 
-
-    public static Boolean item(PItem item, String ...actions){
+    private static Boolean bankedItem(PItem item, String ...actions){
+        if (item == null) return false;
         return PUtils.clientOnly(() -> {
-            if (item == null) return false;
-            if (item.isEquipmentItem) return equippedItem(item, actions);
+            if (item.getWidget() == null) return false;
+            return PInteraction.widget(item.getWidget(), actions);
+        }, "interact_bankItem");
+    }
+
+    private static Boolean shopItem(PItem item, String ...actions){
+        if (item == null) return false;
+        return PUtils.clientOnly(() -> {
+            if (item.getWidget() == null) return false;
+            return PInteraction.widget(item.getWidget(), actions);
+        }, "interact_shopItem");
+    }
+
+    private static Boolean sellOrDepositItem(PItem item, String ...actions){
+        if (item == null) return false;
+        return PUtils.clientOnly(() -> {
+            if (item.getWidget() == null) return false;
+            return PInteraction.widget(item.getWidget(), actions);
+        }, "interact_sellOrDepositItem");
+    }
+
+    private static Boolean regularInventoryItem(PItem item, String ...actions){
+        if (item == null) return false;
+        return PUtils.clientOnly(() -> {
+            if (item.itemType != PItem.PItemType.INVENTORY) return false;
             String[] possibleActions = item.getDefinition().getInventoryActions();
             List<String> desiredActions = Arrays.asList(actions);
             int actionIndex = -1;
@@ -215,14 +238,26 @@ public class PInteraction {
                     9764864);
             PUtils.getClient().setMouseIdleTicks(0);
             return true;
+        }, "interact_regularInventoryItem");
+    }
+
+    public static Boolean item(PItem item, String ...actions){
+        return PUtils.clientOnly(() -> {
+            if (item == null) return false;
+            if (item.itemType == PItem.PItemType.EQUIPMENT) return equippedItem(item, actions);
+            if (item.itemType == PItem.PItemType.BANK) return bankedItem(item, actions);
+            if (item.itemType == PItem.PItemType.SHOP) return shopItem(item, actions);
+            if (PShopping.isShopOpen() || PBanking.isBankOpen()) return sellOrDepositItem(item, actions);
+            return regularInventoryItem(item, actions);
         }, "interact_item");
     }
 
     public static Boolean clickItem(PItem item) {
         return PUtils.clientOnly(() -> {
             if (item == null) return false;
-            if (item.isEquipmentItem) return false;
+            if (item.itemType == PItem.PItemType.EQUIPMENT) return false;
             if (item.getWidgetItem() == null) return false;
+            if (item.getWidgetItem().getWidget().isHidden()) return false;
             PMouse.clickShape(item.getWidgetItem().getCanvasBounds());
             PUtils.getClient().setMouseIdleTicks(0);
             return true;

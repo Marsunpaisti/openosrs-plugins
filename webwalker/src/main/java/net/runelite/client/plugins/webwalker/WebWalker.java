@@ -77,7 +77,6 @@ public class WebWalker extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
-        List<PItem> eq = PInventory.getEquipmentItems();
 
     }
 
