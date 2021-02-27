@@ -18,7 +18,6 @@ apply<VersionPlugin>()
 
 allprojects {
     group = "com.openosrs.externals"
-    version = ProjectVersions.openosrsVersion
     apply<MavenPublishPlugin>()
 }
 
