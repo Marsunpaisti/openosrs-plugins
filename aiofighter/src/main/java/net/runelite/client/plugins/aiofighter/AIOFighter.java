@@ -30,6 +30,7 @@ import org.pf4j.Extension;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.awt.event.KeyEvent;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -195,6 +196,7 @@ public class AIOFighter extends PScript {
         if (isStopRequested()) return;
         handleRun();
         if (isStopRequested()) return;
+        handleAntiAfk();
 
         State prevState = currentState;
         currentState = getValidState();
@@ -206,6 +208,17 @@ public class AIOFighter extends PScript {
             currentState.loop();
         } else {
             setCurrentStateName("Looking for state...");
+        }
+    }
+
+    private void handleAntiAfk(){
+        if (System.currentTimeMillis() - lastAntiAfk >= antiAfkDelay) {
+            lastAntiAfk = System.currentTimeMillis();
+            antiAfkDelay = PUtils.randomNormal(240000, 295000);
+            Keyboard.typeKeysInt(KeyEvent.VK_SPACE);
+            PUtils.sleepNormal(100, 200);
+            Keyboard.typeKeysInt(KeyEvent.VK_BACK_SPACE);
+            PUtils.sleepNormal(100, 200);
         }
     }
 

@@ -36,7 +36,17 @@ public class Keyboard
     public static void pressSpacebar(){
         executorService.submit(() ->
         {
-            pressKey(KeyEvent.VK_SPACE);
+            pressKeyInt(KeyEvent.VK_SPACE);
+        });
+    }
+
+    public static void typeKeysInt(int ...keys){
+        executorService.submit(() ->
+        {
+            for (int k : keys)
+            {
+                pressKeyInt(k);
+            }
         });
     }
 
@@ -49,7 +59,6 @@ public class Keyboard
         {
             for (char c : keys)
             {
-                log.info(c + " pressed!");
                 pressKey(c);
             }
         });
@@ -62,11 +71,11 @@ public class Keyboard
         keyEvent(400, key);
     }
 
-    private static void pressKey(int key)
+    private static void pressKeyInt(int key)
     {
         keyEvent(401, key);
         keyEvent(402, key);
-        //keyEvent(400, key);
+        keyEvent(400, key);
     }
 
     private static void keyEvent(int id, char key)

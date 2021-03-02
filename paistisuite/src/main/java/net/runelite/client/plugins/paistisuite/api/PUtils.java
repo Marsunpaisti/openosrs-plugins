@@ -83,6 +83,7 @@ public class PUtils {
     }
 
     public static Boolean logout(){
+        log.info("Attempting to log out.");
         return PUtils.clientOnly(() -> {
             int param1 = (PWidgets.get(WidgetInfo.LOGOUT_BUTTON) != null) ? 11927560 : 4522007;
             PUtils.getClient().invokeMenuAction(

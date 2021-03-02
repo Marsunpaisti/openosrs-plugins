@@ -75,6 +75,7 @@ public class PInteraction {
                 );
             }
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
         }, "interact_tileObject");
     }
@@ -130,6 +131,7 @@ public class PInteraction {
                     item.getLocation().getX() - PUtils.getClient().getBaseX(),
                     item.getLocation().getY() - PUtils.getClient().getBaseY());
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
         }, "interact_GroundItem");
     }
@@ -149,6 +151,7 @@ public class PInteraction {
                     target.getWidgetItem().getIndex(),
                     9764864);
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
         }, "interact_useItemOnItem");
     }
@@ -237,6 +240,7 @@ public class PInteraction {
                     item.getWidgetItem().getIndex(),
                     9764864);
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
         }, "interact_regularInventoryItem");
     }
@@ -260,6 +264,7 @@ public class PInteraction {
             if (item.getWidgetItem().getWidget().isHidden()) return false;
             PMouse.clickShape(item.getWidgetItem().getCanvasBounds());
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
         }, "clickItem");
     }
@@ -292,6 +297,7 @@ public class PInteraction {
                         (to.getFirst()).getWorldLocation().getY() - PUtils.getClient().getBaseY());
             }
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
         }, "interact_useItemOnItem");
     }
@@ -355,6 +361,7 @@ public class PInteraction {
                     0,
                     0);
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
 
         }, "interact_npc");
@@ -370,6 +377,7 @@ public class PInteraction {
             if (widget == null) return false;
             PMouse.clickShape(widget.getBounds());
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
         }, "clickWidget");
     }
@@ -419,6 +427,7 @@ public class PInteraction {
                     childIndex,
                     widgetId);
             PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
         }, "interact_widget");
     }
