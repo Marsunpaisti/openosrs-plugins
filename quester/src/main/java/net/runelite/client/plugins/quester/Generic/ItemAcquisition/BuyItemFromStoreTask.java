@@ -3,7 +3,7 @@ package net.runelite.client.plugins.quester.Generic.ItemAcquisition;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.paistisuite.PShopping;
+import net.runelite.client.plugins.paistisuite.api.PShopping;
 import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.PathResult;
@@ -11,7 +11,6 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Path
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.PlayerDetails;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Point3D;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.Reachable;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.quester.Quester;
 import net.runelite.client.plugins.quester.Task;
 

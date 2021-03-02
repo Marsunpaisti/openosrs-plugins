@@ -209,4 +209,8 @@ public class PUtils {
     public static String[] parseCommaSeparated(String toParse){
         return Arrays.stream(toParse.strip().split(",")).map(String::strip).toArray(String[]::new);
     }
+
+    public static String[] parseNewlineSeparated(String toParse){
+        return Arrays.stream(toParse.strip().split("\n")).map(String::strip).toArray(String[]::new);
+    }
 }

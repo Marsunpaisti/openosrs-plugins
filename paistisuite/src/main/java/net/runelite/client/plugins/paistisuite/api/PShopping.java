@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paistisuite;
+package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

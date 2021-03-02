@@ -2,14 +2,12 @@ package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameState;
-import net.runelite.client.plugins.paistisuite.PShopping;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import net.runelite.http.api.worlds.WorldType;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.util.WorldUtil;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
 
 import java.util.EnumSet;
 import java.util.List;

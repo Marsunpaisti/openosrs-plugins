@@ -103,8 +103,8 @@ public class PBanking {
 
     public static boolean openBank() {
         if (isBankOpen()) return true;
-        PTileObject booth = PObjects.findObject(Filters.Objects.actionsContains("Bank"));
-        NPC banker = PObjects.findNPC(Filters.NPCs.actionsContains("Bank"));
+        PTileObject booth = PObjects.findObject(Filters.Objects.actionsContains("Bank").and(b -> PPlayer.distanceTo(b) <= 20));
+        NPC banker = PObjects.findNPC(Filters.NPCs.actionsContains("Bank").and(b -> PPlayer.distanceTo(b) <= 20));
         boolean didInteract = false;
         if (booth != null && banker != null){
             if (PUtils.random(1,4) == 1){
@@ -127,5 +127,31 @@ public class PBanking {
                 .filter(filter)
                 .findFirst()
                 .orElse(null);
+    }
+
+
+    public static boolean withdrawItem(String nameOrId, int quantity){
+        if (!isBankOpen()) return false;
+        PItem target = findBankItem(Filters.Items.nameOrIdEquals(nameOrId));
+        if (target == null) return false;
+
+        if (target.getQuantity() < quantity) return false;
+
+        int tens = (int) Math.floor(quantity / 10);
+        int fives = (int) Math.floor((quantity - 10 * tens) / 5);
+        int ones = (int) Math.floor((quantity - 10 * tens - 5 * fives));
+        for (int i = 0; i < tens; i++){
+            if (!PInteraction.item(target, "Withdraw-10")) return false;
+            PUtils.sleepNormal(400, 800);
+        }
+        for (int i = 0; i < fives; i++){
+            if (!PInteraction.item(target, "Withdraw-5")) return false;
+            PUtils.sleepNormal(400, 800);
+        }
+        for (int i = 0; i < ones; i++){
+            if (!PInteraction.item(target, "Withdraw-1")) return false;
+            PUtils.sleepNormal(400, 800);
+        }
+        return true;
     }
 }
