@@ -42,7 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Extension
 @PluginDescriptor(
 	name = "PaistiSuite",
-	description = "Scripting framework by Paisti",
+	description = "Scripting framework by Paisti. Required by all other Paisti Plugins to work!",
 	tags = {"npcs", "items"}
 )
 

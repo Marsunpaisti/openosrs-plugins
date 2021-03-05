@@ -2,10 +2,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navi
 
 import kotlin.Pair;
 import net.runelite.api.TileObject;
-import net.runelite.client.plugins.paistisuite.api.PInteraction;
-import net.runelite.client.plugins.paistisuite.api.PObjects;
-import net.runelite.client.plugins.paistisuite.api.PPlayer;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
@@ -26,11 +23,11 @@ public class ShipUtils {
                 && new RSTile(PPlayer.location()).getPlane() == 1
                 && PObjects.getAllObjects()
                 .stream()
-                .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 10)
-                .anyMatch(pair ->
+                .filter(ob -> ob.getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 10)
+                .anyMatch(ob ->
                         Arrays.asList("Ship's wheel", "Ship's ladder", "Anchor")
                         .stream()
-                        .anyMatch(name -> pair.getSecond().getName().equals(name))
+                        .anyMatch(name -> ob.getSecond().getName().equalsIgnoreCase(name))
                 );
     }
 
@@ -42,18 +39,11 @@ public class ShipUtils {
         if (!PInteraction.tileObject(gangplank, "Cross")) {
             return false;
         }
-        return WaitFor.condition(PUtils.random(2500, 3000), () -> !ShipUtils.isOnShip() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
+        return WaitFor.condition(PUtils.random(3500, 4500), () -> !ShipUtils.isOnShip() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
     }
 
     private static PTileObject getGangplank(){
-        return PObjects.getAllObjects()
-                .stream()
-                .filter(pair -> pair.getSecond().getName() != null && pair.getSecond().getName().equalsIgnoreCase("Gangplank"))
-                .filter(pair -> Arrays.stream(pair.getSecond().getActions())
-                        .filter(Objects::nonNull)
-                        .anyMatch(s -> s.equals("Cross")))
-                .findFirst()
-                .orElse(null);
+        return PObjects.findObject(Filters.Objects.nameEquals("Gangplank").and(Filters.Objects.actionsContains("Cross")));
     }
 
 }

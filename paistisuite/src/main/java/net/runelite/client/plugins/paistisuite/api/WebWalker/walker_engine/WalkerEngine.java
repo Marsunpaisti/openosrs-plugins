@@ -120,6 +120,7 @@ public class WalkerEngine{
                 }
 
                 if (ShipUtils.isOnShip()) {
+                    WaitFor.milliseconds(3000, 4000);
                     if (!ShipUtils.crossGangplank()) {
                         log.info("Failed to exit ship via gangplank.");
                         failedAttempt();

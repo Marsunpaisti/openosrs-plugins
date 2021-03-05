@@ -74,7 +74,7 @@ public class AIOFighter extends PScript {
     private long lastAntiAfk = System.currentTimeMillis();
     private long antiAfkDelay = PUtils.randomNormal(120000, 270000);
     State currentState;
-    List<State> states = new ArrayList<State>();
+    List<State> states;
     public FightEnemiesState fightEnemiesState = new FightEnemiesState(this);
     public LootItemsState lootItemsState = new LootItemsState(this);
     public WalkToFightAreaState walkToFightAreaState = new WalkToFightAreaState(this);
@@ -128,6 +128,7 @@ public class AIOFighter extends PScript {
         }
         DaxWalker.setCredentials(PaistiSuite.getDaxCredentialsProvider());
         DaxWalker.getInstance().allowTeleports = false;
+        states = new ArrayList<State>();
         states.add(this.lootItemsState);
         states.add(this.fightEnemiesState);
         states.add(this.walkToFightAreaState);
