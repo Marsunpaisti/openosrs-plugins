@@ -33,6 +33,10 @@ public class PBreakScheduler {
         return currentBreakDuration;
     }
 
+    public int getTimeUntiNextBreak() {
+        return (int) Duration.between(Instant.now(), lastBreakEnded.plusSeconds(nextBreakIntervalSeconds)).getSeconds();
+    }
+
     public void startBreak(){
         lastBreakStarted = Instant.now();
         currentBreakDuration = (int)PUtils.randomNormal(minDurationSeconds, maxDurationSeconds);

@@ -2,6 +2,7 @@ package net.runelite.client.plugins.paistisuite;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 @Slf4j
@@ -9,12 +10,14 @@ public abstract class PScript extends Plugin {
     protected Runnable requestRunnerStop;
     private PScriptRunner scriptRunner;
     private Thread scriptThread;
-    private boolean stopRequested = false;
     private boolean isRunning = false;
 
     public void start() throws Exception {
-        if (scriptRunner != null) log.error("Trying to start an already running script!");
-        stopRequested = false;
+        if (scriptRunner != null) {
+            PUtils.sendGameMessage("Script already running!");
+            log.error("Trying to start an already running script! Killing old runner");
+            return;
+        }
 
         try {
             scriptRunner = new PScriptRunner(this);
@@ -33,14 +36,13 @@ public abstract class PScript extends Plugin {
 
     public void requestStop(){
         log.info("Requested stop.");
-        stopRequested = true;
         if (scriptRunner != null) scriptRunner.requestStop();
         scriptRunner = null;
         isRunning = false;
     }
 
     public boolean isStopRequested(){
-        return this.stopRequested;
+        return this.scriptRunner == null || this.scriptRunner.isStopRequested();
     }
 
     @Override

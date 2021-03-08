@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
 public class PBanking {
@@ -103,9 +104,23 @@ public class PBanking {
 
     public static boolean openBank() {
         if (isBankOpen()) return true;
-        PTileObject booth = PObjects.findObject(Filters.Objects.actionsContains("Bank").and(b -> PPlayer.distanceTo(b) <= 20));
-        NPC banker = PObjects.findNPC(Filters.NPCs.actionsContains("Bank").and(b -> PPlayer.distanceTo(b) <= 20));
+        PTileObject booth = PObjects.findObject(
+                Filters.Objects.actionsContains("Bank")
+                .and(b -> PPlayer.distanceTo(b) <= 20));
+        PTileObject bankChest = PObjects.findObject(
+                Filters.Objects.actionsContains("Use")
+                .and(Filters.Objects.nameEquals("Bank chest"))
+                .and(b -> PPlayer.distanceTo(b) <= 20));
+        NPC banker = PObjects.findNPC(
+                Filters.NPCs.actionsContains("Bank")
+                .and(b -> PPlayer.distanceTo(b) <= 20));
         boolean didInteract = false;
+
+        if (bankChest != null){
+            didInteract = PInteraction.tileObject(booth, "Use");
+            return true;
+        }
+
         if (booth != null && banker != null){
             if (PUtils.random(1,4) == 1){
                 didInteract = PInteraction.npc(banker, "Bank");
@@ -132,7 +147,7 @@ public class PBanking {
 
     public static boolean withdrawItem(String nameOrId, int quantity){
         if (!isBankOpen()) return false;
-        PItem target = findBankItem(Filters.Items.nameOrIdEquals(nameOrId));
+        PItem target = findBankItem(Filters.Items.nameContainsOrIdEquals(nameOrId));
         if (target == null) return false;
 
         if (target.getQuantity() < quantity) return false;

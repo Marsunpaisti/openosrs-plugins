@@ -14,6 +14,12 @@ public class PScriptRunner implements Runnable {
     }
 
     private boolean stopRequested = false;
+    public boolean isStopRequested(){
+        synchronized (this){
+            return this.stopRequested;
+        }
+    }
+
     public void requestStop (){
         synchronized (this){
             this.stopRequested = true;

@@ -92,7 +92,7 @@ public class Filters {
         }
         public static Predicate<PItem> nameContainsOrIdEquals(String ...namesorids){
             return (PItem pair) -> Arrays.stream(namesorids).anyMatch(str -> {
-                if (pair.getDefinition().getName().contains(str)) return true;
+                if (pair.getDefinition().getName().toLowerCase().contains(str.toLowerCase())) return true;
                 try {
                     int id = Integer.parseInt(str);
                     return pair.getDefinition().getId() == id;

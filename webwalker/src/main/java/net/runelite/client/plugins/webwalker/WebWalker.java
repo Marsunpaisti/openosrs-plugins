@@ -84,13 +84,16 @@ public class WebWalker extends PScript {
     public void onMenuEntryAdded(MenuEntryAdded event) {
         final Widget map = PUtils.getClient().getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
-        if (map == null) {
+        if (WalkerEngine.getInstance().isNavigating() && event.getOption().contains("Walk here")){
+            PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan) + " stop walking");
             return;
         }
 
-        if (map.getBounds().contains(PUtils.getClient().getMouseCanvasPosition().getX(), PUtils.getClient().getMouseCanvasPosition().getY())) {
-            PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan));
-            PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan) + " Autowalk");
+        if (map != null) {
+            if (map.getBounds().contains(PUtils.getClient().getMouseCanvasPosition().getX(), PUtils.getClient().getMouseCanvasPosition().getY())) {
+                PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan));
+                PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan) + " Autowalk");
+            }
         }
     }
 
@@ -101,6 +104,11 @@ public class WebWalker extends PScript {
 
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
+
+        if (event.getMenuOption().contains("stop walking")) {
+            requestStop();
+            return;
+        }
 
         if (event.getMenuOption().contains("Autowalk")) {
             WorldPoint wp = calculateMapPoint(PUtils.getClient().isMenuOpen() ? lastMenuOpenedPoint : PUtils.getClient().getMouseCanvasPosition());
