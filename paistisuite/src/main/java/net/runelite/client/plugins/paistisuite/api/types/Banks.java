@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.paistisuite.api;
+package net.runelite.client.plugins.paistisuite.api.types;
 
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;

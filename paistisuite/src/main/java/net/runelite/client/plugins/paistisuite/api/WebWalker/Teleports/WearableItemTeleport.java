@@ -2,19 +2,16 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.WidgetID;
-import net.runelite.client.plugins.paistisuite.api.Filters;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.RSItemHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.InteractionHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.NPCInteraction;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.function.Predicate;
 
 @Slf4j

@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling;
 
-import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -14,6 +13,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.real_time_collision.RealTimeCollisionTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSVarBit;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 import javax.inject.Singleton;

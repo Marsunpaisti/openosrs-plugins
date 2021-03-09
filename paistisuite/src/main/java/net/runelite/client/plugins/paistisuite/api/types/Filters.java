@@ -1,17 +1,10 @@
-package net.runelite.client.plugins.paistisuite.api;
+package net.runelite.client.plugins.paistisuite.api.types;
 
-import kotlin.Pair;
 import net.runelite.api.NPC;
-import net.runelite.api.TileObject;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
-import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
-import net.runelite.client.plugins.paistisuite.api.types.PItem;
-import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 public class Filters {
@@ -22,18 +15,21 @@ public class Filters {
         public static Predicate<PTileObject> idEquals(int id) {
             return (PTileObject pair) -> pair.getSecond().getId() == id;
         }
-        public static Predicate<PTileObject> actionsContains(String ...action) {
+        public static Predicate<PTileObject> actionsContains(String ...actions) {
             return (PTileObject pair) -> Arrays.stream(pair.getSecond().getActions())
                     .filter(java.util.Objects::nonNull)
-                    .anyMatch(a -> Arrays.asList(action).contains(a));
+                    .anyMatch(a -> Arrays.stream(actions)
+                            .anyMatch(s -> a.toLowerCase().contains(a.toLowerCase())));
         }
         public static Predicate<PTileObject> actionsEquals(String ...actions) {
             return (PTileObject pair) -> Arrays.stream(pair.getSecond().getActions())
                     .filter(java.util.Objects::nonNull)
-                    .allMatch(a -> Arrays.asList(actions).contains(a));
+                    .allMatch(a -> Arrays.stream(actions)
+                            .filter(java.util.Objects::nonNull)
+                            .anyMatch(s -> s.equalsIgnoreCase(a)));
         }
         public static Predicate<PTileObject> nameContains(String name) {
-            return (PTileObject pair) -> pair.getSecond().getName().contains(name);
+            return (PTileObject pair) -> pair.getSecond().getName().toLowerCase().contains(name.toLowerCase());
         }
         public static Predicate<PTileObject> withinDistance(int distance) {
             return (PTileObject pair) -> (pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < distance);
@@ -41,7 +37,7 @@ public class Filters {
     }
     public static class NPCs {
         public static Predicate<NPC> nameContains(String ...name) {
-            return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedComposition().getName().contains(n));
+            return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedComposition().getName().toLowerCase().contains(n.toLowerCase()));
         }
         public static Predicate<NPC> nameEquals(String ...name) {
             return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(name).anyMatch(n -> npc.getTransformedComposition().getName().equalsIgnoreCase(n));
@@ -49,19 +45,37 @@ public class Filters {
         public static Predicate<NPC> actionsEquals(String ...action) {
             return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
                     .filter(java.util.Objects::nonNull)
-                    .allMatch(a -> Arrays.asList(action).contains(a));
+                    .map(String::toLowerCase)
+                    .allMatch(a -> Arrays.stream(action).anyMatch(m -> m.equalsIgnoreCase(a)));
         }
         public static Predicate<NPC> actionsContains(String ...action) {
             return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
-                    .anyMatch(a -> Arrays.asList(action).contains(a));
+                    .filter(java.util.Objects::nonNull)
+                    .map(String::toLowerCase)
+                    .anyMatch(a -> Arrays.stream(action).anyMatch(m -> a.contains(m.toLowerCase())));
         }
-        public static Predicate<NPC> actionsDontContain(String ...action) {
+        public static Predicate<NPC> actionsDontContain(String ... actions) {
             return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
-                    .noneMatch(a -> Arrays.asList(action).contains(a));
+                    .filter(java.util.Objects::nonNull)
+                    .map(String::toLowerCase)
+                    .noneMatch(a -> Arrays.stream(actions).anyMatch(m -> a.contains(m.toLowerCase())));
         }
         public static Predicate<NPC> nameOrIdEquals(String ...namesorids){
             return (NPC n) -> Arrays.stream(namesorids).anyMatch(str -> {
                 if (n.getTransformedComposition() != null && n.getTransformedComposition().getName().equalsIgnoreCase(str)) return true;
+                try {
+                    int id = Integer.parseInt(str);
+                    return n.getTransformedComposition() != null && n.getTransformedComposition().getId() == id;
+                } catch (NumberFormatException ignored){
+                }
+                return false;
+            });
+        }
+
+        public static Predicate<NPC> nameContainsOrIdEquals(String ...namesorids){
+            return (NPC n) -> Arrays.stream(namesorids).anyMatch(str -> {
+                if (n.getTransformedComposition() != null &&
+                        n.getTransformedComposition().getName().toLowerCase().contains(str.toLowerCase())) return true;
                 try {
                     int id = Integer.parseInt(str);
                     return n.getTransformedComposition() != null && n.getTransformedComposition().getId() == id;
@@ -102,7 +116,7 @@ public class Filters {
             });
         }
         public static Predicate<PItem> nameContains(String ...s) {
-            return (PItem pair) -> Arrays.stream(s).anyMatch(str -> pair.getDefinition().getName().contains(str));
+            return (PItem pair) -> Arrays.stream(s).anyMatch(str -> pair.getDefinition().getName().toLowerCase().contains(str.toLowerCase()));
         }
     }
 
@@ -110,7 +124,7 @@ public class Filters {
     public static class GroundItems {
         public static Predicate<PGroundItem> nameContainsOrIdEquals(String ...namesorids){
             return (PGroundItem item) -> Arrays.stream(namesorids).anyMatch(str -> {
-                if (item.getName().contains(str)) return true;
+                if (item.getName().toLowerCase().contains(str.toLowerCase())) return true;
                 try {
                     int id = Integer.parseInt(str);
                     return item.getId() == id;

@@ -1,5 +1,5 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.teleport_utils;
-import net.runelite.client.plugins.paistisuite.api.Filters;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
@@ -7,7 +7,6 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magi
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
-import org.apache.commons.lang3.NotImplementedException;
 
 public enum TeleportScrolls implements Validatable {
     NARDAH("Nardah teleport",new RSTile(3419, 2916, 0)),

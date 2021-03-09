@@ -1,7 +1,7 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers;
 
 
-import net.runelite.client.plugins.paistisuite.api.Filters;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.PBanking;
 import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PInventory;

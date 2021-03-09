@@ -17,7 +17,7 @@ import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engin
 import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.letters.SecondLetter.*;
 import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.letters.ThirdLetter.*;
 
-import net.runelite.client.plugins.paistisuite.api.Filters;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSVarBit;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;

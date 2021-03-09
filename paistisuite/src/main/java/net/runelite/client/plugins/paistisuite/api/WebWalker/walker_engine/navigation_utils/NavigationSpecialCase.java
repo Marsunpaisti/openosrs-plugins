@@ -1,11 +1,9 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils;
 
 
-import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
-import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.*;
@@ -15,7 +13,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.inter
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.NPCInteraction;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.FairyRing;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.AccurateMouse;
-import net.runelite.client.plugins.paistisuite.api.Filters;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 

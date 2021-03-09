@@ -8,7 +8,7 @@ import net.runelite.client.plugins.paistisuite.api.PWidgets;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.InteractionHelper;
-import net.runelite.client.plugins.paistisuite.api.Filters;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;

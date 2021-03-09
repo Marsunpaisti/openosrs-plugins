@@ -11,7 +11,9 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.RSIt
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic.Spell;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.*;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
+import net.runelite.client.plugins.paistisuite.api.types.Spells;
 
 import java.util.ArrayList;
 import java.util.Arrays;

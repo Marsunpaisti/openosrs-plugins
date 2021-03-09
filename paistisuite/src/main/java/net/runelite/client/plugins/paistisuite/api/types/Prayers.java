@@ -3,7 +3,7 @@
  * All rights reserved.
  * Licensed under GPL3, see LICENSE for the full scope.
  */
-package net.runelite.client.plugins.paistisuite.api;
+package net.runelite.client.plugins.paistisuite.api.types;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Getter
 @AllArgsConstructor
-public enum PrayerMap
+public enum Prayers
 {
 	THICK_SKIN("Thick Skin", WidgetInfo.PRAYER_THICK_SKIN, Varbits.PRAYER_THICK_SKIN),
 	BURST_OF_STRENGTH("Burst of Strength", WidgetInfo.PRAYER_BURST_OF_STRENGTH, Varbits.PRAYER_BURST_OF_STRENGTH),
@@ -57,7 +57,7 @@ public enum PrayerMap
 	{
 		ImmutableMap.Builder<String, WidgetInfo> builder = ImmutableMap.builder();
 
-		for (PrayerMap spells : values())
+		for (Prayers spells : values())
 		{
 			builder.put(spells.getName(), spells.getInfo());
 		}

@@ -7,12 +7,11 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.inter
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSVarBit;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 
 public class MasterScrollBook {
 

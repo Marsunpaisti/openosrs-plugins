@@ -3,7 +3,7 @@
  * All rights reserved.
  * Licensed under GPL3, see LICENSE for the full scope.
  */
-package net.runelite.client.plugins.paistisuite.api;
+package net.runelite.client.plugins.paistisuite.api.types;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;

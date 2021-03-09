@@ -3,17 +3,13 @@ package net.runelite.client.plugins.paistisuite.api;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.plugins.paistisuite.PaistiSuite;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.logging.Filter;
-import java.util.stream.Collectors;
 
 public class PBanking {
     public static Boolean isBankOpen(){
