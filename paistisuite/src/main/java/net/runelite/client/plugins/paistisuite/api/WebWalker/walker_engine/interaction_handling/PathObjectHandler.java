@@ -25,19 +25,17 @@ import java.util.stream.Collectors;
 @Singleton
 public class PathObjectHandler {
     private static PathObjectHandler instance;
-    private final TreeSet<String> sortedOptions, sortedBlackList, sortedBlackListOptions, sortedHighPriorityOptions;
+    private final String[] sortedOptionsArr, sortedBlackListOptionsArr, sortedBlackListArr, sortedHighPriorityOptionsArr;
 
     private PathObjectHandler(){
-        sortedOptions = new TreeSet<>(
-                Arrays.asList("Enter", "Cross", "Pass", "Open", "Close", "Walk-through", "Use", "Pass-through", "Exit",
-                        "Walk-Across", "Go-through", "Walk-across", "Climb", "Climb-up", "Climb-down", "Climb-over", "Climb over", "Climb-into", "Climb-through",
-                        "Board", "Jump-from", "Jump-across", "Jump-to", "Squeeze-through", "Jump-over", "Pay-toll(10gp)", "Step-over", "Walk-down", "Walk-up","Walk-Up", "Travel", "Get in",
-                        "Investigate", "Operate", "Climb-under","Jump","Crawl-down","Crawl-through","Activate","Push","Squeeze-past","Walk-Down",
-                        "Swing-on", "Climb up", "Ascend", "Descend","Channel","Teleport","Pass-Through","Jump-up","Jump-down","Swing across"));
-
-        sortedBlackList = new TreeSet<>(Arrays.asList("Coffin","Drawers","null"));
-        sortedBlackListOptions = new TreeSet<>(Arrays.asList("Chop down"));
-        sortedHighPriorityOptions = new TreeSet<>(Arrays.asList("Pay-toll(10gp)","Squeeze-past"));
+        sortedOptionsArr = new String[]{"Enter", "Cross", "Pass", "Open", "Close", "Walk-through", "Use", "Pass-through", "Exit",
+                "Walk-Across", "Go-through", "Walk-across", "Climb", "Climb-up", "Climb-down", "Climb-over", "Climb over", "Climb-into", "Climb-through",
+                "Board", "Jump-from", "Jump-across", "Jump-to", "Squeeze-through", "Jump-over", "Pay-toll(10gp)", "Step-over", "Walk-down", "Walk-up","Walk-Up", "Travel", "Get in",
+                "Investigate", "Operate", "Climb-under","Jump","Crawl-down","Crawl-through","Activate","Push","Squeeze-past","Walk-Down",
+                "Swing-on", "Climb up", "Ascend", "Descend","Channel","Teleport","Pass-Through","Jump-up","Jump-down","Swing across"};
+        sortedBlackListOptionsArr = new String[]{"Chop down"};
+        sortedBlackListArr = new String[]{"Coffin", "Drawers"};
+        sortedHighPriorityOptionsArr = new String[]{"Pay-toll(10gp", "Squeeze-past"};
     }
 
     private static PathObjectHandler getInstance(){
@@ -259,7 +257,8 @@ public class PathObjectHandler {
     }
 
     public static boolean handle(PathAnalyzer.DestinationDetails destinationDetails, List<RSTile> path){
-        RealTimeCollisionTile start = destinationDetails.getDestination(), end = destinationDetails.getNextTile();
+        RealTimeCollisionTile start = destinationDetails.getDestination();
+        RSTile end = destinationDetails.getAssumed();
 
         List<PTileObject> interactiveObjects = null;
 
@@ -268,7 +267,7 @@ public class PathObjectHandler {
         if (specialObject != null) log.info("Special: " + specialObject.name());
         if (specialObject == null) {
             if ((interactiveObjects = getInteractiveObjects(start.getX(), start.getY(), start.getZ(), destinationDetails)).size() < 1 && end != null) {
-                interactiveObjects = getInteractiveObjects(end.getX(), end.getY(), end.getZ(), destinationDetails);
+                interactiveObjects = getInteractiveObjects(end.getX(), end.getY(), end.getPlane(), destinationDetails);
             }
         } else {
             action = specialObject.getAction();
@@ -287,7 +286,6 @@ public class PathObjectHandler {
 
             interactiveObjects = Objects.findNearest(15, specialObjectFilter);
              */
-            Client client = PUtils.getClient();
             interactiveObjects = PObjects.findAllObjects(
                 specialObjectFilter
                 .and(obj -> obj.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 15));
@@ -455,7 +453,7 @@ public class PathObjectHandler {
 
         if (!successfulClick){
             String[] validOptions = action != null ? new String[]{action} : getViableOption(
-                    Arrays.stream(objDefPair.getSecond().getActions()).filter(Objects::nonNull).filter(getInstance().sortedOptions::contains).collect(
+                    Arrays.stream(objDefPair.getSecond().getActions()).filter(Objects::nonNull).filter(Arrays.asList(getInstance().sortedOptionsArr)::contains).collect(
                             Collectors.toList()), destinationDetails);
             if (!clickOnObject(objDefPair, destinationDetails, validOptions)) {
                 return false;
@@ -501,18 +499,12 @@ public class PathObjectHandler {
     }
 
     public static List<PTileObject> getInteractiveObjects(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
-        Client client = PUtils.getClient();
-        List<PTileObject> objects = PObjects.getAllObjects()
-                .stream()
-                .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 25)
-                .filter(interactiveObjectFilter(x, y, z, destinationDetails))
-                .collect(Collectors.toList());
-
+        List<PTileObject> objects = PObjects.findAllObjects(interactiveObjectFilter(x,y,z,destinationDetails));
         final WorldPoint base = new WorldPoint(x, y, z);
         objects.sort((o1, o2) -> {
             int c = Integer.compare(
-                    Math.round(o1.getFirst().getWorldLocation().distanceToHypotenuse(base)),
-                    Math.round(o2.getFirst().getWorldLocation().distanceToHypotenuse(base))
+                    o1.getFirst().getWorldLocation().distanceTo2D(base),
+                    o2.getFirst().getWorldLocation().distanceTo2D(base)
             );
             int assumedZ = destinationDetails.getAssumedZ(), destinationZ = destinationDetails.getDestination().getZ();
             List<String> actions1 = Arrays.asList(o1.getSecond().getActions());
@@ -562,40 +554,39 @@ public class PathObjectHandler {
      * @return
      */
     private static Predicate<PTileObject> interactiveObjectFilter(int x, int y, int z, PathAnalyzer.DestinationDetails destinationDetails){
-        final WorldPoint position = new WorldPoint(x, y, z);
-        return (PTileObject pair) -> {
-            ObjectComposition def = pair.getSecond();
+        return (PTileObject obj) -> {
+            ObjectComposition def = obj.getDef();
             if (def == null){
                 return false;
             }
-            String name = def.getName();
-            if (getInstance().sortedBlackList.contains(name)) {
-                return false;
+
+            if (Filters.Objects.actionsContains("Cross").test(obj)){
+                log.info("Test");
             }
-            List<String> actions = Arrays.asList(def.getActions());
-            if (actions.stream().filter(Objects::nonNull).anyMatch(s -> getInstance().sortedBlackListOptions.contains(s))){
-                return false;
-            }
-            if (pair.getFirst().getWorldLocation().distanceToHypotenuse(destinationDetails.getDestination().getRSTile().toWorldPoint()) > 5) {
+            if (Filters.Objects.nameEquals(getInstance().sortedBlackListArr).test(obj)) {
                 return false;
             }
 
-            /* TODO:
-            if (Arrays.stream(obj.getAllTiles()).noneMatch(rsTile -> rsTile.distanceTo(position) <= 2)) {
+            if (Filters.Objects.actionsContains(getInstance().sortedBlackListOptionsArr).test(obj)){
                 return false;
             }
-            */
 
-            List<String> options = Arrays.asList(def.getActions());
-            return options.stream().filter(Objects::nonNull).anyMatch(getInstance().sortedOptions::contains);
+            if (obj.getFirst().getWorldLocation().distanceTo2D(new WorldPoint(x, y, z)) > 3) {
+                return false;
+            }
 
+            if (obj.getFirst().getWorldLocation().distanceTo2D(PPlayer.getWorldLocation()) > 35) {
+                return false;
+            }
+
+            return Filters.Objects.actionsContains(getInstance().sortedOptionsArr).test(obj);
         };
     }
 
     private static String[] getViableOption(Collection<String> collection, PathAnalyzer.DestinationDetails destinationDetails){
         Set<String> set = new HashSet<>(collection);
-        if (set.retainAll(getInstance().sortedHighPriorityOptions) && set.size() > 0){
-            return set.toArray(new String[set.size()]);
+        if (set.retainAll(Arrays.asList(getInstance().sortedHighPriorityOptionsArr)) && set.size() > 0){
+            return set.toArray(new String[0]);
         }
         if (destinationDetails.getAssumedZ() > destinationDetails.getDestination().getZ()){
             if (collection.contains("Climb-up")){

@@ -21,6 +21,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerSe
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -77,7 +78,12 @@ public class WebWalker extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
-
+        PTileObject logg = PObjects.findObject(Filters.Objects.actionsContains("Cross"));
+        if (logg != null) {
+            //log.info("Found log");
+        } else {
+            //log.info("No log");
+        }
     }
 
     @Subscribe

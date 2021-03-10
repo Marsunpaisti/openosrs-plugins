@@ -9,8 +9,8 @@ import java.util.function.Predicate;
 
 public class Filters {
     public static class Objects {
-        public static Predicate<PTileObject> nameEquals(String name) {
-            return (PTileObject pair) -> pair.getSecond().getName().equalsIgnoreCase(name);
+        public static Predicate<PTileObject> nameEquals(String ...names) {
+            return (PTileObject pair) -> Arrays.stream(names).anyMatch(name -> pair.getSecond().getName().equalsIgnoreCase(name));
         }
         public static Predicate<PTileObject> idEquals(int id) {
             return (PTileObject pair) -> pair.getSecond().getId() == id;
@@ -19,7 +19,7 @@ public class Filters {
             return (PTileObject pair) -> Arrays.stream(pair.getSecond().getActions())
                     .filter(java.util.Objects::nonNull)
                     .anyMatch(a -> Arrays.stream(actions)
-                            .anyMatch(s -> a.toLowerCase().contains(a.toLowerCase())));
+                            .anyMatch(s -> a.toLowerCase().contains(s.toLowerCase())));
         }
         public static Predicate<PTileObject> actionsEquals(String ...actions) {
             return (PTileObject pair) -> Arrays.stream(pair.getSecond().getActions())

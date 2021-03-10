@@ -159,7 +159,7 @@ public class PathAnalyzer {
 
         @Override
         public String toString(){
-            String debug = "PATH_DEBUG[ ";
+            String debug = "PATH_DEBUG (";
             if (state == PathState.END_OF_PATH){
                 debug += state;
             } else {
