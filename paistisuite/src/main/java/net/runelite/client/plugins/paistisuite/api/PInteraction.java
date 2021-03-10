@@ -7,6 +7,7 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
+import net.runelite.client.plugins.paistisuite.api.types.Spells;
 
 import java.util.Arrays;
 import java.util.List;
@@ -147,6 +148,26 @@ public class PInteraction {
                     "",
                     target.getWidgetItem().getId(),
                     MenuAction.ITEM_USE_ON_WIDGET_ITEM.getId(),
+                    target.getWidgetItem().getIndex(),
+                    9764864);
+            PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
+            return true;
+        }, "interact_useItemOnItem");
+    }
+
+    public static Boolean useSpellOnItem(Spells spell, PItem target){
+        return PUtils.clientOnly(() -> {
+            if (spell == null || target == null || target.getWidgetItem() == null || target.itemType != PItem.PItemType.INVENTORY) return false;
+            Widget spellWidget = PWidgets.get(spell.getInfo());
+            if (spellWidget == null) return false;
+            PUtils.getClient().setSelectedSpellWidget(spellWidget.getId());
+            PUtils.getClient().setSelectedSpellChildIndex(-1);
+            PUtils.getClient().invokeMenuAction(
+                    "",
+                    "",
+                    target.getWidgetItem().getId(),
+                    MenuAction.ITEM_USE_ON_WIDGET.getId(),
                     target.getWidgetItem().getIndex(),
                     9764864);
             PUtils.getClient().setMouseIdleTicks(0);

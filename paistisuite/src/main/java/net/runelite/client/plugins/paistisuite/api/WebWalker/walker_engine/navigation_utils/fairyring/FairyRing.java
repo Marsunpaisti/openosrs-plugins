@@ -4,10 +4,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navi
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.paistisuite.api.PInventory;
-import net.runelite.client.plugins.paistisuite.api.PObjects;
-import net.runelite.client.plugins.paistisuite.api.PPlayer;
-import net.runelite.client.plugins.paistisuite.api.PWidgets;
+import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.InteractionHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.letters.FirstLetter;
@@ -38,6 +35,8 @@ public class FairyRing {
 
     private static TileObject ring;
 
+    private static Integer previousWeaponId;
+
 
     private static RSInterface getTeleportButton() {
         return new RSInterface(PWidgets.get(INTERFACE_MASTER, TELEPORT_CHILD));
@@ -59,12 +58,13 @@ public class FairyRing {
                 .anyMatch(item -> item.getId() == DRAMEN_STAFFS[0] || item.getId() == DRAMEN_STAFFS[1]);
 
         if (RSVarBit.get(ELITE_DIARY_VARBIT).getValue() == 0 && !staffEquipped){
-            PItem staff = PInventory.getAllItems()
-                    .stream()
-                    .filter(pair -> pair.getSecond().getId() == DRAMEN_STAFFS[0] || pair.getSecond().getId() == DRAMEN_STAFFS[1])
-                    .findFirst()
-                    .orElse(null);
-
+            PItem staff = PInventory.findItem(Filters.Items.idEquals(DRAMEN_STAFFS[0]).or(Filters.Items.idEquals(DRAMEN_STAFFS[1])));
+            PItem previouslyEquipped = PInventory.findEquipmentItem(i -> i.getSlotName().equalsIgnoreCase("Weapon"));
+            if (previouslyEquipped != null) {
+                previousWeaponId = previouslyEquipped.getId();
+            } else {
+                previousWeaponId = null;
+            }
             if (!InteractionHelper.click(staff, "Wield")){
                 return false;
             } else {
@@ -81,7 +81,23 @@ public class FairyRing {
         final WorldPoint startPos = PPlayer.getWorldLocation();
         if (location.turnTo() && pressTeleport()
                 && WaitFor.condition(8000, () -> startPos.distanceToHypotenuse(PPlayer.location()) > 20 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS){
-            WaitFor.random(350, 1000);
+            WaitFor.random(900, 1600);
+
+            // Try to equip previous
+            if (previousWeaponId != null){
+                PItem previousWeapon = PInventory.findItem(Filters.Items.idEquals(previousWeaponId));
+                if (PInteraction.item(previousWeapon, "Wield")){
+                    if (!PUtils.waitCondition(PUtils.random(1300, 1900), () -> PInventory.findEquipmentItem(Filters.Items.idEquals(previousWeaponId)) != null)){
+                        // Retry once
+                        if (PInteraction.item(previousWeapon, "Wield")){
+                            PUtils.waitCondition(PUtils.random(1300, 1900), () -> PInventory.findEquipmentItem(Filters.Items.idEquals(previousWeaponId)) != null);
+                        }
+                    } else {
+                        PUtils.sleepNormal(200, 500);
+                    }
+                }
+            }
+
             return true;
         }
 
