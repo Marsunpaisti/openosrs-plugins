@@ -3,10 +3,12 @@ package net.runelite.client.plugins.paistisuite.api;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Keyboard;
 import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -30,6 +32,8 @@ public class PBanking {
     }
 
     public static Boolean depositInventory(){
+        if (PInventory.getEmptySlots() == 28) return true;
+
         if (isBankOpen()) {
             Widget button = PWidgets.get(WidgetInfo.BANK_DEPOSIT_INVENTORY);
             return PInteraction.widget(button, "Deposit inventory");
@@ -151,17 +155,28 @@ public class PBanking {
         int tens = (int) Math.floor(quantity / 10);
         int fives = (int) Math.floor((quantity - 10 * tens) / 5);
         int ones = (int) Math.floor((quantity - 10 * tens - 5 * fives));
-        for (int i = 0; i < tens; i++){
-            if (!PInteraction.item(target, "Withdraw-10")) return false;
-            PUtils.sleepNormal(400, 800);
-        }
-        for (int i = 0; i < fives; i++){
-            if (!PInteraction.item(target, "Withdraw-5")) return false;
-            PUtils.sleepNormal(400, 800);
-        }
-        for (int i = 0; i < ones; i++){
-            if (!PInteraction.item(target, "Withdraw-1")) return false;
-            PUtils.sleepNormal(400, 800);
+
+        if (ones+tens+fives >= 3) {
+            if (!PInteraction.item(target, "Withdraw-X")) return false;
+            if (!PUtils.waitCondition(PUtils.random(2000, 3000), () -> PWidgets.isSubstantiated(WidgetInfo.CHATBOX_FULL_INPUT))) return false;
+            PUtils.sleepNormal(250, 600);
+            Keyboard.typeString(""+quantity);
+            PUtils.sleepNormal(250, 600);
+            Keyboard.typeKeysInt(KeyEvent.VK_ENTER);
+            PUtils.sleepNormal(250, 600);
+        } else {
+            for (int i = 0; i < tens; i++){
+                if (!PInteraction.item(target, "Withdraw-10")) return false;
+                PUtils.sleepNormal(400, 800);
+            }
+            for (int i = 0; i < fives; i++){
+                if (!PInteraction.item(target, "Withdraw-5")) return false;
+                PUtils.sleepNormal(400, 800);
+            }
+            for (int i = 0; i < ones; i++){
+                if (!PInteraction.item(target, "Withdraw-1")) return false;
+                PUtils.sleepNormal(400, 800);
+            }
         }
         return true;
     }

@@ -29,6 +29,7 @@ public class Keyboard
             for (char c : string.toCharArray())
             {
                 pressKey(c);
+                PUtils.sleepNormal(100, 250);
             }
         });
     }
@@ -41,11 +42,16 @@ public class Keyboard
     }
 
     public static void typeKeysInt(int ...keys){
+        if (keys == null) {
+            log.error("Null keys given to typeKeys!");
+            return;
+        }
         executorService.submit(() ->
         {
             for (int k : keys)
             {
                 pressKeyInt(k);
+                PUtils.sleepNormal(100, 250);
             }
         });
     }
@@ -60,6 +66,7 @@ public class Keyboard
             for (char c : keys)
             {
                 pressKey(c);
+                PUtils.sleepNormal(100, 250);
             }
         });
     }

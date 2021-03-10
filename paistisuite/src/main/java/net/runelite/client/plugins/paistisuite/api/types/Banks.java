@@ -14,6 +14,7 @@ public enum Banks
 	BARBARIAN_OUTPOST("Barbarian outpost", 2536, 3574, 0),
 	BLAST_FURNACE_BANK("Blast furnace", 1948, 4957, 0),
 	BLAST_MINE("Blast mine", 1502, 3856, 0),
+	SEERS("Seers", 2725, 3493, 0),
 	CAMELOT("Camelot", 2725, 3493, 0),
 	CANIFIS("Canifis",3512, 3480, 0),
 	CASTLE_WARS("Castle Wars", 2443, 3083, 0),
