@@ -33,15 +33,15 @@ public class PPlayer {
     }
 
     public static double distanceTo(WorldPoint point){
-        return PPlayer.getWorldLocation().distanceToHypotenuse((point));
+        return PPlayer.getWorldLocation().distanceTo2DHypotenuse((point));
     }
 
     public static double distanceTo(NPC npc){
-        return PPlayer.getWorldLocation().distanceToHypotenuse(npc.getWorldLocation());
+        return PPlayer.getWorldLocation().distanceTo2DHypotenuse(npc.getWorldLocation());
     }
 
     public static double distanceTo(PTileObject to){
-        return PPlayer.getWorldLocation().distanceToHypotenuse(to.getWorldLocation());
+        return PPlayer.getWorldLocation().distanceTo2DHypotenuse(to.getWorldLocation());
     }
 
     public static boolean isRunEnabled()

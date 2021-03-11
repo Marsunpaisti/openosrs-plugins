@@ -325,16 +325,21 @@ public class NavigationSpecialCase {
                 break;
 
             case WATERBIRTH:
-                String option = PObjects.findNPC(Filters.NPCs.nameContains("Jarvald").and(Filters.NPCs.actionsContains(
-                        "Travel"))) != null ? "Travel" : "Talk-to";
-                if (NPCInteraction.talkTo(Filters.NPCs.nameEquals("Jarvald"), new String[]{option}, new String[]{
-                        "What Jarvald is doing.",
-                        "Can I come?",
-                        "YES",
-                        "Yes"
-                })){
-                    WaitFor.milliseconds(2000, 3000);
+                if (PInteraction.npc(PObjects.findNPC(Filters.NPCs.actionsContains("Rellekka")))) {
+                    WaitFor.milliseconds(4000, 5000);
+                } else {
+                    String option = PObjects.findNPC(Filters.NPCs.nameContains("Jarvald").and(Filters.NPCs.actionsContains(
+                            "Rellekka"))) != null ? "Rellekka" : "Talk-to";
+                    if (NPCInteraction.talkTo(Filters.NPCs.nameEquals("Jarvald"), new String[]{option}, new String[]{
+                            "What Jarvald is doing.",
+                            "Can I come?",
+                            "YES",
+                            "Yes"
+                    })){
+                        WaitFor.milliseconds(2000, 3000);
+                    }
                 }
+
                 break;
 
             case SPIRIT_TREE_GRAND_EXCHANGE: return SpiritTree.to(SpiritTree.Location.SPIRIT_TREE_GRAND_EXCHANGE);
@@ -582,14 +587,14 @@ public class NavigationSpecialCase {
 
                 if (PInteraction.tileObject(logobj, "Walk-across")){
                     int agilityXP = PSkills.getXp(Skill.AGILITY);
-                    if (WaitFor.condition(PUtils.random(7600, 1200), () -> PSkills.getXp(Skill.AGILITY) > agilityXP ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS) {
+                    if (WaitFor.condition(PUtils.random(7600, 8000), () -> PSkills.getXp(Skill.AGILITY) > agilityXP ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS) {
                         return true;
                     }
                     if (PPlayer.isMoving()){
                         WaitFor.milliseconds(1200, 2300);
                     }
                 }
-                log.info("Could not navigate through gnome door.");
+                log.info("Could not navigate ardy log.");
                 break;
 
 

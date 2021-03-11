@@ -12,8 +12,8 @@ public class Filters {
         public static Predicate<PTileObject> nameEquals(String ...names) {
             return (PTileObject pair) -> Arrays.stream(names).anyMatch(name -> pair.getSecond().getName().equalsIgnoreCase(name));
         }
-        public static Predicate<PTileObject> idEquals(int id) {
-            return (PTileObject pair) -> pair.getSecond().getId() == id;
+        public static Predicate<PTileObject> idEquals(int ...ids) {
+            return (PTileObject pair) -> Arrays.stream(ids).anyMatch(id -> pair.getSecond().getId() == id);
         }
         public static Predicate<PTileObject> actionsContains(String ...actions) {
             return (PTileObject pair) -> Arrays.stream(pair.getSecond().getActions())
@@ -32,7 +32,7 @@ public class Filters {
             return (PTileObject pair) -> pair.getSecond().getName().toLowerCase().contains(name.toLowerCase());
         }
         public static Predicate<PTileObject> withinDistance(int distance) {
-            return (PTileObject pair) -> (pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < distance);
+            return (PTileObject pair) -> (pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) < distance);
         }
     }
     public static class NPCs {
