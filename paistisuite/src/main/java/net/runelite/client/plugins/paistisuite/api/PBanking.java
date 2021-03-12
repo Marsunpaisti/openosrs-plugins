@@ -144,7 +144,6 @@ public class PBanking {
                 .orElse(null);
     }
 
-
     public static boolean withdrawItem(String nameOrId, int quantity){
         if (!isBankOpen()) return false;
         PItem target = findBankItem(Filters.Items.nameContainsOrIdEquals(nameOrId));

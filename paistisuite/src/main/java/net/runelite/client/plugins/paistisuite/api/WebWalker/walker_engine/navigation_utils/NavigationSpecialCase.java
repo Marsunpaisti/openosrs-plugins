@@ -325,7 +325,7 @@ public class NavigationSpecialCase {
                 break;
 
             case WATERBIRTH:
-                if (PInteraction.npc(PObjects.findNPC(Filters.NPCs.actionsContains("Rellekka")))) {
+                if (PInteraction.npc(PObjects.findNPC(Filters.NPCs.actionsContains("Rellekka")), "Rellekka")) {
                     WaitFor.milliseconds(4000, 5000);
                 } else {
                     String option = PObjects.findNPC(Filters.NPCs.nameContains("Jarvald").and(Filters.NPCs.actionsContains(

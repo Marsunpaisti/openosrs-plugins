@@ -86,7 +86,7 @@ public class PDialogue {
     /**
      * Presses space bar
      */
-    private static void clickHereToContinue(){
+    public static void clickHereToContinue(){
         log.info("Clicking continue.");
         Keyboard.pressSpacebar();
         PUtils.sleepNormal(200, 800);
