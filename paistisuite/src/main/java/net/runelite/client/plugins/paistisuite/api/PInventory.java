@@ -166,10 +166,10 @@ public class PInventory
 
     public static List<PItem> getEquipmentItems(){
         return PUtils.clientOnly(() -> {
-            ItemContainer container = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT);
-            if (container == null) return null;
-            Item[] eqitems = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
             List<PItem> equippedPItems = new ArrayList<PItem>();
+            ItemContainer container = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT);
+            if (container == null) return equippedPItems;
+            Item[] eqitems = PUtils.getClient().getItemContainer(InventoryID.EQUIPMENT).getItems();
             int slot = 0;
             for (Item i : eqitems){
                 if (i.getId() != -1) equippedPItems.add(PItem.fromEquipmentItem(i, slot));

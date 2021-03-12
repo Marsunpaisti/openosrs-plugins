@@ -163,7 +163,7 @@ public class PUtils {
     }
 
     public static boolean isClientThread(){
-        return PUtils.getClient().isClientThread();
+        return PUtils.getClient() != null && PUtils.getClient().isClientThread();
     }
 
     public static <T> T clientOnly(@NotNull Callable<T> task, String name){
@@ -181,6 +181,7 @@ public class PUtils {
     }
 
     public static void sendGameMessage(String message){
+        log.info("Sent game msg: " + message);
         if (PaistiSuite.getInstance().client.isClientThread()){
             PaistiSuite.getInstance().chatMessageManager
                     .queue(QueuedMessage.builder()

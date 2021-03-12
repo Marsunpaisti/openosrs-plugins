@@ -1,7 +1,7 @@
-version = "0.0.1"
+version = "1.0.0"
 
 project.extra["PluginName"] = "PGearSetup"
-project.extra["PluginDescription"] = "Save and withdraw gear & inventory setups."
+project.extra["PluginDescription"] = "Save and withdraw gear & inventory setups automatically."
 
 dependencies {
     annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")

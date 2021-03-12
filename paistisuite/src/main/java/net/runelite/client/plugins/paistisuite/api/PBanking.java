@@ -19,10 +19,14 @@ public class PBanking {
     }
 
     public static boolean closeBank(){
-        if (!isBankOpen()) return true;
-        Widget bankCloseWidget = PWidgets.get(WidgetInfo.BANK_PIN_EXIT_BUTTON);
-        if (bankCloseWidget != null && !bankCloseWidget.isHidden()) {
-            return PInteraction.clickWidget(bankCloseWidget);
+        if (!isBankOpen() && !isDepositBoxOpen()) return true;
+        Widget parent = PWidgets.get(12, 2);
+        Widget bankCloseWidget = null;
+        if (parent != null) {
+            bankCloseWidget = parent.getDynamicChildren()[11];
+        }
+        if (bankCloseWidget != null) {
+            return PInteraction.widget(bankCloseWidget, "Close");
         }
         return false;
     }
@@ -48,6 +52,7 @@ public class PBanking {
     }
 
     public static boolean depositEquipment(){
+        if (PInventory.getEquipmentItems().size() == 0) return true;
         if (isBankOpen()) {
             Widget button = PWidgets.get(WidgetInfo.BANK_DEPOSIT_EQUIPMENT);
             return PInteraction.widget(button, "Deposit worn items");

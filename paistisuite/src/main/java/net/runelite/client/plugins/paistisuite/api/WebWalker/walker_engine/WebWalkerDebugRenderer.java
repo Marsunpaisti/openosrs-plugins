@@ -32,12 +32,12 @@ public class WebWalkerDebugRenderer {
             debugFurthestTile = destinationDetails.getDestination().getRSTile().toWorldPoint();
             debugAssumedNext = destinationDetails.getAssumed().toWorldPoint();
             if (debugFurthestTile != null){
-                drawTile(graphics, debugFurthestTile, Color.green);
+                drawTile(graphics, debugFurthestTile, new Color(0, 255, 0, 100));
             }
             if (debugAssumedNext != null
                     && destinationDetails.getState() != PathAnalyzer.PathState.FURTHEST_CLICKABLE_TILE
                     && destinationDetails.getState() != PathAnalyzer.PathState.END_OF_PATH){
-                drawTile(graphics, debugAssumedNext, Color.yellow);
+                drawTile(graphics, debugAssumedNext, new Color(255, 255, 0, 100));
             }
         }
 
@@ -48,9 +48,9 @@ public class WebWalkerDebugRenderer {
         {
             if (previous != null){
                 if (previous.equals(debugFurthestTile) && tile.equals(debugAssumedNext) && destinationDetails.getState() != PathAnalyzer.PathState.FURTHEST_CLICKABLE_TILE) {
-                    lineBetweenTiles(graphics, previous, tile, Color.yellow, 6);
+                    lineBetweenTiles(graphics, previous, tile, new Color(255, 255, 0, 100), 6);
                 } else{
-                    lineBetweenTiles(graphics, previous, tile, Color.cyan, 3);
+                    lineBetweenTiles(graphics, previous, tile, new Color(0, 255, 255, 100), 3);
                 }
             }
             previous = tile;
