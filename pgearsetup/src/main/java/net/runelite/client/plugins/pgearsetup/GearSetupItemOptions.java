@@ -2,7 +2,7 @@ package net.runelite.client.plugins.pgearsetup;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.Item;
+import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.util.AsyncBufferedImage;
 
@@ -26,10 +26,10 @@ public class GearSetupItemOptions implements Serializable {
                 , "getImages");
     }
 
-    public GearSetupItemOptions(int id, int quantity){
+    public GearSetupItemOptions(int id, int quantity, boolean isNoted){
         ArrayList<GearSetupItem> options = new ArrayList<GearSetupItem>();;
         if (id != -1 && quantity != -1){
-            options.add(new GearSetupItem(id, quantity));
+            options.add(new GearSetupItem(id, quantity, isNoted));
         }
         this.options = options;
     }

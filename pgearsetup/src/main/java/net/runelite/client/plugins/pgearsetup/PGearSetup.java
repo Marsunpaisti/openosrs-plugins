@@ -1,8 +1,11 @@
 package net.runelite.client.plugins.pgearsetup;
 import com.google.inject.Provides;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameState;
-import net.runelite.api.Item;
 import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -55,6 +58,15 @@ public class PGearSetup extends PScript {
 
     private GearSetupData targetGearSetup = null;
     public ArrayList<GearSetupData> gearSetups;
+
+    @AllArgsConstructor
+    private class WithdrawQuantity {
+        @Getter
+        @Setter
+        int id, quantity;
+        @Getter
+        boolean isNoted;
+    }
 
     @Provides
     PGearSetupConfig provideConfig(ConfigManager configManager)
@@ -224,7 +236,7 @@ public class PGearSetup extends PScript {
         PUtils.sleepNormal(200, 500);
 
         if (PBanking.depositInventory()){
-            PUtils.sleepNormal(300, 700);
+            PUtils.sleepNormal(300, 600);
         } else {
             PUtils.sendGameMessage("Unable to deposit inventory!");
             requestStop();
@@ -232,7 +244,7 @@ public class PGearSetup extends PScript {
         }
 
         if (PBanking.depositEquipment()){
-            PUtils.sleepNormal(700, 1000);
+            PUtils.sleepNormal(300, 600);
         } else {
             PUtils.sendGameMessage("Unable to deposit gear!");
             requestStop();
@@ -243,10 +255,12 @@ public class PGearSetup extends PScript {
         for (GearSetupItemOptions eq : targetGearSetup.getEquipment().values()){
             if (eq.getOptions() == null) continue;
             for (GearSetupItem option : eq.getOptions()){
-                if (!PBanking.withdrawItem("" + option.getId(), option.getQuantity())){
+                boolean success = PBanking.withdrawItem("" + option.getId(), option.getQuantity());
+                if (!success) success = PBanking.withdrawItem(PInventory.getItemDef(option.getId()).getName(), option.getQuantity());
+                if (!success){
                     log.info("Unable to withdraw item id: " + option.getId());
                 } else {
-                    PUtils.sleepNormal(200, 500, 30, 260);
+                    PUtils.sleepNormal(120, 400, 30, 160);
                     continue outer;
                 }
             }
@@ -260,16 +274,17 @@ public class PGearSetup extends PScript {
             return;
         }*/
 
-        PUtils.sleepNormal(600, 1200);
+        PUtils.sleepNormal(300, 700);
         outer2:
         for (GearSetupItemOptions eq : targetGearSetup.getEquipment().values()){
             if (eq.getOptions() == null) continue;
             for (GearSetupItem option : eq.getOptions()){
                 PItem eqItem = PInventory.findItem(Filters.Items.idEquals(option.getId()));
+                if (eqItem == null) eqItem = PInventory.findItem(Filters.Items.nameEquals(PInventory.getItemDef(option.getId()).getName()));
                 if (!PInteraction.item(eqItem, "Wear", "Wield")) {
                     log.info("Unable to equip item id: " + option.getId());
                 } else {
-                    PUtils.sleepNormal(200, 500, 30, 260);
+                    PUtils.sleepNormal(120, 400, 30, 160);
                     continue outer2;
                 }
             }
@@ -295,36 +310,38 @@ public class PGearSetup extends PScript {
         PUtils.sleepNormal(200, 500);
 
         // Group items by ID so they can be withdrawn at one time
-        LinkedHashMap<Integer, Integer> quantities = new LinkedHashMap<>();
+        ArrayList<WithdrawQuantity> quantities = new ArrayList<>();
         outer3:
         for (GearSetupItemOptions withdrawItem : targetGearSetup.getInventory()){
             if (withdrawItem.getOptions() == null) continue;
             for (GearSetupItem option : withdrawItem.getOptions()) {
-                Integer previous = quantities.getOrDefault(option.getId(), null);
+                WithdrawQuantity prev = quantities.stream().filter(q -> q.isNoted == option.isNoted() && q.id == (option.isNoted() ? option.getId() - 1 : option.getId())).findFirst().orElse(null);
+                final Integer[] prevQuantity = {0};
+                quantities.stream().filter(q -> q.getId() == (option.isNoted() ? option.getId() - 1 : option.getId())).forEach(q -> prevQuantity[0] += q.quantity);
 
-                if (previous != null){
-                    if (PBanking.findBankItem(Filters.Items.idEquals(option.getId()).and(pItem -> pItem.getQuantity() >= previous + option.getQuantity())) != null){
-                        quantities.put(option.getId(), previous + option.getQuantity());
+                if (prev != null){
+                    if (PBanking.findBankItem(Filters.Items.idEquals(option.isNoted() ? option.getId() - 1 : option.getId()).and(pItem -> pItem.getQuantity() >= prevQuantity[0] + option.getQuantity())) != null){
+                        prev.setQuantity(prev.getQuantity() + option.getQuantity());
                         continue outer3;
                     }
                 } else {
-                    if (PBanking.findBankItem(Filters.Items.idEquals(option.getId()).and(pItem -> pItem.getQuantity() >= option.getQuantity())) != null){
-                        quantities.put(option.getId(), option.getQuantity());
+                    if (PBanking.findBankItem(Filters.Items.idEquals(option.isNoted() ? option.getId() - 1 : option.getId()).and(pItem -> pItem.getQuantity() >= option.getQuantity())) != null){
+                        quantities.add(new WithdrawQuantity(option.isNoted() ? option.getId() - 1 : option.getId(), option.getQuantity(), option.isNoted()));
                         continue outer3;
                     }
                 }
             }
         }
 
-        for (var invWithdrawPair : quantities.entrySet()){
-            if (!PBanking.withdrawItem(""+ invWithdrawPair.getKey(), invWithdrawPair.getValue())){
-                log.info("Unable to withdraw item id: " + invWithdrawPair.getKey());
-            } else {
-                PUtils.sleepNormal(200, 500, 30, 260);
+        for (WithdrawQuantity withdrawInfo : quantities){
+            if (!PBanking.withdrawItem("" + withdrawInfo.getId(), withdrawInfo.getQuantity(), withdrawInfo.isNoted())){
+                log.info("Unable to withdraw item id: " + withdrawInfo.getId());
+                continue;
             }
+            PUtils.sleepNormal(120, 400, 30, 160);
         }
 
-        PUtils.sendGameMessage("Gearing finished!");
+        PUtils.sendGameMessage("Gear setup finished!");
         requestStop();
     }
 

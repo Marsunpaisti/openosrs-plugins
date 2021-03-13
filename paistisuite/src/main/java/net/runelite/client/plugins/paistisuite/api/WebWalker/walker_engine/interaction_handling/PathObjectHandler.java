@@ -35,7 +35,7 @@ public class PathObjectHandler {
                 "Swing-on", "Climb up", "Ascend", "Descend","Channel","Teleport","Pass-Through","Jump-up","Jump-down","Swing across"};
         sortedBlackListOptionsArr = new String[]{"Chop down"};
         sortedBlackListArr = new String[]{"Coffin", "Drawers"};
-        sortedHighPriorityOptionsArr = new String[]{"Pay-toll(10gp", "Squeeze-past"};
+        sortedHighPriorityOptionsArr = new String[]{"Pay-toll(10gp)", "Squeeze-past"};
     }
 
     private static PathObjectHandler getInstance(){

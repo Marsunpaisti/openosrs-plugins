@@ -9,6 +9,7 @@ import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
 import java.awt.event.KeyEvent;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -149,12 +150,37 @@ public class PBanking {
                 .orElse(null);
     }
 
+    public static boolean isOnWithdrawNoteMode(){
+        return PVars.getVarbit(3958) == 1;
+    }
+
+    public static boolean setWithdrawNoteMode(boolean enable){
+        if (enable == isOnWithdrawNoteMode()) return true;
+
+        if (enable) {
+            Widget w = PWidgets.get(WidgetInfo.BANK_NOTED_BUTTON);
+            return PInteraction.widget(w, "Note");
+        }
+        Widget w = PWidgets.get(WidgetInfo.BANK_UNNOTED_BUTTON);
+        return PInteraction.widget(w, "Item");
+    }
+
     public static boolean withdrawItem(String nameOrId, int quantity){
+        return withdrawItem(nameOrId, quantity, false);
+    }
+
+    public static boolean withdrawItem(String nameOrId, int quantity, boolean asNote){
         if (!isBankOpen()) return false;
-        PItem target = findBankItem(Filters.Items.nameContainsOrIdEquals(nameOrId));
+        PItem target = findBankItem(Filters.Items.nameOrIdEquals(nameOrId));
         if (target == null) return false;
 
         if (target.getQuantity() < quantity) return false;
+
+
+        if (isOnWithdrawNoteMode() != asNote){
+            setWithdrawNoteMode(asNote);
+            PUtils.sleepNormal(700, 1300);
+        }
 
         int tens = (int) Math.floor(quantity / 10);
         int fives = (int) Math.floor((quantity - 10 * tens) / 5);
@@ -167,7 +193,7 @@ public class PBanking {
             Keyboard.typeString(""+quantity);
             PUtils.sleepNormal(250, 600);
             Keyboard.typeKeysInt(KeyEvent.VK_ENTER);
-            PUtils.sleepNormal(250, 600);
+            PUtils.sleepNormal(400, 1200);
         } else {
             for (int i = 0; i < tens; i++){
                 if (!PInteraction.item(target, "Withdraw-10")) return false;

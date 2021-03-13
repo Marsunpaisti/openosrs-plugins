@@ -158,12 +158,12 @@ public class PaistiSuite extends Plugin
 
 	@Subscribe
 	private void onClientTick(ClientTick t) {
-		//clientExecutor.runAllTasks();
+		clientExecutor.runAllTasks();
 	}
 
 	@Subscribe
 	private void onBeforeRender(BeforeRender bf){
-		clientExecutor.runAllTasks();
+		//clientExecutor.runAllTasks();
 	}
 
 	@Subscribe

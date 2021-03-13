@@ -106,12 +106,12 @@ public class PGearSetupElement extends JPanel implements ActionListener {
         if (PUtils.getClient() == null || PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
         HashMap<KitType, GearSetupItemOptions> equipment = new HashMap<KitType, GearSetupItemOptions>();
         PInventory.getEquipmentItems().forEach(i -> {
-            equipment.put(i.kitType, new GearSetupItemOptions(i.getId(), i.getQuantity()));
+            equipment.put(i.kitType, new GearSetupItemOptions(i.getId(), i.getQuantity(), i.isNoted()));
         });
 
         ArrayList<GearSetupItemOptions> inventory = new ArrayList<GearSetupItemOptions>();
         PInventory.getAllItems().forEach(i -> {
-            inventory.add(new GearSetupItemOptions(i.getId(), i.getQuantity()));
+            inventory.add(new GearSetupItemOptions(i.getId(), i.getQuantity(), i.isNoted()));
         });
 
         this.data.setEquipment(equipment);

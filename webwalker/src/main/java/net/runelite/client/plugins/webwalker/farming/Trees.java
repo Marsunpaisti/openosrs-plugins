@@ -16,7 +16,7 @@ public enum Trees
 	FARMING_GUILD("Farming Guild", new WorldPoint(1249, 3719, 0)),
 	GNOME_STRONGHOLD("Gnome Stronghold", new WorldPoint(2437, 3418, 0)),
 	LUMBRIDGE("Lumbridge", new WorldPoint(3195, 3230, 0)),
-	TAVERLEY("Taverley", new WorldPoint(2936, 3450, 0)),
+	TAVERLEY("Taverley", new WorldPoint(2932, 3441, 0)),
 	VARROCK("Varrock", new WorldPoint(3227, 3457, 0));
 
 	private final String name;

@@ -52,7 +52,7 @@ public class PGearSetupEditView extends JPanel {
             if (slotItem != null){
                 slotElements.put(k, new PGearSetupItemElement(plugin, mainPanel, slotItem, k));
             } else {
-                slotElements.put(k, new PGearSetupItemElement(plugin, mainPanel, new GearSetupItemOptions(-1, -1), k));
+                slotElements.put(k, new PGearSetupItemElement(plugin, mainPanel, new GearSetupItemOptions(-1, -1, false), k));
             }
         }
 
@@ -82,7 +82,8 @@ public class PGearSetupEditView extends JPanel {
             if (i < data.getInventory().size()) {
                 inventoryView.add(new PGearSetupItemElement(plugin, mainPanel, data.getInventory().get(i)));
             } else {
-                inventoryView.add(new PGearSetupItemElement(plugin, mainPanel, new GearSetupItemOptions(-1, -1)));
+                data.getInventory().add(new GearSetupItemOptions(-1, -1, false));
+                inventoryView.add(new PGearSetupItemElement(plugin, mainPanel, data.getInventory().get(i)));
             }
         }
 

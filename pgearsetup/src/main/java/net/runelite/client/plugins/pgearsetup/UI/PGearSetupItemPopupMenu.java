@@ -29,7 +29,7 @@ public class PGearSetupItemPopupMenu extends JPopupMenu {
 
     public void buildPanel(){
         for (GearSetupItem option : itemOptions.getOptions()) {
-            JMenuItem removeButton = new JMenuItem("Remove " + PInventory.getItemDef(option.getId()).getName() + " [" + option.getId() + "]");
+            JMenuItem removeButton = new JMenuItem("Remove " + (option.isNoted() ? "(NOTED) " : "") + PInventory.getItemDef(option.getId()).getName() + " [" + option.getId() + "]");
             removeButton.addActionListener((e) -> {
                 this.itemOptions.setOptions(this.itemOptions.getOptions().stream().filter(i -> i.getId() != option.getId()).collect(Collectors.toCollection(ArrayList::new)));
                 mainPanel.reBuild();
@@ -40,25 +40,23 @@ public class PGearSetupItemPopupMenu extends JPopupMenu {
 
         if (slot != null){
             PItem current = PInventory.findEquipmentItem(itm -> itm.kitType == this.slot);
-            if (current != null){
-                if (this.itemOptions.getOptions().stream().noneMatch(i -> i.getId() == current.getId())) {
-                    JMenuItem addCurrent = new JMenuItem("Add option " + current.getDefinition().getName() + " [" + current.getId() + "]");
-                    addCurrent.addActionListener((e) -> {
-                        this.itemOptions.getOptions().add(new GearSetupItem(current.getId(), current.getQuantity()));
-                        mainPanel.reBuild();
-                        plugin.saveSetups();
-                    });
-                    add(addCurrent);
-                }
+            if (current == null || this.itemOptions.getOptions().stream().noneMatch(i -> i.getId() == current.getId())){
+                JMenuItem addCurrent = new JMenuItem("Add option " + current.getDefinition().getName() + " [" + current.getId() + "]");
+                addCurrent.addActionListener((e) -> {
+                    itemOptions.getOptions().add(new GearSetupItem(current.getId(), current.getQuantity(), current.isNoted()));
+                    mainPanel.reBuild();
+                    plugin.saveSetups();
+                });
+                add(addCurrent);
             }
         }
 
-        if (slot == null && this.itemOptions != null && this.itemOptions.getOptions() != null){
+        if (slot == null) {
             List<PItem> newInvItems = PInventory.findAllItems(itm -> itemOptions.getOptions().stream().noneMatch(opt -> opt.getId() == itm.getId()));
             for (PItem newItem : newInvItems){
-                JMenuItem addNew = new JMenuItem("Add option " + newItem.getDefinition().getName() + " [" + newItem.getId() + "]");
+                JMenuItem addNew = new JMenuItem("Add option " + (newItem.isNoted() ? "(NOTED) " : "") + newItem.getDefinition().getName() + " [" + newItem.getId() + "]");
                 addNew.addActionListener((e) -> {
-                    this.itemOptions.getOptions().add(new GearSetupItem(newItem.getId(), newItem.getQuantity()));
+                    itemOptions.getOptions().add(new GearSetupItem(newItem.getId(), newItem.getQuantity(), newItem.isNoted()));
                     mainPanel.reBuild();
                     plugin.saveSetups();
                 });

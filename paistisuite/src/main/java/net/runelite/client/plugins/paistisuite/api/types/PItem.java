@@ -116,6 +116,10 @@ public class PItem {
         return -1;
     }
 
+    public boolean isNoted() {
+        return getDefinition() != null && getDefinition().getNote() != -1;
+    }
+
     public int getQuantity(){
         if (this.widgetItem != null) return widgetItem.getQuantity();
         if (this.item != null) return item.getQuantity();
