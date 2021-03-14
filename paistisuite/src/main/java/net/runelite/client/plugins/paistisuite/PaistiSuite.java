@@ -91,6 +91,7 @@ public class PaistiSuite extends Plugin
 	@Override
 	protected void startUp() {
 		//addSidePanel();
+		client.setHideDisconnect(true);
 		updateDaxCredProvider();
 		instance = this;
 		if (clientExecutor != null) clientExecutor.clearAllTasks();
@@ -153,6 +154,7 @@ public class PaistiSuite extends Plugin
 
 	@Override
 	protected void shutDown() {
+		client.setHideDisconnect(false);
 		if (clientExecutor != null) clientExecutor.clearAllTasks();
 	}
 

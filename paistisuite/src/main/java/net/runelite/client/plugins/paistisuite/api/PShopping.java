@@ -2,12 +2,17 @@ package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWidgets;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +43,25 @@ public class PShopping {
         if (parent == null) return false;
         PInteraction.widget(parent.getChild(11), "Close");
         return PUtils.waitCondition(1200, () -> !isShopOpen());
+    }
+
+    public static List<PItem> getShopPItems(){
+        return PUtils.clientOnly(() -> {
+            List<PItem> items = new ArrayList<PItem>();
+            if (!isShopOpen()) return items;
+            Widget[] widgets = PWidgets.get(300, 16).getChildren();
+            if (widgets == null) return items;
+            int slot = 1; // Slot 0 is some weird empty widget
+            for (Widget i : widgets){
+                if (i.getName() == null || i.getName().length() == 0) continue;
+                int quantity = i.getItemQuantity();
+                int id = i.getItemId();
+                items.add(PItem.fromShopItem(new Item(id, quantity), slot));
+                slot++;
+            }
+
+            return items;
+        }, "getShopItems");
     }
 
     public static List<ShopItem> getShopItems(){

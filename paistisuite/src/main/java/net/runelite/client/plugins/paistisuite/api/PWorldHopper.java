@@ -2,6 +2,7 @@ package net.runelite.client.plugins.paistisuite.api;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameState;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Keyboard;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import net.runelite.http.api.worlds.WorldType;
@@ -90,7 +91,7 @@ public class PWorldHopper {
         hop(world.getId());
     }
 
-    private static void hop(int worldId)
+    private static boolean hop(int worldId)
     {
         if (PBanking.isBankOpen()) PBanking.closeBank();
         if (PShopping.isShopOpen()) PShopping.closeShop();
@@ -99,7 +100,7 @@ public class PWorldHopper {
         World world = worldResult.findWorld(worldId);
         if (world == null)
         {
-            return;
+            return false;
         }
 
         final net.runelite.api.World rsWorld = PUtils.getClient().createWorld();
@@ -113,7 +114,7 @@ public class PWorldHopper {
         if (PUtils.getClient().getGameState() == GameState.LOGIN_SCREEN)
         {
             PUtils.getClient().changeWorld(rsWorld);
-            return;
+            return true;
         }
         log.info("Hopping to world: " + world.getId());
 
@@ -127,17 +128,25 @@ public class PWorldHopper {
             } else {
                 log.info("Failed to open world hopper!");
             }
-            PUtils.sleepNormal(700, 1200);
+            PUtils.sleepNormal(650, 800);
         }
 
+        int worldBefore = PUtils.getClient().getWorld();
         PUtils.clientOnly(() -> {
             PUtils.getClient().hopToWorld(rsWorld);
             return null;
         }, "hopToWorld");
 
-        PUtils.sleepNormal(900, 1800);
-        PUtils.waitCondition(1900, () -> PUtils.getClient().getGameState() == GameState.LOGGED_IN);
-        PUtils.sleepNormal(900, 1800);
+        PUtils.sleepNormal(600, 800);
+        if (!PUtils.waitCondition(1300, () -> PUtils.getClient().getWorld() != worldBefore || PUtils.getClient().getGameState() == GameState.HOPPING)) {
+            return false;
+        }
+        if (PUtils.waitCondition(10000, () -> PUtils.getClient().getWorld() != worldBefore && PUtils.getClient().getGameState() == GameState.LOGGED_IN)){
+            Keyboard.pressSpacebar(); // Do weird activation of input. After worldhop invokeClientActions didnt work?
+            return true;
+        }
+
+        return false;
     }
 
 }

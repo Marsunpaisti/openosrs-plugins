@@ -54,8 +54,9 @@ public class PItem {
         item.ItemComposition = PInventory.getItemDef(shopItem);
         item.slotIndex = slot;
         item.widgetItem = null;
-        if (PWidgets.get(WidgetInfo.SHOP_ITEMS_CONTAINER) != null) item.widget = PWidgets.get(WidgetInfo.SHOP_ITEMS_CONTAINER).getChild(slot);;
+        if (PWidgets.get(WidgetInfo.SHOP_ITEMS_CONTAINER) != null) item.widget = PWidgets.get(300, 16).getChild(slot);;
         item.itemType = PItemType.SHOP;
+
         return item;
     }
 
@@ -194,7 +195,7 @@ public class PItem {
             case BANK:
                 return this.widget != null ? this.widget : PWidgets.get(WidgetInfo.BANK_ITEM_CONTAINER).getChild(slotIndex);
             case SHOP:
-                return this.widget != null ? this.widget : PWidgets.get(WidgetInfo.SHOP_ITEMS_CONTAINER).getChild(slotIndex);
+                return this.widget != null ? this.widget : PWidgets.get(300, 16).getChild(slotIndex);
             default:
                 return null;
     }
@@ -228,7 +229,7 @@ public class PItem {
 
     @Override
     public String toString(){
-        return getName() + " x " + getQuantity() + " Type: " + itemType;
+        return "ID:" + getId() + " Name: " + getName() + " Quantity: " + getQuantity() + " Type: " + itemType + " Slot: " + slotIndex;
     }
 
     @Override
