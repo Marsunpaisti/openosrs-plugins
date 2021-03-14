@@ -29,6 +29,7 @@ include(":paistisuite")
 include(":webwalker")
 include(":aiofighter")
 include(":pgearsetup")
+include(":testscript")
 
 for (project in rootProject.children) {
     project.apply {

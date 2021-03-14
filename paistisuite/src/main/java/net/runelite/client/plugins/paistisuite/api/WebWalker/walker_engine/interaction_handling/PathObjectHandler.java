@@ -48,8 +48,8 @@ public class PathObjectHandler {
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
                 return PObjects.getAllObjects()
                         .stream()
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) < 15)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2D(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Web"))
                         .anyMatch(
                                 pair -> Arrays.stream(pair.getSecond().getActions())
@@ -61,8 +61,8 @@ public class PathObjectHandler {
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
                 return PObjects.getAllObjects()
                         .stream()
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) < 15)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2D(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Rockfall"))
                         .anyMatch(
                                 pair -> Arrays.stream(pair.getSecond().getActions())
@@ -75,8 +75,8 @@ public class PathObjectHandler {
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
                 return PObjects.getAllObjects()
                         .stream()
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) < 15)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2D(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Roots"))
                         .anyMatch(
                                 pair -> Arrays.stream(pair.getSecond().getActions())
@@ -89,8 +89,8 @@ public class PathObjectHandler {
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
                 return PObjects.getAllObjects()
                         .stream()
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) < 15)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2D(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Rockslide"))
                         .anyMatch(
                                 pair -> Arrays.stream(pair.getSecond().getActions())
@@ -103,8 +103,8 @@ public class PathObjectHandler {
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
                 return PObjects.getAllObjects()
                         .stream()
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) < 15)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2D(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Root"))
                         .anyMatch(
                                 pair -> Arrays.stream(pair.getSecond().getActions())
@@ -117,8 +117,8 @@ public class PathObjectHandler {
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
                 return PObjects.getAllObjects()
                         .stream()
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) < 15)
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo(destinationDetails.getAssumed().toWorldPoint()) <= 1)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) < 15)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2D(destinationDetails.getAssumed().toWorldPoint()) <= 1)
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Vines"))
                         .anyMatch(
                                 pair -> Arrays.stream(pair.getSecond().getActions())
@@ -141,25 +141,25 @@ public class PathObjectHandler {
         ARDY_DOOR_LOCK_SIDE("Door", "Pick-lock", new WorldPoint(2565, 3356, 0), new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PPlayer.location().getX() >= 2565 && PPlayer.location().distanceTo(new WorldPoint(2565, 3356, 0)) < 3;
+                return PPlayer.location().getX() >= 2565 && PPlayer.location().distanceTo2D(new WorldPoint(2565, 3356, 0)) < 3;
             }
         }),
         ARDY_DOOR_UNLOCKED_SIDE("Door", "Open", new WorldPoint(2565, 3356, 0), new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PPlayer.location().getX() < 2565 && PPlayer.location().distanceTo(new WorldPoint(2565, 3356, 0)) < 3;
+                return PPlayer.location().getX() < 2565 && PPlayer.location().distanceTo2D(new WorldPoint(2565, 3356, 0)) < 3;
             }
         }),
         YANILLE_DOOR_LOCK_SIDE("Door", "Pick-lock", new WorldPoint(2601, 9482, 0), new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PPlayer.location().getY() <= 9481 && PPlayer.location().distanceTo(new WorldPoint(2601, 9482, 0)) < 3;
+                return PPlayer.location().getY() <= 9481 && PPlayer.location().distanceTo2D(new WorldPoint(2601, 9482, 0)) < 3;
             }
         }),
         YANILLE_DOOR_UNLOCKED_SIDE("Door", "Open", new WorldPoint(2601, 9482, 0), new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                return PPlayer.location().getY() > 9481 && PPlayer.location().distanceTo(new WorldPoint(2601, 9482, 0)) < 3;
+                return PPlayer.location().getY() > 9481 && PPlayer.location().distanceTo2D(new WorldPoint(2601, 9482, 0)) < 3;
             }
         }),
         EDGEVILLE_UNDERWALL_TUNNEL("Underwall tunnel", "Climb-into", new WorldPoint(3138, 3516, 0), new SpecialCondition() {
@@ -203,15 +203,15 @@ public class PathObjectHandler {
         FALADOR_COWS_WIDE_GATE("Gate", "Open", null, new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                PTileObject gate = PObjects.findObject(Filters.Objects.idEquals(1561).and(g -> g.getWorldLocation().distanceTo(new WorldPoint(3031, 3314, 0)) < 5));
-                return gate != null && gate.getWorldLocation().distanceTo(destinationDetails.getDestination().getRSTile().toWorldPoint()) < 4;
+                PTileObject gate = PObjects.findObject(Filters.Objects.idEquals(1561).and(g -> g.getWorldLocation().distanceTo2D(new WorldPoint(3031, 3314, 0)) < 5));
+                return gate != null && gate.getWorldLocation().distanceTo2D(destinationDetails.getDestination().getRSTile().toWorldPoint()) < 4;
             }
         }),
         FALADOR_COWS_WIDE_GATE_CLOSE("Gate", "Close", null, new SpecialCondition() {
             @Override
             boolean isSpecialLocation(PathAnalyzer.DestinationDetails destinationDetails) {
-                PTileObject gate = PObjects.findObject(Filters.Objects.idEquals(1563).and(g -> g.getWorldLocation().distanceTo(new WorldPoint(3031, 3314, 0)) < 5));
-                return gate != null && gate.getWorldLocation().distanceTo(destinationDetails.getDestination().getRSTile().toWorldPoint()) < 4;
+                PTileObject gate = PObjects.findObject(Filters.Objects.idEquals(1563).and(g -> g.getWorldLocation().distanceTo2D(new WorldPoint(3031, 3314, 0)) < 5));
+                return gate != null && gate.getWorldLocation().distanceTo2D(destinationDetails.getDestination().getRSTile().toWorldPoint()) < 4;
             }
         });
         private String name, action;
@@ -274,9 +274,9 @@ public class PathObjectHandler {
             Predicate<PTileObject> specialObjectFilter = (PTileObject obj) -> {
                     ObjectComposition def = obj.getSecond();
                     if (def == null) return false;
-                    return def.getName().equals(specialObject.getName()) &&
+                    return def.getName().equalsIgnoreCase(specialObject.getName()) &&
                             Arrays.asList(def.getActions()).contains(specialObject.getAction()) &&
-                            obj.getFirst().getWorldLocation().distanceTo(specialObject.getLocation() != null ? specialObject.getLocation() : destinationDetails.getAssumed().toWorldPoint()) <= 3;
+                            obj.getFirst().getWorldLocation().distanceTo2D(specialObject.getLocation() != null ? specialObject.getLocation() : destinationDetails.getAssumed().toWorldPoint()) <= 3;
             };
             /*
             Filter<GameObject> specialObjectFilter = Filters.Objects.nameEquals(specialObject.getName())
@@ -288,7 +288,7 @@ public class PathObjectHandler {
              */
             interactiveObjects = PObjects.findAllObjects(
                 specialObjectFilter
-                .and(obj -> obj.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 15));
+                .and(obj -> obj.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) <= 25));
         }
 
         if (interactiveObjects.size() == 0) {
@@ -336,7 +336,7 @@ public class PathObjectHandler {
                 case FALADOR_COWS_WIDE_GATE:
                 case FALADOR_COWS_WIDE_GATE_CLOSE:
                     log.info("Handling gate");
-                    PTileObject gateclose = PObjects.findObject(Filters.Objects.nameEquals("Gate").and(g -> g.getWorldLocation().distanceTo(new WorldPoint(3032, 3314, 0)) < 5));
+                    PTileObject gateclose = PObjects.findObject(Filters.Objects.nameEquals("Gate").and(g -> g.getWorldLocation().distanceTo2D(new WorldPoint(3032, 3314, 0)) < 5));
                     if (gateclose == null) {
                         log.info("Unable to find gate!");
                         return false;
@@ -376,7 +376,7 @@ public class PathObjectHandler {
                         } else {
                             useBladeOnWeb(webs.get(0));
                         }
-                        if (webs.get(0).getWorldLocation().distanceTo(PPlayer.location()) <= 1) {
+                        if (webs.get(0).getWorldLocation().distanceTo2D(PPlayer.location()) <= 1) {
                             WaitFor.milliseconds((int)PUtils.randomNormal(50, 800, 250, 150));
                         } else {
                             WaitFor.milliseconds(2000, 4000);
@@ -402,8 +402,8 @@ public class PathObjectHandler {
                         if (!clickOnObject(objDefPair, destinationDetails, specialObject.getAction())){
                             continue;
                         }
-                        if (PPlayer.location().distanceTo(specialObject.getLocation()) > 1){
-                            WaitFor.condition(PUtils.random(3000, 4000), () -> PPlayer.location().distanceTo(specialObject.getLocation()) <= 1 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+                        if (PPlayer.location().distanceTo2D(specialObject.getLocation()) > 1){
+                            WaitFor.condition(PUtils.random(3000, 4000), () -> PPlayer.location().distanceTo2D(specialObject.getLocation()) <= 1 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
                         }
                         if (PPlayer.location().equals(new WorldPoint(2564, 3356, 0))){
                             successfulClick = true;
@@ -447,6 +447,9 @@ public class PathObjectHandler {
                             WaitFor.milliseconds(3500, 6000);
                         }
                     }
+                    break;
+                default:
+
                     break;
             }
         }
@@ -616,7 +619,7 @@ public class PathObjectHandler {
         } else {
             result = InteractionHelper.click(obj, options);
             log.info("Interacting with (" +  obj.getSecond().getName() + ") at " + obj.getFirst().getWorldLocation() + " with options: " + Arrays.toString(options) + " " + (result ? "SUCCESS" : "FAIL"));
-            if ( obj.getWorldLocation().distanceTo(PPlayer.location()) > 1){
+            if ( obj.getWorldLocation().distanceTo2D(PPlayer.location()) > 1){
                 // Wait for movement start
                 WaitFor.condition(PUtils.random(700, 900), () -> PPlayer.isMoving() ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
                 log.info("Movement started");
@@ -707,7 +710,7 @@ public class PathObjectHandler {
                                         .filter(Objects::nonNull)
                                         .anyMatch(a -> a.equalsIgnoreCase("Climb-down"))
                         )
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(object.getWorldLocation()) <= 2)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(object.getWorldLocation()) <= 2)
                         .collect(Collectors.toList());
 
                 if (result.size() > 0){
@@ -724,7 +727,7 @@ public class PathObjectHandler {
                                         .filter(Objects::nonNull)
                                         .anyMatch(a -> a.equalsIgnoreCase("Climb-down"))
                         )
-                        .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(object.getWorldLocation()) <= 2)
+                        .filter(pair -> pair.getFirst().getWorldLocation().distanceTo2DHypotenuse(object.getWorldLocation()) <= 2)
                         .collect(Collectors.toList());
                 return result.size() > 0 && handleTrapDoor(result.get(0));
             }

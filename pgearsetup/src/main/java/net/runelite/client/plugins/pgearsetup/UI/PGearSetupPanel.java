@@ -27,6 +27,7 @@ public class PGearSetupPanel extends PluginPanel implements ItemListener {
     private final PGearSetup plugin;
     private PGearSetupsContainer pGearSetupsContainer;
     private String lastShownCard = null;
+    private JComboBox setupComboBox;
     @Inject
     private PGearSetupPanel(PGearSetup plugin){
         super(false);
@@ -63,7 +64,7 @@ public class PGearSetupPanel extends PluginPanel implements ItemListener {
 
         JPanel content = new JPanel();
 
-        JComboBox setupComboBox = new JComboBox(plugin.gearSetups.stream().map(GearSetupData::getName).toArray());
+        setupComboBox = new JComboBox(plugin.gearSetups.stream().map(GearSetupData::getName).toArray());
         setupComboBox.setPreferredSize(new Dimension(PANEL_WIDTH, 30));
         setupComboBox.addItemListener(this);
         content.add(setupComboBox);
