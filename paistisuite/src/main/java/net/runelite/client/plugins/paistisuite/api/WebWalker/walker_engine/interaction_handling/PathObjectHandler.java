@@ -289,6 +289,7 @@ public class PathObjectHandler {
             interactiveObjects = PObjects.findAllObjects(
                 specialObjectFilter
                 .and(obj -> obj.getFirst().getWorldLocation().distanceTo2DHypotenuse(PPlayer.location()) <= 25));
+            interactiveObjects.sort(Comparator.comparingInt(obj -> obj.getWorldLocation().distanceTo(PPlayer.getWorldLocation())));
         }
 
         if (interactiveObjects.size() == 0) {
@@ -412,22 +413,11 @@ public class PathObjectHandler {
                     }
                     break;
                 case VARROCK_UNDERWALL_TUNNEL:
-                    if(!clickOnObject(objDefPair, destinationDetails, specialObject.getAction())){
-                        return false;
-                    }
-                    successfulClick = true;
-                    WaitFor.condition(10000, () ->
-                            SpecialObject.EDGEVILLE_UNDERWALL_TUNNEL.getLocation().equals(PPlayer.location()) ?
-                                    WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
-                    break;
                 case EDGEVILLE_UNDERWALL_TUNNEL:
                     if(!clickOnObject(objDefPair, destinationDetails, specialObject.getAction())){
                         return false;
                     }
                     successfulClick = true;
-                    WaitFor.condition(10000, () ->
-                            SpecialObject.VARROCK_UNDERWALL_TUNNEL.getLocation().equals(PPlayer.location()) ?
-                                    WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
                     break;
                 case BRINE_RAT_CAVE_BOULDER:
                     NPC boulder = new NPCQuery()
@@ -634,7 +624,9 @@ public class PathObjectHandler {
             }
 
             // Wait a little bit more for any animations to end
-            PUtils.waitCondition((int)PUtils.randomNormal(1900, 2500), () -> Reachable.getMap().canReach(destinationDetails.getAssumed()) && PPlayer.get().getAnimation() == -1);
+            PUtils.waitCondition((int)PUtils.randomNormal(2000, 3000), () -> PPlayer.get().getAnimation() == -1 && Reachable.getMap().canReach(destinationDetails.getAssumed()));
+            log.info("Animation stopped");
+            //PUtils.sleepNormal(600, 800);
         }
 
         return result;
@@ -644,8 +636,6 @@ public class PathObjectHandler {
         List<String> doorNames = Arrays.asList("Gate of War", "Rickety door", "Oozing barrier", "Portal of Death");
         return  doorNames.contains( object.getSecond().getName());
     }
-
-
 
     private static void handleStrongholdQuestions() {
         NPCInteraction.handleConversation("Use the Account Recovery System.",
