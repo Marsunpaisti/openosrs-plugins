@@ -42,6 +42,7 @@ import java.util.*;
 @Slf4j
 @Singleton
 public class PGearSetup extends PScript {
+    private boolean didInitialLoad;
     PGearSetupPanel panel;
     private NavigationButton navButton;
     @Inject
@@ -98,7 +99,11 @@ public class PGearSetup extends PScript {
 
     @Subscribe
     protected void onGameStateChanged(GameStateChanged e){
-        if (e.getGameState() == GameState.LOGGED_IN){
+        if (e.getGameState() == GameState.LOGIN_SCREEN){
+            didInitialLoad = false;
+        }
+        if (e.getGameState() == GameState.LOGGED_IN && !didInitialLoad){
+            didInitialLoad = true;
             rebuildPanel();
         }
     }

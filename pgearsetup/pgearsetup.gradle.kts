@@ -1,4 +1,4 @@
-version = "1.0.2"
+version = "1.0.3"
 
 project.extra["PluginName"] = "PGearSetup"
 project.extra["PluginDescription"] = "Save and withdraw gear & inventory setups automatically."
