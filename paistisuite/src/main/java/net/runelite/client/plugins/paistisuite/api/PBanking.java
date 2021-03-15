@@ -182,30 +182,33 @@ public class PBanking {
             PUtils.sleepNormal(700, 1300);
         }
 
+        // Try to see if we can directly withdraw with custom X option
+        if (PInteraction.item(target, "Withdraw-"+quantity)) return true;
+
         int tens = (int) Math.floor(quantity / 10);
         int fives = (int) Math.floor((quantity - 10 * tens) / 5);
         int ones = (int) Math.floor((quantity - 10 * tens - 5 * fives));
-
         if (ones+tens+fives >= 3) {
+            // If the amount cant easily be made from ones, fives and tens, use Withdraw-X
             if (!PInteraction.item(target, "Withdraw-X")) return false;
             if (!PUtils.waitCondition(PUtils.random(2000, 3000), () -> PWidgets.isSubstantiated(WidgetInfo.CHATBOX_FULL_INPUT))) return false;
-            PUtils.sleepNormal(250, 600);
+            PUtils.sleepNormal(150, 350);
             Keyboard.typeString(""+quantity);
-            PUtils.sleepNormal(250, 600);
+            PUtils.sleepNormal(150, 350);
             Keyboard.typeKeysInt(KeyEvent.VK_ENTER);
-            PUtils.sleepNormal(400, 1200);
+            PUtils.sleepNormal(450, 700);
         } else {
             for (int i = 0; i < tens; i++){
                 if (!PInteraction.item(target, "Withdraw-10")) return false;
-                PUtils.sleepNormal(400, 800);
+                PUtils.sleepNormal(300, 650);
             }
             for (int i = 0; i < fives; i++){
                 if (!PInteraction.item(target, "Withdraw-5")) return false;
-                PUtils.sleepNormal(400, 800);
+                PUtils.sleepNormal(300, 650);
             }
             for (int i = 0; i < ones; i++){
                 if (!PInteraction.item(target, "Withdraw-1")) return false;
-                PUtils.sleepNormal(400, 800);
+                PUtils.sleepNormal(300, 650);
             }
         }
         return true;

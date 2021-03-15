@@ -29,7 +29,7 @@ public class Keyboard
             for (char c : string.toCharArray())
             {
                 pressKey(c);
-                PUtils.sleepNormal(100, 250);
+                PUtils.sleepNormal(50, 150);
             }
         });
     }

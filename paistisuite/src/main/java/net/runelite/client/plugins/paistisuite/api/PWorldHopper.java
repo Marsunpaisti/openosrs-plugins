@@ -54,19 +54,19 @@ public class PWorldHopper {
         return null;
     }
 
-    public static void hop()
+    public static boolean hop()
     {
         WorldResult worldResult = PaistiSuite.getInstance().worldService.getWorlds();
         if (worldResult == null || PUtils.getClient().getGameState() != GameState.LOGGED_IN)
         {
-            return;
+            return false;
         }
 
         World currentWorld = worldResult.findWorld(PUtils.getClient().getWorld());
         log.info("Current world: {}", currentWorld.getLocation());
         if (currentWorld == null)
         {
-            return;
+            return false;
         }
 
         EnumSet<WorldType> currentWorldTypes = currentWorld.getTypes().clone();
@@ -88,7 +88,7 @@ public class PWorldHopper {
         }
         while (world == null || world == currentWorld);
 
-        hop(world.getId());
+        return hop(world.getId());
     }
 
     private static boolean hop(int worldId)
