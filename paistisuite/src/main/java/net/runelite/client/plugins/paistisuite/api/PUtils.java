@@ -172,6 +172,7 @@ public class PUtils {
                 return task.call();
             }
 
+            if (PaistiSuite.getInstance() == null || PaistiSuite.getInstance().clientExecutor == null) return null;
             return PaistiSuite.getInstance().clientExecutor.scheduleAndWait(task, name);
         } catch (Exception e){
             log.error("Exception in " + name);
