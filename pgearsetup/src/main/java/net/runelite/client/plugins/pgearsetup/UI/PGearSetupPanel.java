@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.pgearsetup.UI;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.loottracker.LootTrackerPlugin;
 import net.runelite.client.plugins.pgearsetup.GearSetupData;
 import net.runelite.client.plugins.pgearsetup.PGearSetup;
@@ -18,6 +19,7 @@ import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class PGearSetupPanel extends PluginPanel implements ItemListener {
     final static Color PANEL_BACKGROUND_COLOR = ColorScheme.DARK_GRAY_COLOR;
     final static Color BACKGROUND_COLOR = ColorScheme.DARKER_GRAY_COLOR;
@@ -31,6 +33,7 @@ public class PGearSetupPanel extends PluginPanel implements ItemListener {
     @Inject
     private PGearSetupPanel(PGearSetup plugin){
         super(false);
+        log.info("Creating panel");
         this.plugin = plugin;
         this.setBackground(PANEL_BACKGROUND_COLOR);
         this.setLayout(new BorderLayout());
@@ -38,6 +41,7 @@ public class PGearSetupPanel extends PluginPanel implements ItemListener {
     }
 
     public void reBuild(){
+        log.info("Re-rendering panel");
         this.removeAll();
         this.buildPanel();
 

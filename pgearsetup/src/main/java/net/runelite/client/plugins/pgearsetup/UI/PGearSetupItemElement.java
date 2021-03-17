@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.pgearsetup.UI;
 
+import net.runelite.api.GameState;
 import net.runelite.api.kit.KitType;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.pgearsetup.GearSetupItemOptions;
 import net.runelite.client.plugins.pgearsetup.PGearSetup;
 import net.runelite.client.util.AsyncBufferedImage;

@@ -4,6 +4,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.kit.KitType;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.pgearsetup.GearSetupData;
 import net.runelite.client.plugins.pgearsetup.GearSetupItemOptions;
 import net.runelite.client.plugins.pgearsetup.PGearSetup;
@@ -105,9 +106,15 @@ public class PGearSetupElement extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (PUtils.getClient() == null || PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
         HashMap<KitType, GearSetupItemOptions> equipment = new HashMap<KitType, GearSetupItemOptions>();
-        PInventory.getEquipmentItems().forEach(i -> {
-            equipment.put(i.kitType, new GearSetupItemOptions(i.getId(), i.getQuantity(), i.isNoted()));
-        });
+
+        for (KitType k : KitType.values()){
+            PItem equipped = PInventory.findEquipmentItem(i -> i.kitType == k);
+            if (equipped != null){
+                equipment.put(k, new GearSetupItemOptions(equipped.getId(), equipped.getQuantity(), false));
+            } else {
+                equipment.put(k, new GearSetupItemOptions(-1, -1, false));
+            }
+        }
 
         ArrayList<GearSetupItemOptions> inventory = new ArrayList<GearSetupItemOptions>();
         PInventory.getAllItems().forEach(i -> {

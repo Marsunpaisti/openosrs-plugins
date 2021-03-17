@@ -33,8 +33,4 @@ public class GearSetupItemOptions implements Serializable {
         }
         this.options = options;
     }
-
-    public GearSetupItemOptions(ArrayList<GearSetupItem> options){
-        this.options = options;
-    }
 }

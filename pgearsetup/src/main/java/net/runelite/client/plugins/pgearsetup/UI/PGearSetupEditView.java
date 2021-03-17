@@ -52,7 +52,8 @@ public class PGearSetupEditView extends JPanel {
             if (slotItem != null){
                 slotElements.put(k, new PGearSetupItemElement(plugin, mainPanel, slotItem, k));
             } else {
-                slotElements.put(k, new PGearSetupItemElement(plugin, mainPanel, new GearSetupItemOptions(-1, -1, false), k));
+                data.getEquipment().put(k, new GearSetupItemOptions(-1, -1, false));
+                slotElements.put(k, new PGearSetupItemElement(plugin, mainPanel, data.getEquipment().get(k), k));
             }
         }
 

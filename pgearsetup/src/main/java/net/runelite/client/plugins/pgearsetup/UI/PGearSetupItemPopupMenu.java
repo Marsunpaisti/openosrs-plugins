@@ -49,9 +49,7 @@ public class PGearSetupItemPopupMenu extends JPopupMenu {
                 });
                 add(addCurrent);
             }
-        }
-
-        if (slot == null) {
+        } else {
             List<PItem> newInvItems = PInventory.findAllItems(itm -> itemOptions.getOptions().stream().noneMatch(opt -> opt.getId() == itm.getId()));
             for (PItem newItem : newInvItems){
                 JMenuItem addNew = new JMenuItem("Add option " + (newItem.isNoted() ? "(NOTED) " : "") + newItem.getDefinition().getName() + " [" + newItem.getId() + "]");
