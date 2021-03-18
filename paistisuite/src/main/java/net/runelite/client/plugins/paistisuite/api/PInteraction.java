@@ -173,7 +173,7 @@ public class PInteraction {
             PUtils.getClient().setMouseIdleTicks(0);
             PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
-        }, "interact_useItemOnItem");
+        }, "interact_useSpellOnItem");
     }
 
     private static Boolean equippedItem(PItem item, String ...actions){
@@ -289,7 +289,7 @@ public class PInteraction {
         }, "clickItem");
     }
 
-    public static Boolean useItemOnGameObject(PItem item, PTileObject to){
+    public static Boolean useItemOnTileObject(PItem item, PTileObject to){
         return PUtils.clientOnly(() -> {
             if (item == null || to == null || item.getWidgetItem() == null || to.tileObject == null) return false;
 
@@ -319,7 +319,7 @@ public class PInteraction {
             PUtils.getClient().setMouseIdleTicks(0);
             PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
-        }, "interact_useItemOnItem");
+        }, "interact_useItemOnTileObject");
     }
 
     public static Boolean npc(NPC npc, String... actions) {

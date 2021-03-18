@@ -375,7 +375,7 @@ public class NavigationSpecialCase {
             case ROPE_TO_ROCK:
                 break;
             case FINISHED_ROPE_TO_ROCK:
-                if (PInteraction.useItemOnGameObject(
+                if (PInteraction.useItemOnTileObject(
                         PInventory.findItem(Filters.Items.idEquals(954)),
                         PObjects.findObject(Filters.Objects.actionsContains("Swim to"))
                 )) {
@@ -393,7 +393,7 @@ public class NavigationSpecialCase {
             case WATERFALL_DUNGEON_ENTRANCE:
                 if (WATERFALL_DUNGEON.getRSTile().toWorldPoint().distanceToHypotenuse(PPlayer.location()) < 500){
                     return InteractionHelper.click(PObjects.findObject(Filters.Objects.nameEquals("Door")), new String[]{"Open"}, () -> WATERFALL_DUNGEON_ENTRANCE.getRSTile().toWorldPoint().distanceTo(PPlayer.location()) < 5 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
-                } else if (PInteraction.useItemOnGameObject(
+                } else if (PInteraction.useItemOnTileObject(
                         PInventory.findItem(Filters.Items.idEquals(954)),
                         PObjects.findObject(Filters.Objects.nameContains("Dead tree"))))
                 {
@@ -436,7 +436,7 @@ public class NavigationSpecialCase {
                     if (tunnel != null && walkToObject(tunnel)){
                         String[] actions = tunnel.getSecond().getActions();
                         if (actions != null && !Arrays.stream(actions).filter(Objects::nonNull).anyMatch(s -> s.startsWith("Climb-down"))) {
-                            if (!PInteraction.useItemOnGameObject(PInventory.findItem(Filters.Items.idEquals(954)), PObjects.findObject(Filters.Objects.nameEquals("Tunnel entrance")))) {
+                            if (!PInteraction.useItemOnTileObject(PInventory.findItem(Filters.Items.idEquals(954)), PObjects.findObject(Filters.Objects.nameEquals("Tunnel entrance")))) {
                                 return false;
                             } else {
                                 WaitFor.milliseconds(3000, 6000);

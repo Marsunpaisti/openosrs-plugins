@@ -1,9 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling;
 
-import kotlin.Pair;
 import net.runelite.api.NPC;
-import net.runelite.api.TileObject;
-import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
@@ -57,7 +54,7 @@ public class InteractionHelper {
     }
 
     public static boolean useItemOnObject(PItem item, PTileObject object){
-        return PInteraction.useItemOnGameObject(item, object);
+        return PInteraction.useItemOnTileObject(item, object);
     }
 
 
