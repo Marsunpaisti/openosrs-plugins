@@ -5,9 +5,9 @@ import javax.inject.Singleton;
 
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.TileItem;
 import net.runelite.api.events.*;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
@@ -16,7 +16,6 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.events.PlayerLootReceived;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.ItemStack;
 import net.runelite.client.game.NPCManager;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
@@ -24,19 +23,15 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.paistisuite.api.PGroundItems;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentials;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentialsProvider;
-import net.runelite.client.plugins.paistisuite.api.types.PGroundItem;
 import net.runelite.client.plugins.paistisuite.framework.ClientExecutor;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
-import net.runelite.client.plugins.paistisuite.sidepanel.PaistiSuitePanel;
+import net.runelite.client.plugins.paistisuite.ui.PaistiSuitePanel;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Extension
@@ -50,6 +45,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @Singleton
 public class PaistiSuite extends Plugin
 {
+	public final static String CONFIG_GROUP = "PaistiSuite";
+
 	@Inject
 	private PaistiSuiteConfig config;
 	@Inject
@@ -66,12 +63,13 @@ public class PaistiSuite extends Plugin
 	private ClientToolbar clientToolbar;
 	@Inject
 	protected Injector injector;
+	@Getter
 	@Inject
 	private ConfigManager configManager;
 	@Inject
 	public WorldService worldService;
 
-	private PaistiSuitePanel panel;
+	PaistiSuitePanel panel;
 	private NavigationButton navButton;
 	private static PaistiSuite instance;
 	private static final ReentrantLock daxCredsLock = new ReentrantLock();
@@ -90,7 +88,7 @@ public class PaistiSuite extends Plugin
 
 	@Override
 	protected void startUp() {
-		//addSidePanel();
+		addSidePanel();
 		client.setHideDisconnect(true);
 		updateDaxCredProvider();
 		instance = this;
@@ -181,7 +179,7 @@ public class PaistiSuite extends Plugin
 	}
 
 	private void addSidePanel(){
-		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "nav.png");
+		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(PaistiSuite.class, "logo.png");
 
 		if (injector != null){
 			panel = injector.getInstance(PaistiSuitePanel.class);
