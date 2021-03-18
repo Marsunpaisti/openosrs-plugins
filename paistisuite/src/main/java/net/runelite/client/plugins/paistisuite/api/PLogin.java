@@ -1,18 +1,21 @@
 package net.runelite.client.plugins.paistisuite.api;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameState;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Keyboard;
 
 import java.awt.event.KeyEvent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 public class PLogin {
     private final static ExecutorService loginThread = Executors.newSingleThreadExecutor();
 
-    private boolean handlePostLoginScreen() {
+    private static boolean handlePostLoginScreen() {
         Widget login = PWidgets.get(378, 87);
         if (login == null || !login.getText().equalsIgnoreCase("CLICK HERE TO PLAY")) return false;
 
@@ -26,7 +29,7 @@ public class PLogin {
         return false;
     }
 
-    public boolean login(String user, String pass){
+    public static boolean login(String user, String pass){
         if (PUtils.getClient().getGameState() != GameState.LOGIN_SCREEN) return false;
         if (user == null || pass == null || user.length() == 0 || pass.length() == 0) return false;
 
@@ -48,5 +51,12 @@ public class PLogin {
 
         return handlePostLoginScreen();
     }
+
+    public static boolean login() {
+		ConfigManager configManager = PaistiSuite.getInstance().getConfigManager();
+		String username = configManager.getConfiguration(PaistiSuite.CONFIG_GROUP, "account-username");
+		String password = configManager.getConfiguration(PaistiSuite.CONFIG_GROUP, "account-password");
+		return login(username, password);
+	}
 
 }
