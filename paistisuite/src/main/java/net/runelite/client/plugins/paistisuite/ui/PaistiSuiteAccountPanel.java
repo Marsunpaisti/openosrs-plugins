@@ -5,16 +5,14 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import javax.inject.Inject;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import static net.runelite.client.plugins.paistisuite.ui.PaistiSuitePanel.PANEL_BACKGROUND_COLOR;
 import static net.runelite.client.ui.PluginPanel.PANEL_WIDTH;
+
+import net.runelite.client.plugins.paistisuite.api.PLogin;
 import net.runelite.client.util.DeferredDocumentChangedListener;
 
 public class PaistiSuiteAccountPanel extends JPanel
@@ -80,6 +78,12 @@ public class PaistiSuiteAccountPanel extends JPanel
 
 		contentPanel.add(pinField);
 
+		final JButton loginButton = new JButton();
+		loginButton.setText("Test Login");
+		loginButton.addActionListener((e) -> {
+			PLogin.login();
+		});
+		contentPanel.add(loginButton);
 	}
 
 	private void setupDefaults()
