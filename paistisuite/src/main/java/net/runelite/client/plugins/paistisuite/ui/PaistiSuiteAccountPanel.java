@@ -2,6 +2,7 @@ package net.runelite.client.plugins.paistisuite.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import javax.inject.Inject;
 import javax.swing.BorderFactory;
@@ -25,7 +26,7 @@ public class PaistiSuiteAccountPanel extends JPanel
 	}
 
 	private final ConfigManager configManager;
-	private final JPanel contentPanel = new JPanel(new BorderLayout());
+	private final JPanel contentPanel = new JPanel(new GridLayout(6, 0));
 
 	PaistiSuiteAccountPanel(PaistiSuite suite)
 	{
@@ -41,8 +42,6 @@ public class PaistiSuiteAccountPanel extends JPanel
 
 	private void init()
 	{
-		contentPanel.removeAll();
-
 		contentPanel.setBorder(new EmptyBorder(10, 10, 0, 10));
 
 		contentPanel.add(new JLabel("Username"));
@@ -69,7 +68,7 @@ public class PaistiSuiteAccountPanel extends JPanel
 
 		contentPanel.add(passwordField);
 
-		contentPanel.add(new JLabel("BankPin"));
+		contentPanel.add(new JLabel("Bank Pin"));
 
 		final JPasswordField pinField = new JPasswordField();
 		pinField.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -81,15 +80,13 @@ public class PaistiSuiteAccountPanel extends JPanel
 
 		contentPanel.add(pinField);
 
-		contentPanel.revalidate();
-		contentPanel.repaint();
 	}
 
 	private void setupDefaults()
 	{
 		if (configManager.getConfiguration(PaistiSuite.CONFIG_GROUP, "account-username") == null)
 		{
-			configManager.setConfiguration(PaistiSuite.CONFIG_GROUP, "account-username", "hcpapaosrs+1@gmaisl.com");
+			configManager.setConfiguration(PaistiSuite.CONFIG_GROUP, "account-username", "");
 		}
 
 		if (configManager.getConfiguration(PaistiSuite.CONFIG_GROUP, "account-password") == null)

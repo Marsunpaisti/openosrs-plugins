@@ -88,7 +88,21 @@ public class PaistiSuite extends Plugin
 
 	@Override
 	protected void startUp() {
-		addSidePanel();
+
+		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(PaistiSuite.class, "logo.png");
+
+		if (injector != null){
+			panel = injector.getInstance(PaistiSuitePanel.class);
+			navButton = NavigationButton.builder()
+				.tooltip("PaistiSuite")
+				.icon(icon)
+				.priority(25)
+				.panel(panel)
+				.build();
+
+			clientToolbar.addNavigation(navButton);
+		}
+
 		client.setHideDisconnect(true);
 		updateDaxCredProvider();
 		instance = this;
@@ -154,6 +168,7 @@ public class PaistiSuite extends Plugin
 	protected void shutDown() {
 		client.setHideDisconnect(false);
 		if (clientExecutor != null) clientExecutor.clearAllTasks();
+		clientToolbar.removeNavigation(navButton);
 	}
 
 	@Subscribe
@@ -174,22 +189,7 @@ public class PaistiSuite extends Plugin
 
 	@Subscribe
 	private void onConfigChanged(ConfigChanged event){
-		if (!event.getGroup().equals("PaistiSuite")) return;
+		if (!event.getGroup().equals(PaistiSuite.CONFIG_GROUP)) return;
 		updateDaxCredProvider();
-	}
-
-	private void addSidePanel(){
-		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(PaistiSuite.class, "logo.png");
-
-		if (injector != null){
-			panel = injector.getInstance(PaistiSuitePanel.class);
-			navButton = NavigationButton.builder()
-					.tooltip("PaistiSuite")
-					.icon(icon)
-					.priority(100)
-					.panel(panel)
-					.build();
-			clientToolbar.addNavigation(navButton);
-		}
 	}
 }
