@@ -112,14 +112,14 @@ public class PBanking {
         if (isBankOpen()) return true;
         PTileObject booth = PObjects.findObject(
                 Filters.Objects.actionsContains("Bank")
-                .and(b -> PPlayer.distanceTo(b) <= 20));
+                .and(b -> PPlayer.distanceTo(b) <= 14));
         PTileObject bankChest = PObjects.findObject(
                 Filters.Objects.actionsContains("Use")
                 .and(Filters.Objects.nameEquals("Bank chest"))
-                .and(b -> PPlayer.distanceTo(b) <= 20));
+                .and(b -> PPlayer.distanceTo(b) <= 14));
         NPC banker = PObjects.findNPC(
                 Filters.NPCs.actionsContains("Bank")
-                .and(b -> PPlayer.distanceTo(b) <= 20));
+                .and(b -> PPlayer.distanceTo(b) <= 14));
         boolean didInteract = false;
 
         if (bankChest != null){
