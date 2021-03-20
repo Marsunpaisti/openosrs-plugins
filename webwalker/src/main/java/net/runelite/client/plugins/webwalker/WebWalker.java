@@ -48,7 +48,6 @@ import java.util.List;
 public class WebWalker extends PScript {
     @Inject
     private WebWalkerConfig config;
-    ArrayList<RSTile> path = null;
     RSTile targetLocation = null;
     int nextRunAt = PUtils.random(55, 95);
     private boolean allowTeleports;
@@ -78,12 +77,6 @@ public class WebWalker extends PScript {
 
     @Subscribe
     private void onGameTick(GameTick event){
-        PTileObject logg = PObjects.findObject(Filters.Objects.actionsContains("Cross"));
-        if (logg != null) {
-            //log.info("Found log");
-        } else {
-            //log.info("No log");
-        }
     }
 
     @Subscribe
@@ -185,34 +178,28 @@ public class WebWalker extends PScript {
     @Override
     protected void loop() {
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
+        PlayerDetails details = PlayerDetails.generate();
 
-        synchronized (this){
-            boolean pathNull = path == null;
+        // Im doing it manually to get the path to my local variables, you can just call DaxWalker.walkTo methods too
+        DaxWalker.getInstance().allowTeleports = allowTeleports;
+        java.util.List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<PathRequestPair>();
+        pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), new Point3D(targetLocation)));
+        java.util.List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details,pathRequestPairs));
+        java.util.List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
+        PathResult pathResult = DaxWalker.getInstance().getBestPath(validPaths);
+        if (pathResult == null) {
+            log.warn("No valid path found");
+            PUtils.sendGameMessage("No valid path found");
+            requestStop();
+            return;
         }
 
-        if (path == null){
-            PlayerDetails details = PlayerDetails.generate();
-
-            // Im doing it manually to get the path to my local variables, you can just call DaxWalker.walkTo methods too
-            DaxWalker.getInstance().allowTeleports = allowTeleports;
-            java.util.List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<PathRequestPair>();
-            pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), new Point3D(targetLocation)));
-            java.util.List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details,pathRequestPairs));
-            java.util.List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
-            PathResult pathResult = DaxWalker.getInstance().getBestPath(validPaths);
-            if (pathResult == null) {
-                log.warn("No valid path found");
-                PUtils.sendGameMessage("No valid path found");
-                requestStop();
-                return;
-            }
-
-            synchronized(this){
-                path = pathResult.toRSTilePath();
-            }
+        ArrayList<RSTile> path = pathResult.toRSTilePath();
+        if (WalkerEngine.getInstance().walkPath(path, walkingCondition)) {
+            log.info("Path successfully finished!");
+        } else {
+            log.info("Failed at walking path");
         }
-
-        WalkerEngine.getInstance().walkPath(path, walkingCondition);
         requestStop();
         return;
     }
@@ -248,24 +235,18 @@ public class WebWalker extends PScript {
         overlayManager.add(worldmapOverlay);
         PUtils.sendGameMessage("WebWalker started!");
         DaxWalker.setCredentials(PaistiSuite.getDaxCredentialsProvider());
-        path = null;
     }
 
     @Override
     protected void onStop() {
         overlayManager.remove(overlay);
         overlayManager.remove(worldmapOverlay);
-        if (path != null) {
-            path.clear();
-            path = null;
-        }
         PUtils.sendGameMessage("WebWalker stopped!");
     }
 
     @Subscribe
     private synchronized void onConfigChanged(ConfigChanged event){
         if (!event.getGroup().equalsIgnoreCase("WebWalker")) return;
-        log.info("New val: " + event.getNewValue());
         if (event.getKey().equalsIgnoreCase("category")){
             if (!event.getNewValue().equalsIgnoreCase("FARMING")){
                 configManager.setConfiguration("WebWalker", "catFarming", Farming.NONE);
