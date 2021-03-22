@@ -387,6 +387,30 @@ public class PInteraction {
         }, "interact_npc");
     }
 
+    public static Boolean useItemOnNpc(PItem item, NPC npc) {
+        return PUtils.clientOnly(() -> {
+            if (npc == null || item == null || item.getWidgetItem() == null) return false;
+            if (npc.getTransformedComposition() == null) {
+                log.error("Unable to get transformed def for NPC");
+                return false;
+            }
+            PUtils.getClient().setSelectedItemWidget(WidgetInfo.INVENTORY.getId());
+            PUtils.getClient().setSelectedItemSlot(item.getWidgetItem().getIndex());
+            PUtils.getClient().setSelectedItemID(item.getWidgetItem().getId());
+            PUtils.getClient().invokeMenuAction(
+                    "",
+                    "",
+                    npc.getIndex(),
+                    MenuAction.ITEM_USE_ON_NPC.getId(),
+                    0,
+                    0);
+            PUtils.getClient().setMouseIdleTicks(0);
+            PUtils.getClient().setKeyboardIdleTicks(0);
+            return true;
+
+        }, "interact_use_item_on_npc");
+    }
+
     /***
      * Just sends a regular click on the widgets area
      * @param widget
