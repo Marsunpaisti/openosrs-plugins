@@ -53,6 +53,7 @@ public class PathObjectHandler {
                         .filter(pair -> pair.getSecond().getName().equalsIgnoreCase("Web"))
                         .anyMatch(
                                 pair -> Arrays.stream(pair.getSecond().getActions())
+                                        .filter(Objects::nonNull)
                                         .anyMatch(a -> a.equalsIgnoreCase("Slash")));
             }
         }),
@@ -368,6 +369,7 @@ public class PathObjectHandler {
                             .filter(pair -> pair.getFirst().getWorldLocation().equals(objDefPair.getFirst().getWorldLocation()))
                             .filter(pair -> Arrays.asList(pair.getSecond().getActions())
                                     .stream()
+                                    .filter(Objects::nonNull)
                                     .anyMatch(a -> a.equalsIgnoreCase("Slash")))
                             .collect(Collectors.toList());
                     int iterations = 0;
@@ -386,6 +388,7 @@ public class PathObjectHandler {
                                 .stream()
                                 .filter(pair -> pair.getFirst().getWorldLocation().equals(objDefPair.getFirst().getWorldLocation()))
                                 .filter(pair -> Arrays.stream(pair.getSecond().getActions())
+                                        .filter(Objects::nonNull)
                                         .anyMatch(a -> a.equalsIgnoreCase("Slash")))
                                 .collect(Collectors.toList());
                         if (Reachable.getMap().getParent(destinationDetails.getAssumedX(), destinationDetails.getAssumedY()) != null && (webs == null || webs.size() == 0) ){
