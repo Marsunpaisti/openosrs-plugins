@@ -37,7 +37,6 @@ public class PGearSetupPanel extends PluginPanel implements ItemListener {
         this.plugin = plugin;
         this.setBackground(PANEL_BACKGROUND_COLOR);
         this.setLayout(new BorderLayout());
-        buildPanel();
     }
 
     public void reBuild(){
