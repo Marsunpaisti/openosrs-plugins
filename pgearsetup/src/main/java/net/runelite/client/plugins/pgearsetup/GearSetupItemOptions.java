@@ -19,11 +19,10 @@ public class GearSetupItemOptions implements Serializable {
     public static List<AsyncBufferedImage> getItemImages(PGearSetup plugin, GearSetupItemOptions item){
         if (item.options == null || item.options.size() == 0) return null;
 
-        return PUtils.clientOnly(() -> item.getOptions()
+        return item.getOptions()
                 .stream()
                 .map(option -> plugin.itemManager.getImage(option.getId(), option.getQuantity(), option.getQuantity() > 1))
-                .collect(Collectors.toList())
-                , "getImages");
+                .collect(Collectors.toList());
     }
 
     public GearSetupItemOptions(int id, int quantity, boolean isNoted){

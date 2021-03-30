@@ -110,6 +110,9 @@ public class PGearSetup extends PScript {
 
     public void rebuildPanel(){
         SwingUtilities.invokeLater(() -> panel.reBuild());
+        /*PaistiSuite.getInstance().clientExecutor.schedule(() -> {
+            SwingUtilities.invokeLater(() -> panel.reBuild());
+        }, "rebuildPanel");*/
     }
 
     public void reloadPanel(){
@@ -265,19 +268,11 @@ public class PGearSetup extends PScript {
                 if (!success){
                     log.info("Unable to withdraw item id: " + option.getId());
                 } else {
-                    PUtils.sleepNormal(120, 400, 30, 160);
+                    PUtils.sleepNormal(120, 500, 50, 350);
                     continue outer;
                 }
             }
         }
-
-        /*
-        PBanking.closeBank();
-        if (!PUtils.waitCondition(PUtils.random(1800, 2700), () -> !PBanking.isBankOpen())){
-            PUtils.sendGameMessage("Unable to close bank!");
-            requestStop();
-            return;
-        }*/
 
         PUtils.sleepNormal(300, 700);
         outer2:
@@ -286,7 +281,7 @@ public class PGearSetup extends PScript {
             for (GearSetupItem option : eq.getOptions()){
                 PItem eqItem = PInventory.findItem(Filters.Items.idEquals(option.getId()));
                 if (eqItem == null) eqItem = PInventory.findItem(Filters.Items.nameEquals(PInventory.getItemDef(option.getId()).getName()));
-                if (!PInteraction.item(eqItem, "Wear", "Wield")) {
+                if (!PInteraction.item(eqItem, "Wear", "Wield", "Equip")) {
                     log.info("Unable to equip item id: " + option.getId());
                 } else {
                     PUtils.sleepNormal(120, 400, 30, 160);

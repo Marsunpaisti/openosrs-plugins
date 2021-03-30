@@ -1,6 +1,9 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.letters;
 
 
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.paistisuite.api.PInteraction;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWidgets;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
@@ -56,9 +59,9 @@ public enum FirstLetter {
     public static boolean turnClockwise(int rotations){
         if(rotations == 0)
             return true;
-        RSInterface iface = getClockwise();
+        Widget w = PWidgets.get(WidgetInfo.FAIRY_RING_LEFT_ORB_CLOCKWISE);
         final int value = get();
-        return iface != null && iface.interact()
+        return PInteraction.widget(w, "Rotate clockwise")
                 && WaitFor.condition(2500, () -> get() != value ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS
                 && turnClockwise(--rotations);
     }
@@ -66,16 +69,10 @@ public enum FirstLetter {
     public static boolean turnAntiClockwise(int rotations){
         if(rotations == 0)
             return true;
-        RSInterface iface = getAntiClockwise();
+        Widget w = PWidgets.get(WidgetInfo.FAIRY_RING_LEFT_ORB_COUNTER_CLOCKWISE);
         final int value = get();
-        return iface != null && iface.interact()
+        return PInteraction.widget(w, "Rotate counter-clockwise")
                 && WaitFor.condition(2500, () -> get() != value ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS
                 && turnAntiClockwise(--rotations);
-    }
-    private static RSInterface getClockwise() {
-        return new RSInterface(PWidgets.get(FairyRing.INTERFACE_MASTER, CLOCKWISE_CHILD));
-    }
-    private static RSInterface getAntiClockwise() {
-        return new RSInterface(PWidgets.get(FairyRing.INTERFACE_MASTER, ANTI_CLOCKWISE_CHILD));
     }
 }

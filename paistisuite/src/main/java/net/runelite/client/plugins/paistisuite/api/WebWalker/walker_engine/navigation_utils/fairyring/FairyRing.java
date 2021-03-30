@@ -4,6 +4,8 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navi
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.InteractionHelper;
@@ -36,11 +38,6 @@ public class FairyRing {
     private static TileObject ring;
 
     private static Integer previousWeaponId;
-
-
-    private static RSInterface getTeleportButton() {
-        return new RSInterface(PWidgets.get(INTERFACE_MASTER, TELEPORT_CHILD));
-    }
 
     public static boolean takeFairyRing(Locations location){
         PTileObject ring = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
@@ -82,22 +79,7 @@ public class FairyRing {
         if (location.turnTo() && pressTeleport()
                 && WaitFor.condition(8000, () -> startPos.distanceToHypotenuse(PPlayer.location()) > 20 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS){
             WaitFor.random(900, 1600);
-
-            // Try to equip previous
-            if (previousWeaponId != null){
-                PItem previousWeapon = PInventory.findItem(Filters.Items.idEquals(previousWeaponId));
-                if (PInteraction.item(previousWeapon, "Wield")){
-                    if (!PUtils.waitCondition(PUtils.random(1300, 1900), () -> PInventory.findEquipmentItem(Filters.Items.idEquals(previousWeaponId)) != null)){
-                        // Retry once
-                        if (PInteraction.item(previousWeapon, "Wield")){
-                            PUtils.waitCondition(PUtils.random(1300, 1900), () -> PInventory.findEquipmentItem(Filters.Items.idEquals(previousWeaponId)) != null);
-                        }
-                    } else {
-                        PUtils.sleepNormal(200, 500);
-                    }
-                }
-            }
-
+            tryToEquipPreviousWeapon();
             return true;
         }
 
@@ -113,9 +95,7 @@ public class FairyRing {
                 .stream()
                 .filter(pair -> pair.getSecond().getName().equals("Fairy ring"))
                 .filter(pair -> pair.getFirst().getWorldLocation().distanceToHypotenuse(PPlayer.location()) <= 25)
-                .filter(pair -> Arrays.stream(pair.getSecond().getActions())
-                                    .filter(Objects::nonNull)
-                                    .anyMatch(a -> a.equals(location.toString())))
+                .filter(Filters.Objects.actionsContains("Last-destination (" + location + ")"))
                 .findFirst()
                 .map(PTileObject::getFirst)
                 .orElse(null);
@@ -123,16 +103,37 @@ public class FairyRing {
         return ring != null;
     }
 
+    private static void tryToEquipPreviousWeapon(){
+        if (previousWeaponId != null){
+            PItem previousWeapon = PInventory.findItem(Filters.Items.idEquals(previousWeaponId));
+            if (PInteraction.item(previousWeapon, "Wield")){
+                if (!PUtils.waitCondition(PUtils.random(1300, 1900), () -> PInventory.findEquipmentItem(Filters.Items.idEquals(previousWeaponId)) != null)){
+                    // Retry once
+                    if (PInteraction.item(previousWeapon, "Wield")){
+                        PUtils.waitCondition(PUtils.random(1300, 1900), () -> PInventory.findEquipmentItem(Filters.Items.idEquals(previousWeaponId)) != null);
+                    }
+                } else {
+                    PUtils.sleepNormal(200, 500);
+                }
+            }
+        }
+    }
+
     private static boolean takeLastDestination(Locations location){
         PTileObject ring = PObjects.findObject(Filters.Objects.nameEquals("Fairy ring"));
         final WorldPoint startPos = PPlayer.location();
-        return InteractionHelper.click(ring,"Last-destination (" + location + ")") &&
+        boolean success = InteractionHelper.click(ring,"Last-destination (" + location + ")") &&
                 WaitFor.condition(8000, () -> startPos.distanceToHypotenuse(PPlayer.location()) > 20 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS;
+
+        if (!success) return false;
+        WaitFor.random(1200, 1600);
+        tryToEquipPreviousWeapon();
+        return true;
     }
 
     private static boolean pressTeleport(){
-        RSInterface iface = getTeleportButton();
-        return iface != null && iface.interact();
+        Widget w = PWidgets.get(WidgetInfo.FAIRY_RING_TELEPORT_BUTTON);
+        return PInteraction.widget(w, "Confirm");
     }
 
     private static boolean openFairyRing(){
