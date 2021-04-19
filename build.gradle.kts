@@ -1,3 +1,5 @@
+import ProjectVersions.openosrsVersion
+
 buildscript {
     repositories {
         gradlePluginPortal()
@@ -68,24 +70,30 @@ subprojects {
     apply(plugin = "com.simonharrer.modernizer")
 
     dependencies {
-        annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.18")
-        annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.6.0")
-
-        compileOnly(group = "com.openosrs", name = "http-api", version = ProjectVersions.openosrsVersion)
-        compileOnly(group = "com.openosrs", name = "runelite-api", version = ProjectVersions.openosrsVersion)
-        compileOnly(group = "com.openosrs", name = "runelite-client", version = ProjectVersions.openosrsVersion)
-
-        compileOnly(group = "org.apache.commons", name = "commons-text", version = "1.9")
-        compileOnly(group = "com.google.guava", name = "guava", version = "30.1-jre")
-        compileOnly(group = "com.google.inject", name = "guice", version = "4.2.3", classifier = "no_aop")
-        compileOnly(group = "com.google.code.gson", name = "gson", version = "2.8.6")
-        compileOnly(group = "net.sf.jopt-simple", name = "jopt-simple", version = "5.0.4")
-        compileOnly(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
-        compileOnly(group = "org.projectlombok", name = "lombok", version = "1.18.18")
+        annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
+        annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.4.1")
+        implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
+        implementation(group = "com.google.code.gson", name = "gson", version = "2.8.6")
+        implementation(group = "com.google.guava", name = "guava", version = "29.0-jre")
+        implementation(group = "com.google.inject", name = "guice", version = "4.2.3", classifier = "no_aop")
+        implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.0")
+        implementation(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.6")
+        implementation(group = "net.sf.jopt-simple", name = "jopt-simple", version = "5.0.4")
+        implementation(group = "org.apache.commons", name = "commons-text", version = "1.9")
+        implementation(group = "org.pf4j", name = "pf4j", version = "3.4.1")
+        implementation(group = "org.projectlombok", name = "lombok", version = "1.18.12")
+        implementation(group = "org.pushing-pixels", name = "radiance-substance", version = "2.5.1")
         compileOnly(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.1")
-        compileOnly(group = "org.pf4j", name = "pf4j", version = "3.6.0")
-        compileOnly(group = "io.reactivex.rxjava3", name = "rxjava", version = "3.0.10")
-        compileOnly(group = "org.pushing-pixels", name = "radiance-substance", version = "2.5.1")
+
+        compileOnly("com.openosrs:runelite-api:$openosrsVersion+")
+        compileOnly("com.openosrs.rs:runescape-api:$openosrsVersion+")
+        compileOnly("com.openosrs:runelite-client:$openosrsVersion+")
+        compileOnly("com.openosrs:http-api:$openosrsVersion+")
+
+        compileOnly(Libraries.guice)
+        compileOnly(Libraries.javax)
+        compileOnly(Libraries.lombok)
+        compileOnly(Libraries.pf4j)
     }
 
     checkstyle {

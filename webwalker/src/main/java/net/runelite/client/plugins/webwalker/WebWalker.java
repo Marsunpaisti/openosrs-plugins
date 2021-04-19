@@ -32,7 +32,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Extension
 @PluginDependency(PaistiSuite.class)
@@ -189,7 +191,14 @@ public class WebWalker extends PScript {
         PathResult pathResult = DaxWalker.getInstance().getBestPath(validPaths);
         if (pathResult == null) {
             log.warn("No valid path found");
-            PUtils.sendGameMessage("No valid path found");
+            PUtils.sendGameMessage("No valid path found. Path status list: ");
+            Set<PathStatus> statuses = new HashSet<PathStatus>();
+            for (PathResult r : pathResults){
+                statuses.add(r.getPathStatus());
+            }
+            for (PathStatus r : statuses){
+                PUtils.sendGameMessage(r.toString());
+            }
             requestStop();
             return;
         }
