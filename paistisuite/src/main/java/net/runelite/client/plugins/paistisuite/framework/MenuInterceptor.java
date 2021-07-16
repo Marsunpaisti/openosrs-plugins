@@ -14,7 +14,7 @@ public class MenuInterceptor {
     }
 
     public static void onMenuOptionClicked(MenuOptionClicked event) {
-        log.info("Menu: " + event.getMenuOption()
+        log.debug("Menu: " + event.getMenuOption()
                 + " TAR: " + event.getMenuTarget()
                 + " ID: " + event.getId()
                 + " OP: " + event.getMenuAction()
