@@ -25,7 +25,7 @@ public class NPCInteraction {
 
     private static final WidgetInfo[] ALL_WINDOWS = {
             WidgetInfo.DIALOG_OPTION_OPTION1,
-            WidgetInfo.DIALOG_NPC,
+            WidgetInfo.DIALOG_NPC_HEAD_MODEL,
             WidgetInfo.DIALOG_PLAYER,
             WidgetInfo.DIALOG_SPRITE,
             WidgetInfo.DIALOG_NOTIFICATION_CONTINUE
