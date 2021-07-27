@@ -557,7 +557,7 @@ public class PathObjectHandler {
             }
 
             if (Filters.Objects.actionsContains("Cross").test(obj)){
-                log.info("Test");
+                //log.info("Test");
             }
             if (Filters.Objects.nameEquals(getInstance().sortedBlackListArr).test(obj)) {
                 return false;

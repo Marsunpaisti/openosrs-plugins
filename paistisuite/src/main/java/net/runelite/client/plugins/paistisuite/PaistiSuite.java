@@ -89,7 +89,7 @@ public class PaistiSuite extends Plugin
 	@Override
 	protected void startUp() {
 
-		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(PaistiSuite.class, "logo.png");
+		final BufferedImage icon = ImageUtil.loadImageResource(PaistiSuite.class, "logo.png");
 
 		if (injector != null){
 			panel = injector.getInstance(PaistiSuitePanel.class);

@@ -63,7 +63,7 @@ public class PWalking {
             return false;
         }
 
-        Widget worldmapButton = PUtils.getClient().getWidget(WidgetInfo.WORLD_MAP_BUTTON_BORDER);
+        Widget worldmapButton = PUtils.getClient().getWidget(WidgetInfo.MINIMAP_WORLDMAP_OPTIONS);
         if (worldmapButton != null){
             if (worldmapButton.getBounds() != null) {
                 if (worldmapButton.getBounds().contains(minimapPoint.getX(), minimapPoint.getY())){
