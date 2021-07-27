@@ -6,7 +6,7 @@ project.extra["PluginDescription"] = "Fully configurable all-in-one fighter"
 dependencies {
     annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
     annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.2.0")
-    compileOnly(group = "com.openosrs.externals", name = "paistisuite", version = "+")
+    compileOnly(project(":paistisuite"))
 }
 
 tasks {

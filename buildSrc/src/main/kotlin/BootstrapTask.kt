@@ -38,7 +38,12 @@ open class BootstrapTask : DefaultTask() {
             val bootstrapDir = File("${project.projectDir}")
             val bootstrapReleaseDir = File("${project.projectDir}/release")
 
+            bootstrapReleaseDir.deleteRecursively()
             bootstrapReleaseDir.mkdirs()
+
+            File(bootstrapDir, "plugins.json").printWriter().use { out ->
+                out.println("")
+            }
 
             val plugins = ArrayList<JSONObject>()
             val baseBootstrap = getBootstrap("$bootstrapDir/plugins.json") ?: throw RuntimeException("Base bootstrap is null!")

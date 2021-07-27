@@ -1,4 +1,4 @@
-version = "3.1.2"
+version = "3.2.0"
 
 project.extra["PluginName"] = "WebWalker"
 project.extra["PluginDescription"] = "Walks around with DaxWalker. Special thanks to Manhattan, Illumine and Runemoro."
@@ -6,7 +6,7 @@ project.extra["PluginDescription"] = "Walks around with DaxWalker. Special thank
 dependencies {
     annotationProcessor(group = "org.projectlombok", name = "lombok", version = "1.18.12")
     annotationProcessor(group = "org.pf4j", name = "pf4j", version = "3.2.0")
-    compileOnly(group = "com.openosrs.externals", name = "paistisuite", version = "+")
+    compileOnly(project(":paistisuite"))
 }
 
 tasks {

@@ -24,6 +24,7 @@ import net.runelite.client.plugins.paistisuite.api.PWalking;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -69,25 +70,23 @@ public class WebWalker extends PScript {
     private ConfigManager configManager;
 
     @Provides
-    WebWalkerConfig provideConfig(ConfigManager configManager)
-    {
+    WebWalkerConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(WebWalkerConfig.class);
     }
 
     @Override
-    protected void startUp()
-    {
+    protected void startUp() {
     }
 
     @Subscribe
-    private void onGameTick(GameTick event){
+    private void onGameTick(GameTick event) {
     }
 
     @Subscribe
     public void onMenuEntryAdded(MenuEntryAdded event) {
         final Widget map = PUtils.getClient().getWidget(WidgetInfo.WORLD_MAP_VIEW);
 
-        if (WalkerEngine.getInstance().isNavigating() && event.getOption().contains("Walk here")){
+        if (WalkerEngine.getInstance().isNavigating() && event.getOption().contains("Walk here")) {
             PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan) + " stop walking");
             return;
         }
@@ -101,7 +100,7 @@ public class WebWalker extends PScript {
     }
 
     @Subscribe
-    public void onMenuOpened(MenuOpened event){
+    public void onMenuOpened(MenuOpened event) {
         lastMenuOpenedPoint = PUtils.getClient().getMouseCanvasPosition();
     }
 
@@ -120,7 +119,7 @@ public class WebWalker extends PScript {
             event.consume();
             try {
                 super.start();
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error("Error trying to start WebWalker");
                 e.printStackTrace();
             }
@@ -188,17 +187,17 @@ public class WebWalker extends PScript {
         DaxWalker.getInstance().allowTeleports = allowTeleports;
         java.util.List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
         pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), new Point3D(targetLocation)));
-        java.util.List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details,pathRequestPairs));
+        java.util.List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details, pathRequestPairs));
         java.util.List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
         PathResult pathResult = DaxWalker.getInstance().getBestPath(validPaths);
         if (pathResult == null) {
             log.warn("No valid path found");
             PUtils.sendGameMessage("No valid path found. Path status list: ");
             Set<PathStatus> statuses = new HashSet<PathStatus>();
-            for (PathResult r : pathResults){
+            for (PathResult r : pathResults) {
                 statuses.add(r.getPathStatus());
             }
-            for (PathStatus r : statuses){
+            for (PathStatus r : statuses) {
                 PUtils.sendGameMessage(r.toString());
             }
             requestStop();
@@ -225,14 +224,14 @@ public class WebWalker extends PScript {
         return WalkingCondition.State.CONTINUE_WALKER;
     };
 
-    public void handleRun(){
+    public void handleRun() {
         if (PWalking.isRunEnabled() && config.disableRun()) {
             PWalking.setRunEnabled(false);
             PUtils.sleepNormal(800, 3000, 400, 1200);
             return;
         }
 
-        if (!PWalking.isRunEnabled() && PWalking.getRunEnergy() > nextRunAt && !config.disableRun()){
+        if (!PWalking.isRunEnabled() && PWalking.getRunEnergy() > nextRunAt && !config.disableRun()) {
             nextRunAt = PUtils.random(55, 95);
             PWalking.setRunEnabled(true);
             PUtils.sleepNormal(800, 3000, 400, 1200);
@@ -256,20 +255,18 @@ public class WebWalker extends PScript {
     }
 
     @Subscribe
-    private synchronized void onConfigChanged(ConfigChanged event){
+    private synchronized void onConfigChanged(ConfigChanged event) {
         if (!event.getGroup().equalsIgnoreCase("WebWalker")) return;
-        if (event.getKey().equalsIgnoreCase("category")){
-            if (!event.getNewValue().equalsIgnoreCase("FARMING")){
+        if (event.getKey().equalsIgnoreCase("category")) {
+            if (!event.getNewValue().equalsIgnoreCase("FARMING")) {
                 configManager.setConfiguration("WebWalker", "catFarming", Farming.NONE);
             }
         }
     }
 
     @Subscribe
-    private void onConfigButtonPressed(ConfigButtonClicked configButtonClicked)
-    {
-        if (!configButtonClicked.getGroup().equalsIgnoreCase("WebWalker"))
-        {
+    private void onConfigButtonPressed(ConfigButtonClicked configButtonClicked) {
+        if (!configButtonClicked.getGroup().equalsIgnoreCase("WebWalker")) {
             return;
         }
 
@@ -281,31 +278,29 @@ public class WebWalker extends PScript {
         }
 
 
-        if (configButtonClicked.getKey().equals("startButton"))
-        {
+        if (configButtonClicked.getKey().equals("startButton")) {
             Player player = PUtils.getClient().getLocalPlayer();
-            if (player != null && PUtils.getClient().getGameState() == GameState.LOGGED_IN)
-            {
+            if (player != null && PUtils.getClient().getGameState() == GameState.LOGGED_IN) {
                 try {
                     super.start();
-                } catch (Exception e){
+                } catch (Exception e) {
                     log.error(e.toString());
                 }
             }
-        } else if (configButtonClicked.getKey().equals("stopButton")){
+        } else if (configButtonClicked.getKey().equals("stopButton")) {
             requestStop();
             return;
         }
     }
 
-    private RSTile getConfigTargetLocation(){
-        if (config.category().equals(Category.CUSTOM)){
+    private RSTile getConfigTargetLocation() {
+        if (config.category().equals(Category.CUSTOM)) {
             String[] coordStrings = config.customLocation()
                     .strip()
                     .replaceAll("[^\\d,]", "")
                     .split(",");
 
-            if(coordStrings.length != 3) return null;
+            if (coordStrings.length != 3) return null;
             return new RSTile(
                     Integer.parseInt(coordStrings[0]),
                     Integer.parseInt(coordStrings[1]),
@@ -313,8 +308,7 @@ public class WebWalker extends PScript {
         }
 
 
-        switch (config.category())
-        {
+        switch (config.category()) {
             case BANKS:
                 return new RSTile(config.catBanks().getWorldPoint());
             case BARCRAWL:
@@ -337,12 +331,9 @@ public class WebWalker extends PScript {
     }
 
 
-    private RSTile getFarmLocation()
-    {
-        if (config.category().equals(Category.FARMING))
-        {
-            switch (config.catFarming())
-            {
+    private RSTile getFarmLocation() {
+        if (config.category().equals(Category.FARMING)) {
+            switch (config.catFarming()) {
                 case ALLOTMENTS:
                     return new RSTile(config.catFarmAllotments().getWorldPoint());
                 case BUSHES:

@@ -14,7 +14,7 @@ plugins {
     id("com.simonharrer.modernizer") version "2.1.0-1" apply false
 }
 
-project.extra["GithubUrl"] = "https://github.com/marsunpaisti/plugins-release"
+project.extra["GithubUrl"] = "https://github.com/rokaHakor/openosrs-plugins"
 apply<BootstrapPlugin>()
 apply<VersionPlugin>()
 
@@ -27,9 +27,9 @@ subprojects {
     var subprojectName = name
     group = "com.openosrs.externals"
 
-    project.extra["PluginProvider"] = "Paisti"
-    project.extra["ProjectUrl"] = "https://github.com/Marsunpaisti/openosrs-plugins"
-    project.extra["ProjectSupportUrl"] = "https://discord.gg/tT8BQQ8J9G"
+    project.extra["PluginProvider"] = "Satoshi Oda"
+    project.extra["ProjectUrl"] = "https://github.com/rokaHakor/openosrs-plugins"
+    project.extra["ProjectSupportUrl"] = "https://discord.gg/qPrKNJvBK5"
     project.extra["PluginLicense"] = "3-Clause BSD License"
 
     repositories {
@@ -126,23 +126,14 @@ subprojects {
             options.encoding = "UTF-8"
         }
 
-        withType<Jar> {
-            doLast {
-                copy {
-                    from("./build/libs/")
-                    into("../release/")
-                }
-
-                val externalManagerDirectory: String = project.findProperty("externalManagerDirectory")?.toString() ?: System.getProperty("user.home") + "/.openosrs/plugins"
-                val releaseToExternalModules: List<String> = project.findProperty("releaseToExternalmanager")?.toString()?.split(",") ?: emptyList()
-                if (releaseToExternalModules.contains(subprojectName) || releaseToExternalModules.contains("all")) {
-                    copy {
-                        from("./build/libs/")
-                        into(externalManagerDirectory)
-                    }
-                }
-            }
-        }
+//        withType<Jar> {
+//            doLast {
+//                copy {
+//                    from("./build/libs/")
+//                    into("../release/")
+//                }
+//            }
+//        }
 
         withType<AbstractArchiveTask> {
             isPreserveFileTimestamps = false
