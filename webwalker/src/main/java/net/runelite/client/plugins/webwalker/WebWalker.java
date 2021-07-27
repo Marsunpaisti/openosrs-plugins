@@ -1,8 +1,11 @@
 package net.runelite.client.plugins.webwalker;
+
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.GameState;
+import net.runelite.api.Player;
 import net.runelite.api.Point;
+import net.runelite.api.RenderOverview;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.widgets.Widget;
@@ -14,16 +17,15 @@ import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.paistisuite.PScript;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
-import net.runelite.client.plugins.paistisuite.api.*;
+import net.runelite.client.plugins.paistisuite.api.PMenu;
+import net.runelite.client.plugins.paistisuite.api.PPlayer;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.PWalking;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
-import net.runelite.client.plugins.paistisuite.api.types.Filters;
-import net.runelite.client.plugins.paistisuite.api.types.PItem;
-import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 import org.pf4j.Extension;
@@ -33,9 +35,9 @@ import javax.inject.Singleton;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings({"ConstantConditions", "UnnecessaryReturnStatement"})
 @Extension
 @PluginDependency(PaistiSuite.class)
 @PluginDescriptor(
@@ -145,7 +147,7 @@ public class WebWalker extends PScript {
             return null;
         }
 
-        Float pixelsPerTile = ro.getWorldMapZoom();
+        float pixelsPerTile = ro.getWorldMapZoom();
 
         Widget map = PUtils.getClient().getWidget(WidgetInfo.WORLD_MAP_VIEW);
         if (map != null) {
@@ -184,7 +186,7 @@ public class WebWalker extends PScript {
 
         // Im doing it manually to get the path to my local variables, you can just call DaxWalker.walkTo methods too
         DaxWalker.getInstance().allowTeleports = allowTeleports;
-        java.util.List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<PathRequestPair>();
+        java.util.List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
         pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), new Point3D(targetLocation)));
         java.util.List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details,pathRequestPairs));
         java.util.List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
