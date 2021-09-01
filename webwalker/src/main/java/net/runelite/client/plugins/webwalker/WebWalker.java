@@ -24,7 +24,6 @@ import net.runelite.client.plugins.paistisuite.api.PWalking;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.ui.overlay.OverlayManager;
