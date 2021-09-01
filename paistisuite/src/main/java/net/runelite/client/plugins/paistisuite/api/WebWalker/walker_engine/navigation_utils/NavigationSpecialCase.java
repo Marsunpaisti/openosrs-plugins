@@ -70,6 +70,8 @@ public class NavigationSpecialCase {
         SPIRIT_TREE_STRONGHOLD (2461, 3444, 0),
         SPIRIT_TREE_KHAZARD (2555, 3259, 0),
         SPIRIT_TREE_VILLAGE (2542, 3170, 0),
+        SPIRIT_TREE_BRIMHAVEN (2800, 3204, 0),
+        SPIRIT_TREE_GUILD(1252,3752,0),
 
         GNOME_TREE_GLIDER (GnomeGlider.Location.TA_QUIR_PRIW.getX(), GnomeGlider.Location.TA_QUIR_PRIW.getY(), GnomeGlider.Location.TA_QUIR_PRIW.getZ()),
         AL_KHARID_GLIDER (
@@ -346,6 +348,8 @@ public class NavigationSpecialCase {
             case SPIRIT_TREE_STRONGHOLD: return SpiritTree.to(SpiritTree.Location.SPIRIT_TREE_STRONGHOLD);
             case SPIRIT_TREE_KHAZARD: return SpiritTree.to(SpiritTree.Location.SPIRIT_TREE_KHAZARD);
             case SPIRIT_TREE_VILLAGE: return SpiritTree.to(SpiritTree.Location.SPIRIT_TREE_VILLAGE);
+            case SPIRIT_TREE_BRIMHAVEN: return SpiritTree.to(SpiritTree.Location.SPIRIT_TREE_BRIMHAVEN);
+            case SPIRIT_TREE_GUILD: return SpiritTree.to(SpiritTree.Location.SPIRIT_TREE_GUILD);
 
             case GNOME_TREE_GLIDER: return GnomeGlider.to(GnomeGlider.Location.TA_QUIR_PRIW);
             case AL_KHARID_GLIDER: return GnomeGlider.to(GnomeGlider.Location.KAR_HEWO);

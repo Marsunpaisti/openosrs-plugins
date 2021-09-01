@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports;
 
 
+import net.runelite.api.util.Text;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.teleport_utils.TeleportConstants;
@@ -368,7 +369,7 @@ public enum Teleport {
     XERICS_LOOKOUT(
             35, new RSTile(1575, 3531, 0),
             () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.XERICS_TALISMAN_FILTER),
-            () -> teleportWithScrollInterface(WearableItemTeleport.XERICS_TALISMAN_FILTER, ".*Xeric's Look-out")
+            () -> teleportWithScrollInterface(WearableItemTeleport.XERICS_TALISMAN_FILTER, ".*Xeric's Lookout")
     ),
 
     WEST_ARDOUGNE_TELEPORT_TAB(
@@ -662,7 +663,7 @@ public enum Teleport {
         for(RSInterface child : children){
             String txt = child.getText();
             if(txt != null && txt.matches(regex)){
-                Keyboard.typeString(txt.substring(0,1));
+                Keyboard.typeString(Text.removeTags(txt).substring(0,1));
                 return true;
             }
         }

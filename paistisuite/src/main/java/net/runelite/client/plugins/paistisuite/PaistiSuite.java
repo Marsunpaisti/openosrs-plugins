@@ -1,8 +1,5 @@
 package net.runelite.client.plugins.paistisuite;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import lombok.Getter;
@@ -23,6 +20,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.paistisuite.api.PGroundItems;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentials;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.DaxCredentialsProvider;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTreeManager;
 import net.runelite.client.plugins.paistisuite.framework.ClientExecutor;
 import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.client.plugins.paistisuite.ui.PaistiSuitePanel;
@@ -31,6 +29,8 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import org.pf4j.Extension;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -68,6 +68,8 @@ public class PaistiSuite extends Plugin
 	private ConfigManager configManager;
 	@Inject
 	public WorldService worldService;
+	@Inject
+	private SpiritTreeManager spiritTreeManager;
 
 	PaistiSuitePanel panel;
 	private NavigationButton navButton;
@@ -164,6 +166,12 @@ public class PaistiSuite extends Plugin
 		PGroundItems.onGameStateChanged(event);
 	}
 
+    @Subscribe
+    private void onWidgetLoaded(WidgetLoaded event) {
+        int groupId = event.getGroupId();
+		spiritTreeManager.checkTrees(groupId);
+    }
+
 	@Override
 	protected void shutDown() {
 		client.setHideDisconnect(false);
@@ -191,5 +199,9 @@ public class PaistiSuite extends Plugin
 	private void onConfigChanged(ConfigChanged event){
 		if (!event.getGroup().equals(PaistiSuite.CONFIG_GROUP)) return;
 		updateDaxCredProvider();
+
+		if (spiritTreeManager.getActiveSpiritTrees().isEmpty() && event.getKey().equals(PaistiSuiteConfig.SPIRIT_TREES)) {
+			spiritTreeManager.loadSpiritTrees();
+		}
 	}
 }
