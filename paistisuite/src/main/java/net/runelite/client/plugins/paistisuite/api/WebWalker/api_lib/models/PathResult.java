@@ -16,11 +16,13 @@ public class PathResult {
 
     private int cost;
 
-    private PathResult () {
-
+    private PathResult() {
+        this.pathStatus = PathStatus.SUCCESS;
+        this.path = new ArrayList<>();
+        this.cost = 0;
     }
 
-    public PathResult (PathStatus pathStatus) {
+    public PathResult(PathStatus pathStatus) {
         this.pathStatus = pathStatus;
     }
 
@@ -46,12 +48,42 @@ public class PathResult {
         this.path = path;
     }
 
+    public void addPathPoint(Point3D point) {
+        path.add(point);
+    }
+
+    public Point3D getFirstPoint() {
+        return path.get(0);
+    }
+
+    public Point3D getLastPoint() {
+        if (path.size() == 0) {
+            return null;
+        }
+        return path.get(path.size() - 1);
+    }
+
     public int getCost() {
         return cost;
     }
 
     public void setCost(int cost) {
         this.cost = cost;
+    }
+
+    public PathResult addPath(PathResult secondPath) {
+        PathResult newPath = new PathResult();
+
+        for (Point3D point : path) {
+            newPath.addPathPoint(point);
+        }
+
+        for (Point3D point : secondPath.getPath()) {
+            newPath.addPathPoint(point);
+        }
+        newPath.setCost(this.getCost() + secondPath.getCost());
+
+        return newPath;
     }
 
     public ArrayList<RSTile> toRSTilePath() {
@@ -80,8 +112,16 @@ public class PathResult {
         return Objects.hash(pathStatus, path, cost);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (Point3D point : path) {
+            builder.append(point);
+        }
+        return builder.toString();
+    }
+
     public static PathResult fromJson(JsonElement jsonObject) {
         return new Gson().fromJson(jsonObject, PathResult.class);
     }
-
 }

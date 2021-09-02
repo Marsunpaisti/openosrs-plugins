@@ -5,6 +5,7 @@ import net.runelite.client.plugins.paistisuite.api.PObjects;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWidgets;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Point3D;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.InteractionHelper;
@@ -24,21 +25,29 @@ public class SpiritTree {
         SPIRIT_TREE_STRONGHOLD("Gnome Stronghold", 2461, 3444, 0),
         SPIRIT_TREE_KHAZARD("Battlefield of Khazard", 2555, 3259, 0),
         SPIRIT_TREE_VILLAGE("Tree Gnome Village", 2542, 3170, 0),
+        SPIRIT_TREE_FELDIP("Feldip Hills", 2486, 2849, 0),
+        SPIRIT_TREE_PRIFDDINAS("Prifddinas", 3274, 6123, 0),
+        SPIRIT_TREE_SARIM("Port Sarim", 3059, 3256, 0),
+        SPIRIT_TREE_ETCETERIA("Etceteria", 2611, 3857, 0),
         SPIRIT_TREE_BRIMHAVEN("Brimhaven", 2800, 3204, 0),
+        SPIRIT_TREE_HOSIDIUS("Hosidius", 1692, 3540, 0),
         SPIRIT_TREE_GUILD("Farming Guild", 1252, 3752, 0);
 
         private int x, y, z;
         private String name;
-        Location(String name, int x, int y, int z){
+
+        Location(String name, int x, int y, int z) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.name = name;
         }
+
         public String getName() {
             return name;
         }
-        public RSTile getRSTile(){
+
+        public RSTile getRSTile() {
             return new RSTile(x, y, z);
         }
 
@@ -53,9 +62,13 @@ public class SpiritTree {
         public int getZ() {
             return z;
         }
+
+        public Point3D getPoint3D() {
+            return new Point3D(x, y, z);
+        }
     }
 
-    public static boolean to(Location location){
+    public static boolean to(Location location) {
         PTileObject tree = PObjects.findObject(Filters.Objects.nameEquals("Spirit tree").and(Filters.Objects.actionsContains("Travel")));
         if (tree == null) return false;
 
@@ -65,28 +78,27 @@ public class SpiritTree {
         }
 
 
-        
         RSInterface option = InterfaceHelper.getAllChildren(187, 3)
                 .stream()
                 .filter(rsInterface -> {
                     String text = rsInterface.getText();
                     return (text != null && text.contains(location.getName()));
-                 })
+                })
                 .findFirst()
                 .orElse(null);
 
 
-        if (option == null){
+        if (option == null) {
             log.info("Option null");
             return false;
         }
 
-        if (!option.interact()){
+        if (!option.interact()) {
             log.info("Failed to click option");
             return false;
         }
 
-        if (WaitFor.condition(PUtils.random(5400, 6500), () -> location.getRSTile().toWorldPoint().distanceToHypotenuse(PPlayer.location()) < 10 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS){
+        if (WaitFor.condition(PUtils.random(5400, 6500), () -> location.getRSTile().toWorldPoint().distanceToHypotenuse(PPlayer.location()) < 10 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS) {
             WaitFor.milliseconds(1200, 3000);
             return true;
         }

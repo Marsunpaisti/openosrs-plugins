@@ -71,6 +71,7 @@ public class NPCInteraction {
         NPC npc = new NPCQuery().filter(rsnpcFilter).result(PUtils.getClient()).nearestTo(PPlayer.get());
         if (npc == null) {
             log.info("Cannot find NPC.");
+            return false;
         }
 
         return InteractionHelper.click(npc, options);

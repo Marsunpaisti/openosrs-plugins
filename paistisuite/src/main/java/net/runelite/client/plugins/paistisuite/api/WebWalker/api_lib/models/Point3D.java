@@ -15,19 +15,19 @@ public class Point3D {
         this.z = z;
     }
 
-    public Point3D(RSTile tile){
+    public Point3D(RSTile tile) {
         this.x = tile.getX();
         this.y = tile.getY();
         this.z = tile.getPlane();
     }
 
-    public Point3D(WorldPoint tile){
+    public Point3D(WorldPoint tile) {
         this.x = tile.getX();
         this.y = tile.getY();
         this.z = tile.getPlane();
     }
 
-    public WorldPoint toWorldPoint(){
+    public WorldPoint toWorldPoint() {
         return new WorldPoint(this.x, this.y, this.z);
     }
 
@@ -45,6 +45,16 @@ public class Point3D {
 
     public JsonElement toJson() {
         return new Gson().toJsonTree(this);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Point3D)) {
+            return false;
+        }
+
+        Point3D point = (Point3D) object;
+        return x == point.getX() && y == point.getY() && z == point.getZ();
     }
 
     @Override

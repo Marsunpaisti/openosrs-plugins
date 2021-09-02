@@ -239,7 +239,7 @@ public enum Teleport {
     GAMES_NECK_CORPOREAL (
             35, new RSTile(2965, 4382, 2),
             () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.GAMES_NECKLACE_FILTER),
-            () -> WearableItemTeleport.teleport(WearableItemTeleport.GAMES_NECKLACE_FILTER, "(?i).*corpreal.*")
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.GAMES_NECKLACE_FILTER, "(?i).*corporeal.*")
     ),
 
     GAMES_NECK_WINTERTODT (
@@ -582,6 +582,7 @@ public enum Teleport {
                 canUse = false;
             }
         }
+        failedAttempts = 0;
         return value;
     }
 

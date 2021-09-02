@@ -5,6 +5,7 @@ import kotlin.Pair;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
 import java.util.Arrays;
@@ -35,7 +36,11 @@ public enum RuneElement {
             return Integer.MAX_VALUE;
         }
         List<PItem> items = PInventory.findAllItems((PItem pair) -> {
-            String name = pair.getSecond().getName().toLowerCase();
+            if(pair.getDefinition().isMembers() && !PUtils.isMembersWorld()){
+                return false;
+            }
+
+            String name = getItemName(pair).toLowerCase();
 
             if (!name.contains("rune")) {
                 return false;
@@ -54,7 +59,11 @@ public enum RuneElement {
 
     private boolean haveStaff() {
         return PInventory.findEquipmentItem((PItem item) -> {
-            String name = item.getDefinition().getName().toLowerCase();
+            if(item.getDefinition().isMembers() && !PUtils.isMembersWorld()){
+                return false;
+            }
+
+            String name = getItemName(item).toLowerCase();
             if (!name.contains("staff")) {
                 return false;
             }
@@ -72,7 +81,7 @@ public enum RuneElement {
      * @return item name. Never null. "null" if no name.
      */
     private static String getItemName(PItem item) {
-        ItemComposition definition = item.getSecond();
+        ItemComposition definition = item.getDefinition();
         String name;
         return definition == null || (name = definition.getName()) == null ? "null" : name;
     }

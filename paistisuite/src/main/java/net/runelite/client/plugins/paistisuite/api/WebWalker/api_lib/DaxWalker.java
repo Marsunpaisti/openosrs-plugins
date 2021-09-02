@@ -9,6 +9,8 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.ShipUtils;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTree;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTreeManager;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 
 import java.util.*;
@@ -20,6 +22,7 @@ public class DaxWalker {
     private static Map<RSTile, Teleport> map;
     private static DaxWalker daxWalker;
     public boolean allowTeleports = false;
+
     public static DaxWalker getInstance() {
         return daxWalker != null ? daxWalker : (daxWalker = new DaxWalker());
     }
@@ -69,21 +72,31 @@ public class DaxWalker {
             return true;
         }
 
-        List<PathRequestPair> pathRequestPairs = getInstance().allowTeleports ? getInstance().getPathTeleports(destination) : new ArrayList<PathRequestPair>();
+        List<PathRequestPair> pathRequestPairs = getInstance().allowTeleports ? getInstance().getPathTeleports(destination) : new ArrayList<>();
 
         pathRequestPairs.add(new PathRequestPair(new Point3D(start), new Point3D(destination)));
 
-	    List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(PlayerDetails.generate(),pathRequestPairs));
+        log.info("Testing");
+        for (SpiritTree.Location location : SpiritTree.Location.values()) {
+            log.info(location.getName());
+            if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
+                log.info("True");
+                pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), new Point3D(destination)));
+                pathRequestPairs.add(new PathRequestPair(new Point3D(start), location.getPoint3D()));
+            }
+        }
 
-	    List<PathResult> validPaths = getInstance().validPaths(pathResults);
+        List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(PlayerDetails.generate(), pathRequestPairs));
 
-	    PathResult pathResult = getInstance().getBestPath(validPaths);
-	    if (pathResult == null) {
+        List<PathResult> validPaths = getInstance().validPaths(pathResults);
+
+        PathResult pathResult = getInstance().getBestPath(validPaths);
+        if (pathResult == null) {
             log.warn("No valid path found");
-		    return false;
-	    }
+            return false;
+        }
 
-	    return WalkerEngine.getInstance().walkPath(pathResult.toRSTilePath(), getGlobalWalkingCondition().combine(walkingCondition));
+        return WalkerEngine.getInstance().walkPath(pathResult.toRSTilePath(), getGlobalWalkingCondition().combine(walkingCondition));
     }
 
     public static boolean walkToBank() {
@@ -104,14 +117,14 @@ public class DaxWalker {
             WaitFor.milliseconds(500, 1200);
         }
 
-        if(bank != null)
-            return walkTo(bank.getPosition());
+        if (bank != null)
+            return walkTo(bank.getPosition(), walkingCondition);
 
         List<BankPathRequestPair> pathRequestPairs = getInstance().getBankPathTeleports();
 
-        pathRequestPairs.add(new BankPathRequestPair(new Point3D(PPlayer.location()),null));
+        pathRequestPairs.add(new BankPathRequestPair(new Point3D(PPlayer.location()), null));
 
-        List<PathResult> pathResults = WebWalkerServerApi.getInstance().getBankPaths(new BulkBankPathRequest(PlayerDetails.generate(),pathRequestPairs));
+        List<PathResult> pathResults = WebWalkerServerApi.getInstance().getBankPaths(new BulkBankPathRequest(PlayerDetails.generate(), pathRequestPairs));
 
         List<PathResult> validPaths = getInstance().validPaths(pathResults);
         PathResult pathResult = getInstance().getBestPath(validPaths);
@@ -137,7 +150,7 @@ public class DaxWalker {
 
     public List<PathResult> validPaths(List<PathResult> list) {
         List<PathResult> result = list.stream().filter(pathResult -> pathResult.getPathStatus() == PathStatus.SUCCESS).collect(
-		        Collectors.toList());
+                Collectors.toList());
         if (!result.isEmpty()) {
             return result;
         }

@@ -26,6 +26,8 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTree;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTreeManager;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
@@ -34,9 +36,8 @@ import org.pf4j.Extension;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 @SuppressWarnings({"ConstantConditions", "UnnecessaryReturnStatement"})
 @Extension
@@ -183,13 +184,75 @@ public class WebWalker extends PScript {
         if (PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
         PlayerDetails details = PlayerDetails.generate();
 
+        Point3D start = new Point3D(PPlayer.location());
+        Point3D destination = new Point3D(targetLocation);
+
+        //log.info("Start: " + start + ", Destination: " + destination);
+
         // Im doing it manually to get the path to my local variables, you can just call DaxWalker.walkTo methods too
         DaxWalker.getInstance().allowTeleports = allowTeleports;
-        java.util.List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
-        pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), new Point3D(targetLocation)));
-        java.util.List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details, pathRequestPairs));
-        java.util.List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
-        PathResult pathResult = DaxWalker.getInstance().getBestPath(validPaths);
+        List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
+        pathRequestPairs.add(new PathRequestPair(start, destination));
+
+        for (SpiritTree.Location location : SpiritTree.Location.values()) {
+            log.info(location.getName());
+            if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
+                log.info("True");
+                pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
+                pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), location.getPoint3D()));
+            }
+        }
+
+        List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details, pathRequestPairs));
+
+        //log.info("Total Paths: " + pathResults.size());
+
+        List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
+
+        //log.info("Valid Paths: " + validPaths.size());
+
+//        for (PathResult path : validPaths) {
+//            log.info(path.toString());
+//        }
+
+        List<PathResult> curatedPaths = new ArrayList<>();
+        List<PathResult> firstPath = new ArrayList<>();
+        List<PathResult> secondPath = new ArrayList<>();
+
+        for (PathResult path : validPaths) {
+            boolean addedPath = false;
+            for (SpiritTree.Location location : SpiritTree.Location.values()) {
+                if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
+                    if (path.getFirstPoint().equals(start) && path.getLastPoint().equals(location.getPoint3D())) {
+                        firstPath.add(path);
+                        addedPath = true;
+                        break;
+                    }
+                    if (path.getFirstPoint().equals(location.getPoint3D()) && path.getLastPoint().equals(destination)) {
+                        secondPath.add(path);
+                        addedPath = true;
+                        break;
+                    }
+                }
+            }
+            if (!addedPath) {
+                //log.info("Adding path1: " + path);
+                curatedPaths.add(path);
+            }
+        }
+
+        for (PathResult first : firstPath) {
+            for (PathResult second : secondPath) {
+                PathResult combinedPath = first.addPath(second);
+                //log.info("Adding path2: " + combinedPath);
+                curatedPaths.add(combinedPath);
+            }
+        }
+
+        //log.info("Curated Paths: " + curatedPaths.size());
+
+        PathResult pathResult = DaxWalker.getInstance().getBestPath(curatedPaths);
+        log.info(pathResult.toString());
         if (pathResult == null) {
             log.warn("No valid path found");
             PUtils.sendGameMessage("No valid path found. Path status list: ");

@@ -2,6 +2,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.mag
 
 
 import net.runelite.client.plugins.paistisuite.api.PInventory;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSVarBit;
 
@@ -73,6 +74,6 @@ public class RunePouch{
     }
 
     private static boolean hasPouch(){
-        return PInventory.findItem(Filters.Items.nameEquals("Rune pouch")) != null;
+        return PInventory.findItem(Filters.Items.nameEquals("Rune pouch")) != null && PUtils.isMembersWorld();
     }
 }

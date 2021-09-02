@@ -105,6 +105,8 @@ public class PaistiSuite extends Plugin
 			clientToolbar.addNavigation(navButton);
 		}
 
+		spiritTreeManager.loadSpiritTrees();
+
 		client.setHideDisconnect(true);
 		updateDaxCredProvider();
 		instance = this;
