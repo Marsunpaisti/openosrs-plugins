@@ -24,6 +24,7 @@ import net.runelite.client.plugins.paistisuite.api.PWalking;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTree;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTreeManager;
@@ -35,8 +36,10 @@ import org.pf4j.Extension;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings({"ConstantConditions", "UnnecessaryReturnStatement"})
 @Extension
