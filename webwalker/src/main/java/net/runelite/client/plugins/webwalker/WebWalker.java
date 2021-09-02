@@ -197,9 +197,9 @@ public class WebWalker extends PScript {
         pathRequestPairs.add(new PathRequestPair(start, destination));
 
         for (SpiritTree.Location location : SpiritTree.Location.values()) {
-            log.info(location.getName());
+            //log.info(location.getName());
             if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
-                log.info("True");
+                //log.info("True");
                 pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
                 pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), location.getPoint3D()));
             }

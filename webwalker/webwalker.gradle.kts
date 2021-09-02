@@ -1,4 +1,4 @@
-version = "3.3.0"
+version = "3.3.1"
 
 project.extra["PluginName"] = "WebWalker"
 project.extra["PluginDescription"] = "Walks around with DaxWalker. Special thanks to Manhattan, Illumine and Runemoro."
