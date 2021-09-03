@@ -16,6 +16,7 @@ public abstract class PScript extends Plugin {
         if (scriptRunner != null) {
             PUtils.sendGameMessage("Script already running!");
             log.error("Trying to start an already running script! Killing old runner");
+            requestStop();
             return;
         }
 
