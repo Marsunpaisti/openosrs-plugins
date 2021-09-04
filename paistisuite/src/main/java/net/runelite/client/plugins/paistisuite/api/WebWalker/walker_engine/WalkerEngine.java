@@ -337,6 +337,7 @@ public class WalkerEngine{
 
     private void failedAttempt(){
         log.info("Failed attempt on action.");
+        attemptsForAction++;
         WaitFor.milliseconds(450 * (attemptsForAction + 1), 850 * (attemptsForAction + 1));
         CollisionDataCollector.generateRealTimeCollision();
     }

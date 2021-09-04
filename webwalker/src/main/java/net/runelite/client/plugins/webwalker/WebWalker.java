@@ -189,12 +189,12 @@ public class WebWalker extends PScript {
         Point3D start = new Point3D(PPlayer.location());
         Point3D destination = new Point3D(targetLocation);
 
-        //log.info("Start: " + start + ", Destination: " + destination);
+        log.info("Start: " + start + ", Destination: " + destination);
 
         // Im doing it manually to get the path to my local variables, you can just call DaxWalker.walkTo methods too
         DaxWalker.getInstance().allowTeleports = allowTeleports;
         List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
-        pathRequestPairs.add(new PathRequestPair(start, destination));
+        pathRequestPairs.add(0, new PathRequestPair(start, destination));
 
         for (SpiritTree.Location location : SpiritTree.Location.values()) {
             //log.info(location.getName());
@@ -208,6 +208,9 @@ public class WebWalker extends PScript {
         List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details, pathRequestPairs));
 
         //log.info("Total Paths: " + pathResults.size());
+        if (pathResults.get(0) != null) {
+            destination = pathResults.get(0).getLastPoint();
+        }
 
         List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
 
