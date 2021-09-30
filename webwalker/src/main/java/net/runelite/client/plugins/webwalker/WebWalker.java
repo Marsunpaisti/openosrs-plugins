@@ -257,7 +257,7 @@ public class WebWalker extends PScript {
         //log.info("Curated Paths: " + curatedPaths.size());
 
         PathResult pathResult = DaxWalker.getInstance().getBestPath(curatedPaths);
-        log.info(pathResult.toString());
+        //log.info(pathResult.toString());
         if (pathResult == null) {
             log.warn("No valid path found");
             PUtils.sendGameMessage("No valid path found. Path status list: ");

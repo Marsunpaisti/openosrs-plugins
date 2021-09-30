@@ -73,7 +73,14 @@ public class NPCInteraction {
             log.info("Cannot find NPC.");
             return false;
         }
-
+        if(npc.getTransformedComposition() == null)
+        {
+            log.info("No transform");
+            return false;
+        }
+        for(String s:npc.getTransformedComposition().getActions()){
+            log.info(s);
+        }
         return InteractionHelper.click(npc, options);
     }
 

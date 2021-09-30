@@ -24,7 +24,7 @@ public class Filters {
         public static Predicate<PTileObject> actionsEquals(String ...actions) {
             return (PTileObject pair) -> Arrays.stream(pair.getSecond().getActions())
                     .filter(java.util.Objects::nonNull)
-                    .allMatch(a -> Arrays.stream(actions)
+                    .anyMatch(a -> Arrays.stream(actions)
                             .filter(java.util.Objects::nonNull)
                             .anyMatch(s -> s.equalsIgnoreCase(a)));
         }
@@ -46,7 +46,7 @@ public class Filters {
             return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
                     .filter(java.util.Objects::nonNull)
                     .map(String::toLowerCase)
-                    .allMatch(a -> Arrays.stream(action).anyMatch(m -> m.equalsIgnoreCase(a)));
+                    .anyMatch(a -> Arrays.stream(action).anyMatch(m -> m.equalsIgnoreCase(a)));
         }
         public static Predicate<NPC> actionsContains(String ...action) {
             return (NPC npc) -> npc.getTransformedComposition() != null && Arrays.stream(npc.getTransformedComposition().getActions())
