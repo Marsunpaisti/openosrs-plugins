@@ -295,7 +295,7 @@ public class PathObjectHandler {
 
         if (interactiveObjects.size() == 0) {
             log.info("No interactive objects found.");
-            return false;
+            return true;
         }
 
         StringBuilder stringBuilder = new StringBuilder("Sort Order: ");

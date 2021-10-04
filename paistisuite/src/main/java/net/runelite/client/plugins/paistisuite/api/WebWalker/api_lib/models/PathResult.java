@@ -57,7 +57,7 @@ public class PathResult {
     }
 
     public Point3D getLastPoint() {
-        if (path.size() == 0) {
+        if (path == null || path.size() == 0) {
             return null;
         }
         return path.get(path.size() - 1);

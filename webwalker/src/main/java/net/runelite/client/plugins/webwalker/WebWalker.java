@@ -2,14 +2,13 @@ package net.runelite.client.plugins.webwalker;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.GameState;
-import net.runelite.api.Player;
+import net.runelite.api.*;
 import net.runelite.api.Point;
-import net.runelite.api.RenderOverview;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -59,12 +58,19 @@ public class WebWalker extends PScript {
     RSTile targetLocation = null;
     int nextRunAt = PUtils.random(55, 95);
     private boolean allowTeleports;
+    private boolean gnomeVillageComplete;
     private Point lastMenuOpenedPoint;
 
     @Inject
     private OverlayManager overlayManager;
     @Inject
     private WebWalkerOverlay overlay;
+
+    @Inject
+    private Client client;
+
+    @Inject
+    private ClientThread clientThread;
 
     @Inject
     private WebWalkerWorldmapOverlay worldmapOverlay;
@@ -196,19 +202,21 @@ public class WebWalker extends PScript {
         List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
         pathRequestPairs.add(0, new PathRequestPair(start, destination));
 
-        for (SpiritTree.Location location : SpiritTree.Location.values()) {
-            //log.info(location.getName());
-            if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
-                //log.info("True");
-                pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
-                pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), location.getPoint3D()));
+        if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {
+            for (SpiritTree.Location location : SpiritTree.Location.values()) {
+                //log.info(location.getName());
+                if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
+                    //log.info("True");
+                    pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
+                    pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), location.getPoint3D()));
+                }
             }
         }
 
         List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details, pathRequestPairs));
 
         //log.info("Total Paths: " + pathResults.size());
-        if (pathResults.get(0) != null) {
+        if (pathResults.get(0) != null && pathResults.get(0).getPath() != null) {
             destination = pathResults.get(0).getLastPoint();
         }
 
@@ -309,6 +317,12 @@ public class WebWalker extends PScript {
 
     @Override
     protected void onStart() {
+        gnomeVillageComplete = false;
+        clientThread.invoke(() -> {
+            // Checking if Tree Gnome Village is complete
+            client.runScript(ScriptID.QUEST_STATUS_GET, 438);
+            gnomeVillageComplete = client.getIntStack()[0] == 2;
+        });
         overlayManager.add(overlay);
         overlayManager.add(worldmapOverlay);
         PUtils.sendGameMessage("WebWalker started!");
