@@ -159,11 +159,11 @@ public class PBanking {
 
         if (enable) {
             //WidgetInfo.BANK_NOTED_BUTTON
-            Widget w = PWidgets.get(12, 25);
+            Widget w = PWidgets.get(12, 24);
             return PInteraction.widget(w, "Note");
         }
         //WidgetInfo.BANK_UNNOTED_BUTTON
-        Widget w = PWidgets.get(12, 23);
+        Widget w = PWidgets.get(12, 22);
         return PInteraction.widget(w, "Item");
     }
 

@@ -47,7 +47,7 @@ import java.util.Set;
         name = "WebWalker",
         enabledByDefault = false,
         description = "Walks around with DaxWalker. Special thanks to Manhattan, Illumine and Runemoro.",
-        tags = {"npcs", "items", "paisti"}
+        tags = {"npcs", "items", "paisti", "satoshi"}
 )
 
 @Slf4j
