@@ -158,10 +158,12 @@ public class PBanking {
         if (enable == isOnWithdrawNoteMode()) return true;
 
         if (enable) {
-            Widget w = PWidgets.get(WidgetInfo.BANK_NOTED_BUTTON);
+            //WidgetInfo.BANK_NOTED_BUTTON
+            Widget w = PWidgets.get(12, 25);
             return PInteraction.widget(w, "Note");
         }
-        Widget w = PWidgets.get(WidgetInfo.BANK_UNNOTED_BUTTON);
+        //WidgetInfo.BANK_UNNOTED_BUTTON
+        Widget w = PWidgets.get(12, 23);
         return PInteraction.widget(w, "Item");
     }
 
