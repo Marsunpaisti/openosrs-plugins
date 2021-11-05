@@ -1,10 +1,10 @@
 package net.runelite.client.plugins.pgearsetup.UI;
 
 import net.runelite.api.GameState;
-import net.runelite.api.kit.KitType;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
+import net.runelite.client.plugins.paistisuite.api.types.PKitType;
 import net.runelite.client.plugins.pgearsetup.GearSetupData;
 import net.runelite.client.plugins.pgearsetup.GearSetupItemOptions;
 import net.runelite.client.plugins.pgearsetup.PGearSetup;
@@ -20,8 +20,8 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static net.runelite.client.plugins.pgearsetup.UI.PGearSetupPanel.*;
-import static net.runelite.client.ui.PluginPanel.PANEL_WIDTH;
+import static net.runelite.client.plugins.pgearsetup.UI.PGearSetupPanel.BACKGROUND_COLOR;
+import static net.runelite.client.plugins.pgearsetup.UI.PGearSetupPanel.PANEL_BACKGROUND_COLOR;
 
 public class PGearSetupElement extends JPanel implements ActionListener {
     PGearSetup plugin;
@@ -29,17 +29,16 @@ public class PGearSetupElement extends JPanel implements ActionListener {
     GearSetupData data;
 
     @Override
-    public Dimension getPreferredSize()
-    {
+    public Dimension getPreferredSize() {
         return new Dimension(PluginPanel.PANEL_WIDTH, super.getPreferredSize().height);
     }
 
-    public void reBuild(){
+    public void reBuild() {
         this.removeAll();
         this.buildPanel();
     }
 
-    public PGearSetupElement(PGearSetup plugin, PGearSetupPanel mainPanel, GearSetupData data){
+    public PGearSetupElement(PGearSetup plugin, PGearSetupPanel mainPanel, GearSetupData data) {
         this.plugin = plugin;
         this.data = data;
         this.mainPanel = mainPanel;
@@ -51,7 +50,7 @@ public class PGearSetupElement extends JPanel implements ActionListener {
         buildPanel();
     }
 
-    private void buildPanel(){
+    private void buildPanel() {
         JTextField name = new JTextField(this.data.getName());
         name.setHorizontalAlignment(JTextField.CENTER);
         name.setPreferredSize(new Dimension(200, 20));
@@ -63,7 +62,7 @@ public class PGearSetupElement extends JPanel implements ActionListener {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     data.setName(name.getText());
                     plugin.saveSetups();
                     mainPanel.reBuild();
@@ -105,11 +104,11 @@ public class PGearSetupElement extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (PUtils.getClient() == null || PUtils.getClient().getGameState() != GameState.LOGGED_IN) return;
-        HashMap<KitType, GearSetupItemOptions> equipment = new HashMap<KitType, GearSetupItemOptions>();
+        HashMap<PKitType, GearSetupItemOptions> equipment = new HashMap<PKitType, GearSetupItemOptions>();
 
-        for (KitType k : KitType.values()){
+        for (PKitType k : PKitType.values()) {
             PItem equipped = PInventory.findEquipmentItem(i -> i.kitType == k);
-            if (equipped != null){
+            if (equipped != null) {
                 equipment.put(k, new GearSetupItemOptions(equipped.getId(), equipped.getQuantity(), false));
             } else {
                 equipment.put(k, new GearSetupItemOptions(-1, -1, false));

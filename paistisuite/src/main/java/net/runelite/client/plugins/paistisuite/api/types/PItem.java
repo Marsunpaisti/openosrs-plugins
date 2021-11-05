@@ -46,7 +46,7 @@ public class PItem {
     private String equipmentSlotName;
     private int slotIndex;
     public PItemType itemType;
-    public KitType kitType;
+    public PKitType kitType;
 
     public static PItem fromShopItem(Item shopItem, int slot){
         PItem item = new PItem(null);
@@ -76,7 +76,7 @@ public class PItem {
         item.itemType = PItemType.EQUIPMENT;
         item.item = equipmentItem;
         item.ItemComposition = PInventory.getItemDef(equipmentItem);
-        item.kitType = KitType.values()[slot];
+        item.kitType = PKitType.values()[slot];
         item.equipmentSlotName = item.kitType.getName();
         item.widget = PWidgets.get(slotToWidget[slot]);
         item.slotIndex = slot;

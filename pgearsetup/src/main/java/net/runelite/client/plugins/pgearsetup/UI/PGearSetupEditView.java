@@ -1,9 +1,9 @@
 package net.runelite.client.plugins.pgearsetup.UI;
 
-import net.runelite.api.kit.KitType;
 import net.runelite.client.plugins.pgearsetup.GearSetupData;
 import net.runelite.client.plugins.pgearsetup.GearSetupItemOptions;
 import net.runelite.client.plugins.pgearsetup.PGearSetup;
+import net.runelite.client.plugins.paistisuite.api.types.PKitType;
 import net.runelite.client.ui.PluginPanel;
 
 import javax.swing.*;
@@ -45,9 +45,9 @@ public class PGearSetupEditView extends JPanel {
         equipmentView.setPreferredSize(new Dimension(PANEL_WIDTH, 210));
         equipmentView.setSize(new Dimension(PANEL_WIDTH, 210));
 
-        HashMap<KitType, PGearSetupItemElement> slotElements = new HashMap<>();
-        for (KitType k : KitType.values()){
-            if (k == KitType.HAIR || k == KitType.JAW) continue;
+        HashMap<PKitType, PGearSetupItemElement> slotElements = new HashMap<>();
+        for (PKitType k : PKitType.values()){
+            if (k == PKitType.HAIR || k == PKitType.JAW) continue;
             GearSetupItemOptions slotItem = this.data.getEquipment().getOrDefault(k, null);
             if (slotItem != null){
                 slotElements.put(k, new PGearSetupItemElement(plugin, mainPanel, slotItem, k));
@@ -61,21 +61,21 @@ public class PGearSetupEditView extends JPanel {
             equipmentView.add(slot);
         }
 
-        slotElements.get(KitType.HEAD).setBounds((equipmentView.getWidth()/2) - 21, 5, 36, 36);
+        slotElements.get(PKitType.HEAD).setBounds((equipmentView.getWidth()/2) - 21, 5, 36, 36);
 
-        slotElements.get(KitType.AMULET).setBounds((equipmentView.getWidth()/2) - 21, 5 + 40, 36, 36);
-        slotElements.get(KitType.CAPE).setBounds((equipmentView.getWidth()/2) - 21 - 40, 5 + 40, 36, 36);
-        slotElements.get(KitType.AMMUNITION).setBounds((equipmentView.getWidth()/2) - 21 + 40, 5 + 40, 36, 36);
+        slotElements.get(PKitType.AMULET).setBounds((equipmentView.getWidth()/2) - 21, 5 + 40, 36, 36);
+        slotElements.get(PKitType.CAPE).setBounds((equipmentView.getWidth()/2) - 21 - 40, 5 + 40, 36, 36);
+        slotElements.get(PKitType.AMMUNITION).setBounds((equipmentView.getWidth()/2) - 21 + 40, 5 + 40, 36, 36);
 
-        slotElements.get(KitType.TORSO).setBounds((equipmentView.getWidth()/2) - 21, 5 + 40*2, 36, 36);
-        slotElements.get(KitType.WEAPON).setBounds((equipmentView.getWidth()/2) - 21 - 55, 5 + 40*2, 36, 36);
-        slotElements.get(KitType.SHIELD).setBounds((equipmentView.getWidth()/2) - 21 + 55, 5 + 40*2, 36, 36);
+        slotElements.get(PKitType.TORSO).setBounds((equipmentView.getWidth()/2) - 21, 5 + 40*2, 36, 36);
+        slotElements.get(PKitType.WEAPON).setBounds((equipmentView.getWidth()/2) - 21 - 55, 5 + 40*2, 36, 36);
+        slotElements.get(PKitType.SHIELD).setBounds((equipmentView.getWidth()/2) - 21 + 55, 5 + 40*2, 36, 36);
 
-        slotElements.get(KitType.LEGS).setBounds((equipmentView.getWidth()/2) - 21, 5 + 40*3, 36, 36);
+        slotElements.get(PKitType.LEGS).setBounds((equipmentView.getWidth()/2) - 21, 5 + 40*3, 36, 36);
 
-        slotElements.get(KitType.BOOTS).setBounds((equipmentView.getWidth()/2) - 21, 5 + 40*4, 36, 36);
-        slotElements.get(KitType.HANDS).setBounds((equipmentView.getWidth()/2) - 21 - 55, 5 + 40*4, 36, 36);
-        slotElements.get(KitType.RING).setBounds((equipmentView.getWidth()/2) - 21 + 55, 5 + 40*4, 36, 36);
+        slotElements.get(PKitType.BOOTS).setBounds((equipmentView.getWidth()/2) - 21, 5 + 40*4, 36, 36);
+        slotElements.get(PKitType.HANDS).setBounds((equipmentView.getWidth()/2) - 21 - 55, 5 + 40*4, 36, 36);
+        slotElements.get(PKitType.RING).setBounds((equipmentView.getWidth()/2) - 21 + 55, 5 + 40*4, 36, 36);
 
         JPanel inventoryView = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
         inventoryView.setPreferredSize(new Dimension(PANEL_WIDTH, 320));

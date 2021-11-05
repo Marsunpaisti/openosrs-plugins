@@ -2,7 +2,7 @@ package net.runelite.client.plugins.pgearsetup;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.kit.KitType;
+import net.runelite.client.plugins.paistisuite.api.types.PKitType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,13 +15,13 @@ public class GearSetupData implements Serializable {
 
     @Getter
     @Setter
-    HashMap<KitType, GearSetupItemOptions> equipment;
+    HashMap<PKitType, GearSetupItemOptions> equipment;
 
     @Getter
     @Setter
     ArrayList<GearSetupItemOptions> inventory;
 
-    public GearSetupData(String name, HashMap<KitType, GearSetupItemOptions> equipment, ArrayList<GearSetupItemOptions> inventory){
+    public GearSetupData(String name, HashMap<PKitType, GearSetupItemOptions> equipment, ArrayList<GearSetupItemOptions> inventory){
         this.name = name;
         if (equipment == null) {
             this.equipment = new HashMap<>();

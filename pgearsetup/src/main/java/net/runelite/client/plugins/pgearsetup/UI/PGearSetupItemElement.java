@@ -1,10 +1,8 @@
 package net.runelite.client.plugins.pgearsetup.UI;
 
-import net.runelite.api.GameState;
-import net.runelite.api.kit.KitType;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.pgearsetup.GearSetupItemOptions;
 import net.runelite.client.plugins.pgearsetup.PGearSetup;
+import net.runelite.client.plugins.paistisuite.api.types.PKitType;
 import net.runelite.client.util.AsyncBufferedImage;
 import net.runelite.client.util.ImageUtil;
 
@@ -16,27 +14,25 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
 
-import static net.runelite.client.plugins.pgearsetup.UI.PGearSetupPanel.*;
-
 public class PGearSetupItemElement extends JPanel {
-    final static HashMap<KitType, BufferedImage> bgImages = new HashMap<KitType, BufferedImage>(){{
-        put(KitType.AMULET, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "amulet.png"));
-        put(KitType.AMMUNITION, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "ammo.png"));
-        put(KitType.TORSO, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "body.png"));
-        put(KitType.BOOTS, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "boots.png"));
-        put(KitType.CAPE, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "cape.png"));
-        put(KitType.HANDS, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "gloves.png"));
-        put(KitType.HEAD, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "head.png"));
-        put(KitType.LEGS, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "legs.png"));
-        put(KitType.RING, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "ring.png"));
-        put(KitType.WEAPON, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "weapon.png"));
-        put(KitType.SHIELD, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "shield.png"));
+    final static HashMap<PKitType, BufferedImage> bgImages = new HashMap<PKitType, BufferedImage>(){{
+        put(PKitType.AMULET, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "amulet.png"));
+        put(PKitType.AMMUNITION, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "ammo.png"));
+        put(PKitType.TORSO, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "body.png"));
+        put(PKitType.BOOTS, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "boots.png"));
+        put(PKitType.CAPE, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "cape.png"));
+        put(PKitType.HANDS, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "gloves.png"));
+        put(PKitType.HEAD, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "head.png"));
+        put(PKitType.LEGS, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "legs.png"));
+        put(PKitType.RING, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "ring.png"));
+        put(PKitType.WEAPON, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "weapon.png"));
+        put(PKitType.SHIELD, ImageUtil.getResourceStreamFromClass(PGearSetup.class, "shield.png"));
     }};
     final static BufferedImage emptyInventoryBg = ImageUtil.getResourceStreamFromClass(PGearSetup.class, "emptyInventory.png");
     final static BufferedImage emptyEquipmentBg = ImageUtil.getResourceStreamFromClass(PGearSetup.class, "empty.png");
     PGearSetup plugin;
     PGearSetupPanel mainPanel;
-    KitType slot;
+    PKitType slot;
     GearSetupItemOptions item;
     JLabel imageLabel;
     List<AsyncBufferedImage> images;
@@ -99,7 +95,7 @@ public class PGearSetupItemElement extends JPanel {
         startUpdateTimer();
     }
 
-    public PGearSetupItemElement(PGearSetup plugin, PGearSetupPanel mainPanel, GearSetupItemOptions item, KitType slot){
+    public PGearSetupItemElement(PGearSetup plugin, PGearSetupPanel mainPanel, GearSetupItemOptions item, PKitType slot){
         this.plugin = plugin;
         this.slot = slot;
         this.item = item;

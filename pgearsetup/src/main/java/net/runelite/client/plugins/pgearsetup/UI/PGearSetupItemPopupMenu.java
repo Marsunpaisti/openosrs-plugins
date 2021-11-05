@@ -1,13 +1,11 @@
 package net.runelite.client.plugins.pgearsetup.UI;
 
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.kit.KitType;
 import net.runelite.client.plugins.paistisuite.api.PInventory;
-import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.pgearsetup.GearSetupItem;
 import net.runelite.client.plugins.pgearsetup.GearSetupItemOptions;
 import net.runelite.client.plugins.pgearsetup.PGearSetup;
+import net.runelite.client.plugins.paistisuite.api.types.PKitType;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -18,8 +16,8 @@ public class PGearSetupItemPopupMenu extends JPopupMenu {
     PGearSetup plugin;
     PGearSetupPanel mainPanel;
     GearSetupItemOptions itemOptions;
-    KitType slot;
-    public PGearSetupItemPopupMenu(PGearSetup plugin, PGearSetupPanel mainPanel, GearSetupItemOptions itemOptions, KitType slot){
+    PKitType slot;
+    public PGearSetupItemPopupMenu(PGearSetup plugin, PGearSetupPanel mainPanel, GearSetupItemOptions itemOptions, PKitType slot){
         this.plugin = plugin;
         this.mainPanel = mainPanel;
         this.itemOptions = itemOptions;
