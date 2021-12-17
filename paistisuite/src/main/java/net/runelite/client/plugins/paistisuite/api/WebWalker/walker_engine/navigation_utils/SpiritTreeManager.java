@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils;
 
 import com.google.common.base.Strings;
+import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Singleton;
@@ -14,9 +15,11 @@ import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.PaistiSuiteConfig;
 
 import javax.inject.Inject;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("UnstableApiUsage")
 @Slf4j
 @Singleton
 public class SpiritTreeManager {
@@ -34,7 +37,13 @@ public class SpiritTreeManager {
     private Gson gson;
 
     @Getter
-    private static final Map<SpiritTree.Location, Boolean> activeSpiritTrees = new HashMap<>();
+    private static final Map<String, Map<SpiritTree.Location, Boolean>> spiritTreeData = new HashMap<>();
+
+    public static Map<SpiritTree.Location, Boolean> getActiveSpiritTrees(Client client) {
+        return spiritTreeData.getOrDefault(Hashing.sha256()
+                .hashString(client.getUsername(), StandardCharsets.UTF_8)
+                .toString(), new HashMap<>());
+    }
 
     public void checkTrees(int groupId) {
         if (groupId == 187) {
@@ -55,7 +64,12 @@ public class SpiritTreeManager {
                     if (text != null) {
                         for (SpiritTree.Location location : SpiritTree.Location.values()) {
                             if (text.contains(location.getName())) {
-                                activeSpiritTrees.put(location, !text.contains("5f5f5f"));
+                                String userNameHash = Hashing.sha256()
+                                        .hashString(client.getUsername(), StandardCharsets.UTF_8)
+                                        .toString();
+                                Map<SpiritTree.Location, Boolean> currentSpiritTrees = spiritTreeData.getOrDefault(userNameHash, new HashMap<>());
+                                currentSpiritTrees.put(location, !text.contains("5f5f5f"));
+                                spiritTreeData.put(userNameHash, currentSpiritTrees);
                                 break;
                             }
                         }
@@ -71,16 +85,16 @@ public class SpiritTreeManager {
         final String spiritTreeJSON = configManager.getConfiguration(PaistiSuite.CONFIG_GROUP, PaistiSuiteConfig.SPIRIT_TREES);
 
         if (!Strings.isNullOrEmpty(spiritTreeJSON)) {
-            final Map<SpiritTree.Location, Boolean> trees = gson.fromJson(spiritTreeJSON, new TypeToken<HashMap<SpiritTree.Location, Boolean>>() {
+            final Map<String, Map<SpiritTree.Location, Boolean>> trees = gson.fromJson(spiritTreeJSON, new TypeToken<HashMap<String, HashMap<SpiritTree.Location, Boolean>>>() {
             }.getType());
 
-            activeSpiritTrees.clear();
-            activeSpiritTrees.putAll(trees);
+            spiritTreeData.clear();
+            spiritTreeData.putAll(trees);
         }
     }
 
     public void saveSpiritTrees() {
-        final String json = gson.toJson(activeSpiritTrees);
+        final String json = gson.toJson(spiritTreeData);
         configManager.setConfiguration(PaistiSuite.CONFIG_GROUP, PaistiSuiteConfig.SPIRIT_TREES, json);
     }
 }

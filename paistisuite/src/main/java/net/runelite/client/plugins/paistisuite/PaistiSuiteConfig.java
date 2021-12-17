@@ -7,7 +7,7 @@ import net.runelite.client.config.ConfigItem;
 @ConfigGroup(PaistiSuite.CONFIG_GROUP)
 public interface PaistiSuiteConfig extends Config {
 
-    String SPIRIT_TREES = "spirit";
+    String SPIRIT_TREES = "spirittrees";
 
     @ConfigItem(
             keyName = "daxApiKey",

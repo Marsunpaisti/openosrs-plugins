@@ -15,7 +15,7 @@ public class PMenu {
             return;
         }
 
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = new NewMenuEntry();
         entry.setOption(option);
         entry.setTarget(event.getTarget());
         entries.add(0, entry);

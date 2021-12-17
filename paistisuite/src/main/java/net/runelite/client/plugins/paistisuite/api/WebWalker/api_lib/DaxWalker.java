@@ -3,6 +3,7 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.Teleport;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
@@ -79,7 +80,7 @@ public class DaxWalker {
         log.info("Testing");
         for (SpiritTree.Location location : SpiritTree.Location.values()) {
             log.info(location.getName());
-            if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
+            if (SpiritTreeManager.getActiveSpiritTrees(PUtils.getClient()).getOrDefault(location, false)) {
                 log.info("True");
                 pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), new Point3D(destination)));
                 pathRequestPairs.add(new PathRequestPair(new Point3D(start), location.getPoint3D()));

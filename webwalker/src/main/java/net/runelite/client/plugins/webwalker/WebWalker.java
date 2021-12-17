@@ -205,7 +205,7 @@ public class WebWalker extends PScript {
         if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {
             for (SpiritTree.Location location : SpiritTree.Location.values()) {
                 //log.info(location.getName());
-                if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
+                if (SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
                     //log.info("True");
                     pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
                     pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), location.getPoint3D()));
@@ -235,7 +235,7 @@ public class WebWalker extends PScript {
         for (PathResult path : validPaths) {
             boolean addedPath = false;
             for (SpiritTree.Location location : SpiritTree.Location.values()) {
-                if (SpiritTreeManager.getActiveSpiritTrees().getOrDefault(location, false)) {
+                if (SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
                     if (path.getFirstPoint().equals(start) && path.getLastPoint().equals(location.getPoint3D())) {
                         firstPath.add(path);
                         addedPath = true;

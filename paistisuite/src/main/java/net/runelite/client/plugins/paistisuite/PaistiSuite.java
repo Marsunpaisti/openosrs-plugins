@@ -202,7 +202,7 @@ public class PaistiSuite extends Plugin
 		if (!event.getGroup().equals(PaistiSuite.CONFIG_GROUP)) return;
 		updateDaxCredProvider();
 
-		if (spiritTreeManager.getActiveSpiritTrees().isEmpty() && event.getKey().equals(PaistiSuiteConfig.SPIRIT_TREES)) {
+		if (SpiritTreeManager.getActiveSpiritTrees(client).isEmpty() && event.getKey().equals(PaistiSuiteConfig.SPIRIT_TREES)) {
 			spiritTreeManager.loadSpiritTrees();
 		}
 	}

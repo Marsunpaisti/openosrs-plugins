@@ -76,7 +76,7 @@ public class PWalking {
         coordX = localPoint.getSceneX();
         coordY = localPoint.getSceneY();
         PWalking.walkAction = true;
-        MenuInterceptor.setNextEntry(new MenuEntry("Walk here", "", 0, MenuAction.WALK.getId(),
+        MenuInterceptor.setNextEntry(new NewMenuEntry("Walk here", "", 0, MenuAction.WALK.getId(),
                 0, 0, false));
         PMouse.clickPoint(minimapPoint);
         return true;
@@ -92,7 +92,7 @@ public class PWalking {
         coordX = localPoint.getSceneX();
         coordY = localPoint.getSceneY();
         PWalking.walkAction = true;
-        MenuInterceptor.setNextEntry(new MenuEntry("Walk here", "", 0, MenuAction.WALK.getId(),
+        MenuInterceptor.setNextEntry(new NewMenuEntry("Walk here", "", 0, MenuAction.WALK.getId(),
                 0, 0, false));
         Point randPoint = new Point(PUtils.getClient().getCenterX() + PUtils.random(-100, 100), PUtils.getClient().getCenterY() + PUtils.random(-100, 100));
         PMouse.clickPoint(randPoint);
