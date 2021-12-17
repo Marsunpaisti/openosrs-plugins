@@ -102,8 +102,8 @@ public class WebWalker extends PScript {
 
         if (map != null) {
             if (map.getBounds().contains(PUtils.getClient().getMouseCanvasPosition().getX(), PUtils.getClient().getMouseCanvasPosition().getY())) {
-                PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan));
                 PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan) + " Autowalk");
+                PMenu.addEntry(event, ColorUtil.wrapWithColorTag("WebWalker", Color.cyan));
             }
         }
     }

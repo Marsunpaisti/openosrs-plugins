@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api;
 
+import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuEntryAdded;
 
@@ -15,12 +16,11 @@ public class PMenu {
             return;
         }
 
-        MenuEntry entry = new NewMenuEntry();
-        entry.setOption(option);
-        entry.setTarget(event.getTarget());
-        entries.add(0, entry);
-
-        PUtils.getClient().setMenuEntries(entries.toArray(new MenuEntry[0]));
+        PUtils.getClient().createMenuEntry(-1).setOption(option)
+                .setTarget(event.getTarget())
+                .setIdentifier(0)
+                .setParam1(0)
+                .setParam1(0)
+                .setType(MenuAction.RUNELITE);
     }
-
 }
