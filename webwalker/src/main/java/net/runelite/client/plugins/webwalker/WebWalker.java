@@ -2,8 +2,8 @@ package net.runelite.client.plugins.webwalker;
 
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.widgets.Widget;
@@ -53,6 +53,9 @@ import java.util.Set;
 @Slf4j
 @Singleton
 public class WebWalker extends PScript {
+
+    public final static String CONFIG_GROUP = "WebWalker";
+
     @Inject
     private WebWalkerConfig config;
     RSTile targetLocation = null;
@@ -328,6 +331,7 @@ public class WebWalker extends PScript {
         overlayManager.add(worldmapOverlay);
         PUtils.sendGameMessage("WebWalker started!");
         DaxWalker.setCredentials(PaistiSuite.getDaxCredentialsProvider());
+        configManager.setConfiguration(WebWalker.CONFIG_GROUP, WebWalkerConfig.WALKING, true);
     }
 
     @Override
@@ -335,6 +339,7 @@ public class WebWalker extends PScript {
         overlayManager.remove(overlay);
         overlayManager.remove(worldmapOverlay);
         PUtils.sendGameMessage("WebWalker stopped!");
+        configManager.setConfiguration(WebWalker.CONFIG_GROUP, WebWalkerConfig.WALKING, false);
     }
 
     @Subscribe

@@ -318,7 +318,7 @@ public class AIOFighter extends PScript {
 
         if (config.enablePathfind()) filter = filter.and(this::isReachable);
         return filter;
-    };
+    }
 
     private synchronized Predicate<PItem> createValidFoodFilter(){
         return Filters.Items.nameOrIdEquals(foodsToEat);

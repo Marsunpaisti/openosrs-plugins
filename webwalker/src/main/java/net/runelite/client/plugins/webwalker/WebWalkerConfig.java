@@ -3,9 +3,11 @@ package net.runelite.client.plugins.webwalker;
 import net.runelite.client.config.*;
 import net.runelite.client.plugins.webwalker.farming.*;
 
-@ConfigGroup("WebWalker")
+@ConfigGroup(WebWalker.CONFIG_GROUP)
 public interface WebWalkerConfig extends Config
 {
+    String WALKING = "walking";
+
     @ConfigTitle(
             name = "Instructions",
             description = "",
