@@ -59,7 +59,7 @@ public class PInteraction {
             if (to.getFirst() instanceof GameObject){
                 PUtils.getClient().invokeMenuAction(
                         "",
-                        "",
+                        "PaistiSuite",
                         to.getFirst().getId(),
                         finalActionOp.getId(),
                         ((GameObject)to.getFirst()).getSceneMinLocation().getX(),
@@ -67,7 +67,7 @@ public class PInteraction {
             } else {
                 PUtils.getClient().invokeMenuAction(
                         "",
-                        "",
+                        "PaistiSuite",
                         to.getFirst().getId(),
                         finalActionOp.getId(),
                         (to.getFirst()).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
@@ -125,7 +125,7 @@ public class PInteraction {
             MenuAction finalActionOp = actionOp;
             PUtils.getClient().invokeMenuAction(
                     "",
-                    "",
+                    "PaistiSuite",
                     item.getId(),
                     finalActionOp.getId(),
                     item.getLocation().getX() - PUtils.getClient().getBaseX(),
@@ -145,7 +145,7 @@ public class PInteraction {
             PUtils.getClient().setSelectedItemID(item.getWidgetItem().getId());
             PUtils.getClient().invokeMenuAction(
                     "",
-                    "",
+                    "PaistiSuite",
                     target.getWidgetItem().getId(),
                     MenuAction.ITEM_USE_ON_WIDGET_ITEM.getId(),
                     target.getWidgetItem().getIndex(),
@@ -165,7 +165,7 @@ public class PInteraction {
             PUtils.getClient().setSelectedSpellChildIndex(-1);
             PUtils.getClient().invokeMenuAction(
                     "",
-                    "",
+                    "PaistiSuite",
                     target.getWidgetItem().getId(),
                     MenuAction.ITEM_USE_ON_WIDGET.getId(),
                     target.getWidgetItem().getIndex(),
@@ -254,7 +254,7 @@ public class PInteraction {
             MenuAction finalActionOp = actionOp;
             PUtils.getClient().invokeMenuAction(
                     "",
-                    "",
+                    "PaistiSuite",
                     item.getId(),
                     finalActionOp.getId(),
                     item.getWidgetItem().getIndex(),
@@ -299,7 +299,7 @@ public class PInteraction {
                 PUtils.getClient().setSelectedItemID(item.getId());
                 PUtils.getClient().invokeMenuAction(
                         "",
-                        "",
+                        "PaistiSuite",
                         to.getFirst().getId(),
                         MenuAction.ITEM_USE_ON_GAME_OBJECT.getId(),
                         ((GameObject)to.getFirst()).getSceneMinLocation().getX(),
@@ -310,7 +310,7 @@ public class PInteraction {
                 PUtils.getClient().setSelectedItemID(item.getId());
                 PUtils.getClient().invokeMenuAction(
                         "",
-                        "",
+                        "PaistiSuite",
                         to.getFirst().getId(),
                         MenuAction.ITEM_USE_ON_GAME_OBJECT.getId(),
                         (to.getFirst()).getWorldLocation().getX() - PUtils.getClient().getBaseX(),
@@ -375,7 +375,7 @@ public class PInteraction {
 
             PUtils.getClient().invokeMenuAction(
                     "",
-                    "",
+                    "PaistiSuite",
                     npc.getIndex(),
                     finalActionOp.getId(),
                     0,
@@ -399,7 +399,7 @@ public class PInteraction {
             PUtils.getClient().setSelectedItemID(item.getWidgetItem().getId());
             PUtils.getClient().invokeMenuAction(
                     "",
-                    "",
+                    "PaistiSuite",
                     npc.getIndex(),
                     MenuAction.ITEM_USE_ON_NPC.getId(),
                     0,
@@ -465,7 +465,7 @@ public class PInteraction {
             }
             PUtils.getClient().invokeMenuAction(
                     "",
-                    "",
+                    "PaistiSuite",
                     finalActionIndex,
                     finalActionOp.getId(),
                     childIndex,

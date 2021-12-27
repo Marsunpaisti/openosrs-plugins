@@ -88,7 +88,7 @@ public class PUtils {
             int param1 = (PWidgets.get(WidgetInfo.LOGOUT_BUTTON) != null) ? 11927560 : 4522007;
             PUtils.getClient().invokeMenuAction(
                     "",
-                    "",
+                    "PaistiSuite",
                     1,
                     MenuAction.CC_OP.getId(),
                     -1,
