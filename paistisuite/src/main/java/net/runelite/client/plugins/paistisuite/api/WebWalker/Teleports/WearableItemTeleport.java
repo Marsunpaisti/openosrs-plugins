@@ -32,11 +32,13 @@ public class WearableItemTeleport {
     public static final Predicate<PItem> XERICS_TALISMAN_FILTER = Filters.Items.nameEquals("Xeric's talisman");
     public static final Predicate<PItem> RADAS_BLESSING_FILTER = Filters.Items.nameContains("Rada's blessing");
     public static final Predicate<PItem> CRAFTING_CAPE_FILTER = Filters.Items.nameContains("Crafting cape");
+    public static final Predicate<PItem> FARMING_CAPE_FILTER = Filters.Items.nameContains("Farming cape");
     public static final Predicate<PItem> EXPLORERS_RING_FILTER = Filters.Items.nameContains("Explorer's ring");
     public static final Predicate<PItem> QUEST_CAPE_FILTER = Filters.Items.nameContains("Quest point cape");
     public static final Predicate<PItem> ARDOUGNE_CLOAK_FILTER = Filters.Items.nameContains("Ardougne cloak");
     public static final Predicate<PItem> CONSTRUCTION_CAPE_FILTER = Filters.Items.nameContains("Construct. cape");
     public static final Predicate<PItem> SLAYER_RING = Filters.Items.nameContains("Slayer ring");
+    public static final Predicate<PItem> ENCHANTED_LYRE_FILTER = Filters.Items.nameContains("Enchanted lyre");
 
 
     private WearableItemTeleport() {

@@ -201,15 +201,14 @@ public class WebWalker extends PScript {
         log.info("Start: " + start + ", Destination: " + destination);
 
         // Im doing it manually to get the path to my local variables, you can just call DaxWalker.walkTo methods too
-        DaxWalker.getInstance().allowTeleports = allowTeleports;
+        DaxWalker.getInstance().allowTeleports = allowTeleports;//TODO add additional teleports and teleport filtering
         List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
+        log.info("Teleport count: " + pathRequestPairs.size());
         pathRequestPairs.add(0, new PathRequestPair(start, destination));
 
         if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {
             for (SpiritTree.Location location : SpiritTree.Location.values()) {
-                //log.info(location.getName());
                 if (SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
-                    //log.info("True");
                     pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
                     pathRequestPairs.add(new PathRequestPair(new Point3D(PPlayer.location()), location.getPoint3D()));
                 }
@@ -225,8 +224,7 @@ public class WebWalker extends PScript {
 
         List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
 
-        //log.info("Valid Paths: " + validPaths.size());
-
+//        log.info("Valid Paths: " + validPaths.size());
 //        for (PathResult path : validPaths) {
 //            log.info(path.toString());
 //        }

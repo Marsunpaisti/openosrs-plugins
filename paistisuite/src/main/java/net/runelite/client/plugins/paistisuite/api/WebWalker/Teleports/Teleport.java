@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports;
 
 
+import lombok.Getter;
 import net.runelite.api.util.Text;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.*;
@@ -11,7 +12,10 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Requ
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.RSItemHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic.Spell;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.*;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Keyboard;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSVarBit;
 import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.Spells;
@@ -25,502 +29,599 @@ public enum Teleport {
     VARROCK_TELEPORT(
             35, new RSTile(3212, 3424, 0),
             Spell.VARROCK_TELEPORT::canUse,
-            () -> castSpell("Varrock Teleport","Cast")
+            () -> castSpell("Varrock Teleport", "Cast")
     ),
 
     VARROCK_TELEPORT_TAB(
             35, new RSTile(3212, 3424, 0),
-            () -> inMembersWorld() && PInventory.getCount("Varrock teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.VARROCK_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Varrock t.*", "Break")
     ),
 
     VARROCK_TELEPORT_GRAND_EXCHANGE(
             35, new RSTile(3161, 3478, 0),
             () -> Spell.VARROCK_TELEPORT.canUse() && TeleportConstants.isVarrockTeleportAtGE(),
-            () -> castSpell("Varrock Teleport","Grand Exchange")
+            () -> castSpell("Varrock Teleport", "Grand Exchange")
     ),
 
     LUMBRIDGE_TELEPORT(
             35, new RSTile(3225, 3219, 0),
             Spell.LUMBRIDGE_TELEPORT::canUse,
-            () -> castSpell("Lumbridge Teleport","Cast")
+            () -> castSpell("Lumbridge Teleport", "Cast")
     ),
 
     LUMBRIDGE_TELEPORT_TAB(
             35, new RSTile(3225, 3219, 0),
-            () -> inMembersWorld() && PInventory.getCount("Lumbridge teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.LUMBRIDGE_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Lumbridge t.*", "Break")
     ),
 
     FALADOR_TELEPORT(
             35, new RSTile(2966, 3379, 0),
             Spell.FALADOR_TELEPORT::canUse,
-            () -> castSpell("Falador Teleport","Cast")
+            () -> castSpell("Falador Teleport", "Cast")
     ),
 
     FALADOR_TELEPORT_TAB(
             35, new RSTile(2966, 3379, 0),
-            () -> inMembersWorld() && PInventory.getCount("Falador teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.FALADOR_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Falador t.*", "Break")
     ),
 
     CAMELOT_TELEPORT(
             35, new RSTile(2757, 3479, 0),
-            () -> inMembersWorld() && Spell.CAMELOT_TELEPORT.canUse(),
-            () -> castSpell("Camelot Teleport","Cast")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && Spell.CAMELOT_TELEPORT.canUse(),
+            () -> castSpell("Camelot Teleport", "Cast")
 
     ),
 
     CAMELOT_TELEPORT_TAB(
             35, new RSTile(2757, 3479, 0),
-            () -> inMembersWorld() && PInventory.getCount("Camelot teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CAMELOT_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Camelot t.*", "Break")
     ),
 
     SEERS_TELEPORT(
             35, new RSTile(2757, 3479, 0),
-            () -> inMembersWorld() && Spell.CAMELOT_TELEPORT.canUse() && RSVarBit.get(4560).getValue() == 1,
-            () -> castSpell("Camelot Teleport","Seers'")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && Spell.CAMELOT_TELEPORT.canUse() && RSVarBit.get(4560).getValue() == 1,
+            () -> castSpell("Camelot Teleport", "Seers'")
     ),
 
     ARDOUGNE_TELEPORT(
             35, new RSTile(2661, 3300, 0),
-            () -> inMembersWorld() && Spell.ARDOUGNE_TELEPORT.canUse(),
-            () -> castSpell("Ardougne Teleport","Cast")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && Spell.ARDOUGNE_TELEPORT.canUse(),
+            () -> castSpell("Ardougne Teleport", "Cast")
 
     ),
 
     ARDOUGNE_TELEPORT_TAB(
             35, new RSTile(2661, 3300, 0),
-            () -> inMembersWorld() && PInventory.getCount("Ardougne teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.ARDOUGNE_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Ardougne t.*", "Break")
     ),
 
     NARDAH_TELEPORT(
-            35, TeleportScrolls.NARDAH
+            35, TeleportScrolls.NARDAH, HasItems.NARDAH
     ),
     DIGSITE_TELEPORT(
-            35, TeleportScrolls.DIGSITE
+            35, TeleportScrolls.DIGSITE, HasItems.DIGSITE
     ),
     FELDIP_HILLS_TELEPORT(
-            35, TeleportScrolls.FELDIP_HILLS
+            35, TeleportScrolls.FELDIP_HILLS, HasItems.FELDIP_HILLS
     ),
     LUNAR_ISLE_TELEPORT(
-            35, TeleportScrolls.LUNAR_ISLE
+            35, TeleportScrolls.LUNAR_ISLE, HasItems.LUNAR_ISLE
     ),
     MORTTON_TELEPORT(
-            35, TeleportScrolls.MORTTON
+            35, TeleportScrolls.MORTTON, HasItems.MORTTON
     ),
     PEST_CONTROL_TELEPORT(
-            35, TeleportScrolls.PEST_CONTROL
+            35, TeleportScrolls.PEST_CONTROL, HasItems.PEST_CONTROL
     ),
     PISCATORIS_TELEPORT(
-            35, TeleportScrolls.PISCATORIS
+            35, TeleportScrolls.PISCATORIS, HasItems.PISCATORIS
     ),
     TAI_BWO_WANNAI_TELEPORT(
-            35, TeleportScrolls.TAI_BWO_WANNAI
+            35, TeleportScrolls.TAI_BWO_WANNAI, HasItems.TAI_BWO_WANNAI
     ),
     ELF_CAMP_TELEPORT(
-            35, TeleportScrolls.ELF_CAMP
+            35, TeleportScrolls.ELF_CAMP, HasItems.ELF_CAMP
     ),
     MOS_LE_HARMLESS_TELEPORT(
-            35, TeleportScrolls.MOS_LE_HARMLESS
+            35, TeleportScrolls.MOS_LE_HARMLESS, HasItems.MOS_LE_HARMLESS
     ),
     LUMBERYARD_TELEPORT(
-            35, TeleportScrolls.LUMBERYARD
+            35, TeleportScrolls.LUMBERYARD, HasItems.LUMBERYARD
     ),
     ZULLANDRA_TELEPORT(
-            35, TeleportScrolls.ZULLANDRA
+            35, TeleportScrolls.ZULLANDRA, HasItems.ZULLANDRA
     ),
     KEY_MASTER_TELEPORT(
-            35, TeleportScrolls.KEY_MASTER
+            35, TeleportScrolls.KEY_MASTER, HasItems.KEY_MASTER
     ),
     REVENANT_CAVES_TELEPORT(
-            35, TeleportScrolls.REVENANT_CAVES
+            35, TeleportScrolls.REVENANT_CAVES, HasItems.REVENANT_CAVES
     ),
     WATSON_TELEPORT(
-            35, TeleportScrolls.WATSON
+            35, TeleportScrolls.WATSON, HasItems.WATSON
     ),
 
 
     RING_OF_WEALTH_GRAND_EXCHANGE(
             35, new RSTile(3161, 3478, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RING_OF_WEALTH_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_WEALTH_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_WEALTH_FILTER, "(?i)Grand Exchange"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
     RING_OF_WEALTH_FALADOR(
             35, new RSTile(2994, 3377, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RING_OF_WEALTH_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_WEALTH_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_WEALTH_FILTER, "(?i)falador.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
     RING_OF_WEALTH_MISCELLANIA(
             35, new RSTile(2535, 3861, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RING_OF_WEALTH_FILTER) && PVars.getSetting(359) >= 100,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_WEALTH_FILTER.getHasItem().checkHasItem() && PVars.getSetting(359) >= 100,
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_WEALTH_FILTER, "(?i)misc.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    RING_OF_DUELING_DUEL_ARENA (
+    RING_OF_DUELING_DUEL_ARENA(
             35, new RSTile(3313, 3233, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RING_OF_DUELING_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_DUELING_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_DUELING_FILTER, "(?i).*duel arena.*")
     ),
 
-    RING_OF_DUELING_CASTLE_WARS (
+    RING_OF_DUELING_CASTLE_WARS(
             35, new RSTile(2440, 3090, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RING_OF_DUELING_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_DUELING_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_DUELING_FILTER, "(?i).*Castle Wars.*")
     ),
 
-    RING_OF_DUELING_FEROX_ENCLAVE (
+    RING_OF_DUELING_FEROX_ENCLAVE(
             35, new RSTile(3150, 3635, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RING_OF_DUELING_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_DUELING_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_DUELING_FILTER, "(?i).*Ferox Enclave.*")
     ),
 
-    NECKLACE_OF_PASSAGE_WIZARD_TOWER (
+    NECKLACE_OF_PASSAGE_WIZARD_TOWER(
             35, new RSTile(3113, 3179, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.NECKLACE_OF_PASSAGE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.NECKLACE_OF_PASSAGE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.NECKLACE_OF_PASSAGE_FILTER, "(?i).*wizard.+tower.*")
     ),
 
-    NECKLACE_OF_PASSAGE_OUTPOST (
+    NECKLACE_OF_PASSAGE_OUTPOST(
             35, new RSTile(2430, 3347, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.NECKLACE_OF_PASSAGE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.NECKLACE_OF_PASSAGE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.NECKLACE_OF_PASSAGE_FILTER, "(?i).*the.+outpost.*")
     ),
 
-    NECKLACE_OF_PASSAGE_EYRIE (
+    NECKLACE_OF_PASSAGE_EYRIE(
             35, new RSTile(3406, 3156, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.NECKLACE_OF_PASSAGE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.NECKLACE_OF_PASSAGE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.NECKLACE_OF_PASSAGE_FILTER, "(?i).*eagl.+eyrie.*")
     ),
 
-    COMBAT_BRACE_WARRIORS_GUILD (
+    COMBAT_BRACE_WARRIORS_GUILD(
             35, new RSTile(2882, 3550, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.COMBAT_BRACE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.COMBAT_BRACE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.COMBAT_BRACE_FILTER, "(?i).*warrior.+guild.*")
     ),
 
-    COMBAT_BRACE_CHAMPIONS_GUILD (
+    COMBAT_BRACE_CHAMPIONS_GUILD(
             35, new RSTile(3190, 3366, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.COMBAT_BRACE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.COMBAT_BRACE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.COMBAT_BRACE_FILTER, "(?i).*champion.+guild.*")
     ),
 
-    COMBAT_BRACE_MONASTARY (
+    COMBAT_BRACE_MONASTARY(
             35, new RSTile(3053, 3486, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.COMBAT_BRACE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.COMBAT_BRACE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.COMBAT_BRACE_FILTER, "(?i).*monastery.*")
     ),
 
-    COMBAT_BRACE_RANGE_GUILD (
+    COMBAT_BRACE_RANGE_GUILD(
             35, new RSTile(2656, 3442, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.COMBAT_BRACE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.COMBAT_BRACE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.COMBAT_BRACE_FILTER, "(?i).*rang.+guild.*")
     ),
 
-    GAMES_NECK_BURTHORPE (
+    GAMES_NECK_BURTHORPE(
             35, new RSTile(2897, 3551, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.GAMES_NECKLACE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GAMES_NECKLACE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GAMES_NECKLACE_FILTER, "(?i).*burthorpe.*")
     ),
 
-    GAMES_NECK_BARBARIAN_OUTPOST (
+    GAMES_NECK_BARBARIAN_OUTPOST(
             35, new RSTile(2520, 3570, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.GAMES_NECKLACE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GAMES_NECKLACE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GAMES_NECKLACE_FILTER, "(?i).*barbarian.*")
     ),
 
-    GAMES_NECK_CORPOREAL (
+    GAMES_NECK_CORPOREAL(
             35, new RSTile(2965, 4382, 2),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.GAMES_NECKLACE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GAMES_NECKLACE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GAMES_NECKLACE_FILTER, "(?i).*corporeal.*")
     ),
 
-    GAMES_NECK_WINTERTODT (
+    GAMES_NECK_WINTERTODT(
             35, new RSTile(1623, 3937, 0),
-            () -> inMembersWorld() && hasBeenToZeah() && WearableItemTeleport.has(WearableItemTeleport.GAMES_NECKLACE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && hasBeenToZeah() && HasItems.GAMES_NECKLACE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GAMES_NECKLACE_FILTER, "(?i).*wintertodt.*")
     ),
 
-    GLORY_EDGEVILLE (
+    GLORY_EDGEVILLE(
             35, new RSTile(3087, 3496, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.GLORY_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GLORY_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER, "(?i).*edgeville.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    GLORY_KARAMJA (
+    GLORY_KARAMJA(
             35, new RSTile(2918, 3176, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.GLORY_FILTER),
-            () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER,"(?i).*karamja.*"),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GLORY_FILTER.getHasItem().checkHasItem(),
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER, "(?i).*karamja.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    GLORY_DRAYNOR (
+    GLORY_DRAYNOR(
             35, new RSTile(3105, 3251, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.GLORY_FILTER),
-            () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER,"(?i).*draynor.*"),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GLORY_FILTER.getHasItem().checkHasItem(),
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER, "(?i).*draynor.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    GLORY_AL_KHARID (
+    GLORY_AL_KHARID(
             35, new RSTile(3293, 3163, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.GLORY_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GLORY_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER, "(?i).*al kharid.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    SKILLS_FISHING_GUILD (
+    SKILLS_FISHING_GUILD(
             35, new RSTile(2610, 3391, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SKILLS_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Fishing.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    SKILLS_MINING_GUILD (
+    SKILLS_MINING_GUILD(
             35, new RSTile(3052, 9764, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SKILLS_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Mining.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    SKILLS_CRAFTING_GUILD (
+    SKILLS_CRAFTING_GUILD(
             35, new RSTile(2935, 3293, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SKILLS_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Craft.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    SKILLS_COOKING_GUILD (
+    SKILLS_COOKING_GUILD(
             35, new RSTile(3145, 3442, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SKILLS_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Cooking.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    SKILLS_WOODCUTTING_GUILD (
+    SKILLS_WOODCUTTING_GUILD(
             35, new RSTile(1663, 3507, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SKILLS_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Woodcutting.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
 
-    SKILLS_FARMING_GUILD (
+    SKILLS_FARMING_GUILD(
             35, new RSTile(1248, 3719, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SKILLS_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Farming.*"),
             TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
     ),
-    BURNING_AMULET_CHAOS_TEMPLE (
+    BURNING_AMULET_CHAOS_TEMPLE(
             35, new RSTile(3236, 3635, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.BURNING_AMULET_FILTER),
-            () -> WearableItemTeleport.teleport(WearableItemTeleport.BURNING_AMULET_FILTER, "(Chaos.*|Okay, teleport to level.*)"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.BURNING_AMULET_FILTER.getHasItem().checkHasItem(),
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.BURNING_AMULET_FILTER, "(Chaos.*|Okay, teleport to level.*)")
     ),
 
-    BURNING_AMULET_BANDIT_CAMP (
+    BURNING_AMULET_BANDIT_CAMP(
             35, new RSTile(3039, 3652, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.BURNING_AMULET_FILTER),
-            () -> WearableItemTeleport.teleport(WearableItemTeleport.BURNING_AMULET_FILTER, "(Bandit.*|Okay, teleport to level.*)"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.BURNING_AMULET_FILTER.getHasItem().checkHasItem(),
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.BURNING_AMULET_FILTER, "(Bandit.*|Okay, teleport to level.*)")
     ),
 
-    BURNING_AMULET_LAVA_MAZE (
+    BURNING_AMULET_LAVA_MAZE(
             35, new RSTile(3029, 3843, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.BURNING_AMULET_FILTER),
-            () -> WearableItemTeleport.teleport(WearableItemTeleport.BURNING_AMULET_FILTER, "(Lava.*|Okay, teleport to level.*)"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.BURNING_AMULET_FILTER.getHasItem().checkHasItem(),
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.BURNING_AMULET_FILTER, "(Lava.*|Okay, teleport to level.*)")
     ),
 
-    DIGSITE_PENDANT (
-            35, new RSTile(3346,3445,0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.DIGSITE_PENDANT_FILTER),
+    DIGSITE_PENDANT(
+            35, new RSTile(3346, 3445, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.DIGSITE_PENDANT_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.DIGSITE_PENDANT_FILTER, "Digsite")
     ),
 
-    ECTOPHIAL (
+    ECTOPHIAL(
             0, new RSTile(3660, 3524, 0),
-            () -> inMembersWorld() && PInventory.findItem(Filters.Items.nameContains("Ectophial")) != null,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.ECTOPHIAL_FILTER.getHasItem().checkHasItem(),
             () -> RSItemHelper.click(Filters.Items.nameContains("Ectophial"), "Empty")
     ),
 
-    LLETYA (
-            35, new RSTile(2330,3172,0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.TELEPORT_CRYSTAL_FILTER),
+    LLETYA(
+            35, new RSTile(2330, 3172, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.TELEPORT_CRYSTAL_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.TELEPORT_CRYSTAL_FILTER, "Lletya")
     ),
 
     XERICS_GLADE(
             35, new RSTile(1753, 3565, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.XERICS_TALISMAN_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.XERICS_TALISMAN_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.XERICS_TALISMAN_FILTER, ".*Xeric's Glade")
     ),
     XERICS_INFERNO(
-            35, new RSTile(1505,3809,0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.XERICS_TALISMAN_FILTER),
+            35, new RSTile(1505, 3809, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.XERICS_TALISMAN_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.XERICS_TALISMAN_FILTER, ".*Xeric's Inferno")
     ),
     XERICS_LOOKOUT(
             35, new RSTile(1575, 3531, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.XERICS_TALISMAN_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.XERICS_TALISMAN_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.XERICS_TALISMAN_FILTER, ".*Xeric's Lookout")
     ),
 
     WEST_ARDOUGNE_TELEPORT_TAB(
-            35, new RSTile(2500,3290,0),
-            () -> inMembersWorld() && PInventory.getCount("West ardougne teleport") > 0,
+            35, new RSTile(2500, 3290, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.WEST_ARDOUGNE_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("West ardougne t.*", "Break")
     ),
 
     RADAS_BLESSING_KOUREND_WOODLAND(
             0, new RSTile(1558, 3458, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RADAS_BLESSING_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RADAS_BLESSING_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RADAS_BLESSING_FILTER, "Kourend .*")
     ),
     RADAS_BLESSING_MOUNT_KARUULM(
             0, new RSTile(1310, 3796, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.RADAS_BLESSING_FILTER.and(Filters.Items.nameContains("3","4"))),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RADAS_BLESSING_FILTER3.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RADAS_BLESSING_FILTER, "Mount.*")
     ),
 
     CRAFTING_CAPE_TELEPORT(
             0, new RSTile(2931, 3286, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.CRAFTING_CAPE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CRAFTING_CAPE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.CRAFTING_CAPE_FILTER, "Teleport")
     ),
 
     CABBAGE_PATCH_TELEPORT(
             0, new RSTile(3049, 3287, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.EXPLORERS_RING_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.EXPLORERS_RING_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.EXPLORERS_RING_FILTER, "Teleport")
     ),
 
     LEGENDS_GUILD_TELEPORT(
             0, new RSTile(2729, 3348, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.QUEST_CAPE_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.QUEST_CAPE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.QUEST_CAPE_FILTER, "Teleport")
     ),
 
     KANDARIN_MONASTERY_TELEPORT(
             0, new RSTile(2606, 3216, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.ARDOUGNE_CLOAK_FILTER),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.ARDOUGNE_CLOAK_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.ARDOUGNE_CLOAK_FILTER, "Monastery.*")
     ),
 
     RIMMINGTON_TELEPORT_TAB(
-            35, new RSTile(2954,3224, 0),
-            () -> inMembersWorld() && PInventory.getCount("Rimmington teleport") > 0,
+            35, new RSTile(2954, 3224, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RIMMINGTON_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Rimmington t.*", "Break")
     ),
 
     TAVERLEY_TELEPORT_TAB(
             35, new RSTile(2894, 3465, 0),
-            () -> inMembersWorld() && PInventory.getCount("Taverley teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.TAVERLEY_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Taverley t.*", "Break")
     ),
 
     RELLEKKA_TELEPORT_TAB(
             35, new RSTile(2668, 3631, 0),
-            () -> inMembersWorld() && PInventory.getCount("Rellekka teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RELLEKKA_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Rellekka t.*", "Break")
     ),
 
     BRIMHAVEN_TELEPORT_TAB(
             35, new RSTile(2758, 3178, 0),
-            () -> inMembersWorld() && PInventory.getCount("Brimhaven teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.BRIMHAVEN_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Brimhaven t.*", "Break")
     ),
 
     POLLNIVNEACH_TELEPORT_TAB(
             35, new RSTile(3340, 3004, 0),
-            () -> inMembersWorld() && PInventory.getCount("Pollnivneach teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.POLLNIVNEACH_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Pollnivneach t.*", "Break")
     ),
 
     YANILLE_TELEPORT_TAB(
             35, new RSTile(2544, 3095, 0),
-            () -> inMembersWorld() && PInventory.getCount("Yanille teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.YANILLE_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Yanille t.*", "Break")
     ),
 
     HOSIDIUS_TELEPORT_TAB(
             35, new RSTile(1744, 3517, 0),
-            () -> inMembersWorld() && PInventory.getCount("Hosidius teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.HOSIDIUS_TELEPORT_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Hosidius t.*", "Break")
     ),
 
     CONSTRUCTION_CAPE_RIMMINGTON(
-            0, new RSTile(2954,3224, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER),
-            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER,".*Rimmington")
+            0, new RSTile(2954, 3224, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CONSTRUCTION_CAPE_FILTER.getHasItem().checkHasItem(),
+            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER, ".*Rimmington")
     ),
 
     CONSTRUCTION_CAPE_TAVERLEY(
             0, new RSTile(2894, 3465, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER),
-            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER,".*Taverley")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CONSTRUCTION_CAPE_FILTER.getHasItem().checkHasItem(),
+            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER, ".*Taverley")
     ),
 
     CONSTRUCTION_CAPE_RELLEKKA(
             0, new RSTile(2668, 3631, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER),
-            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER,".*Rellekka")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CONSTRUCTION_CAPE_FILTER.getHasItem().checkHasItem(),
+            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER, ".*Rellekka")
     ),
 
     CONSTRUCTION_CAPE_BRIMHAVEN(
             0, new RSTile(2758, 3178, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER),
-            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER,".*Brimhaven")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CONSTRUCTION_CAPE_FILTER.getHasItem().checkHasItem(),
+            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER, ".*Brimhaven")
     ),
 
     CONSTRUCTION_CAPE_POLLNIVNEACH(
             0, new RSTile(3340, 3004, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER),
-            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER,".*Pollnivneach")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CONSTRUCTION_CAPE_FILTER.getHasItem().checkHasItem(),
+            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER, ".*Pollnivneach")
     ),
 
     CONSTRUCTION_CAPE_YANILLE(
             0, new RSTile(2544, 3095, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER),
-            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER,".*Yanille")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CONSTRUCTION_CAPE_FILTER.getHasItem().checkHasItem(),
+            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER, ".*Yanille")
     ),
 
     CONSTRUCTION_CAPE_HOSIDIUS(
             0, new RSTile(1744, 3517, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER),
-            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER,".*Hosidius")
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.CONSTRUCTION_CAPE_FILTER.getHasItem().checkHasItem(),
+            () -> teleportWithScrollInterface(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER, ".*Hosidius")
     ),
 
     SLAYER_RING_GNOME_STRONGHOLD(
             35, new RSTile(2433, 3424, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SLAYER_RING),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SLAYER_RING.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.SLAYER_RING, ".*Stronghold")
     ),
 
     SLAYER_RING_MORYTANIA(
             35, new RSTile(3422, 3537, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SLAYER_RING),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SLAYER_RING.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.SLAYER_RING, ".*Tower")
     ),
 
     SLAYER_RING_RELLEKKA_CAVE(
             35, new RSTile(2801, 9999, 0),
-            () -> inMembersWorld() && WearableItemTeleport.has(WearableItemTeleport.SLAYER_RING),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SLAYER_RING.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.SLAYER_RING, ".*Rellekka")
     ),
 
     SALVE_GRAVEYARD_TAB(
             35, new RSTile(3432, 3460, 0),
-            () -> inMembersWorld() && PInventory.getCount("Salve graveyard teleport") > 0,
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SALVE_GRAVEYARD_TAB.getHasItem().checkHasItem(),
             () -> RSItemHelper.click("Salve graveyard t.*", "Break")
-    )
-    ;
+    ),
+
+    ENCHANTED_LYRE_RELLEKA(
+            35, new RSTile(2661, 3465, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.ENCHANTED_LYRE_FILTER.getHasItem().checkHasItem(),
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.ENCHANTED_LYRE_FILTER, "Play|Rellekka.*")
+    ),
+
+    FARMING_CAPE(
+            0, new RSTile(1248, 3719, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.FARMING_CAPE_FILTER.getHasItem().checkHasItem(),
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.FARMING_CAPE_FILTER, "Teleport")
+    );//TODO Royal seedpod
+
+    enum CachedBooleans {
+        IN_MEMBERS_WORLD(new CachedBoolean() {
+            @Override
+            public boolean checkState() {
+                return inMembersWorld();
+            }
+        }),
+        ;
+
+        @Getter
+        private final CachedBoolean cachedBoolean;
+
+        CachedBooleans(CachedBoolean cachedBoolean) {
+            this.cachedBoolean = cachedBoolean;
+        }
+    }
+
+    public enum HasItems {//TODO use item IDs instead of string comparision
+        ENCHANTED_LYRE_FILTER(new HasItem(WearableItemTeleport.ENCHANTED_LYRE_FILTER), false),
+        SLAYER_RING(new HasItem(WearableItemTeleport.SLAYER_RING)),
+        CONSTRUCTION_CAPE_FILTER(new HasItem(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER)),
+        ARDOUGNE_CLOAK_FILTER(new HasItem(WearableItemTeleport.ARDOUGNE_CLOAK_FILTER)),
+        QUEST_CAPE_FILTER(new HasItem(WearableItemTeleport.QUEST_CAPE_FILTER)),
+        EXPLORERS_RING_FILTER(new HasItem(WearableItemTeleport.EXPLORERS_RING_FILTER)),
+        CRAFTING_CAPE_FILTER(new HasItem(WearableItemTeleport.CRAFTING_CAPE_FILTER)),
+        FARMING_CAPE_FILTER(new HasItem(WearableItemTeleport.FARMING_CAPE_FILTER)),
+        RADAS_BLESSING_FILTER3(new HasItem(WearableItemTeleport.RADAS_BLESSING_FILTER.and(Filters.Items.nameContains("3", "4")))),
+        RADAS_BLESSING_FILTER(new HasItem(WearableItemTeleport.RADAS_BLESSING_FILTER)),
+        XERICS_TALISMAN_FILTER(new HasItem(WearableItemTeleport.XERICS_TALISMAN_FILTER)),
+        TELEPORT_CRYSTAL_FILTER(new HasItem(WearableItemTeleport.TELEPORT_CRYSTAL_FILTER), false),
+        ECTOPHIAL_FILTER(new HasItem(Filters.Items.nameContains("Ectophial")), false),
+        DIGSITE_PENDANT_FILTER(new HasItem(WearableItemTeleport.DIGSITE_PENDANT_FILTER)),
+        BURNING_AMULET_FILTER(new HasItem(WearableItemTeleport.BURNING_AMULET_FILTER)),
+        SKILLS_FILTER(new HasItem(WearableItemTeleport.SKILLS_FILTER)),
+        GLORY_FILTER(new HasItem(WearableItemTeleport.GLORY_FILTER)),
+        GAMES_NECKLACE_FILTER(new HasItem(WearableItemTeleport.GAMES_NECKLACE_FILTER)),
+        COMBAT_BRACE_FILTER(new HasItem(WearableItemTeleport.COMBAT_BRACE_FILTER)),
+        NECKLACE_OF_PASSAGE_FILTER(new HasItem(WearableItemTeleport.NECKLACE_OF_PASSAGE_FILTER)),
+        RING_OF_DUELING_FILTER(new HasItem(WearableItemTeleport.RING_OF_DUELING_FILTER)),
+        RING_OF_WEALTH_FILTER(new HasItem(WearableItemTeleport.RING_OF_WEALTH_FILTER)),
+        VARROCK_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Varrock teleport")), false),
+        HOSIDIUS_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Hosidius teleport")), false),
+        YANILLE_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Yanille teleport")), false),
+        POLLNIVNEACH_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Pollnivneach teleport")), false),
+        BRIMHAVEN_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Brimhaven teleport")), false),
+        RELLEKKA_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Rellekka teleport")), false),
+        TAVERLEY_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Taverley teleport")), false),
+        RIMMINGTON_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Rimmington teleport")), false),
+        SALVE_GRAVEYARD_TAB(new HasItem(Filters.Items.nameContains("Salve graveyard teleport")), false),
+        WEST_ARDOUGNE_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("West ardougne teleport")), false),
+        ARDOUGNE_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Ardougne teleport")), false),
+        CAMELOT_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Camelot teleport")), false),
+        FALADOR_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Falador teleport")), false),
+        LUMBRIDGE_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Lumbridge teleport")), false),
+        MASTER_SCROLL_BOOK(new HasItem(Filters.Items.nameContains("Master scroll book")), false),
+        NARDAH(new HasItem(Filters.Items.nameContains(TeleportScrolls.NARDAH.name())), false),
+        DIGSITE(new HasItem(Filters.Items.nameContains(TeleportScrolls.DIGSITE.name())), false),
+        FELDIP_HILLS(new HasItem(Filters.Items.nameContains(TeleportScrolls.FELDIP_HILLS.name())), false),
+        LUNAR_ISLE(new HasItem(Filters.Items.nameContains(TeleportScrolls.LUNAR_ISLE.name())), false),
+        MORTTON(new HasItem(Filters.Items.nameContains(TeleportScrolls.MORTTON.name())), false),
+        PEST_CONTROL(new HasItem(Filters.Items.nameContains(TeleportScrolls.PEST_CONTROL.name())), false),
+        PISCATORIS(new HasItem(Filters.Items.nameContains(TeleportScrolls.PISCATORIS.name())), false),
+        TAI_BWO_WANNAI(new HasItem(Filters.Items.nameContains(TeleportScrolls.TAI_BWO_WANNAI.name())), false),
+        ELF_CAMP(new HasItem(Filters.Items.nameContains(TeleportScrolls.ELF_CAMP.name())), false),
+        MOS_LE_HARMLESS(new HasItem(Filters.Items.nameContains(TeleportScrolls.MOS_LE_HARMLESS.name())), false),
+        LUMBERYARD(new HasItem(Filters.Items.nameContains(TeleportScrolls.LUMBERYARD.name())), false),
+        ZULLANDRA(new HasItem(Filters.Items.nameContains(TeleportScrolls.ZULLANDRA.name())), false),
+        KEY_MASTER(new HasItem(Filters.Items.nameContains(TeleportScrolls.KEY_MASTER.name())), false),
+        REVENANT_CAVES(new HasItem(Filters.Items.nameContains(TeleportScrolls.REVENANT_CAVES.name())), false),
+        WATSON(new HasItem(Filters.Items.nameContains(TeleportScrolls.WATSON.name())), false),
+        ;
+
+        @Getter
+        private final HasItem hasItem;
+        @Getter
+        private final boolean equippable;
+
+        HasItems(HasItem hasItem) {
+            this.hasItem = hasItem;
+            this.equippable = true;
+        }
+
+        HasItems(HasItem hasItem, boolean equippable) {
+            this.hasItem = hasItem;
+            this.equippable = equippable;
+        }
+    }
+
     private int moveCost;
     private RSTile location;
     private Requirement requirement;
@@ -547,12 +648,16 @@ public enum Teleport {
         this.teleportLimit = limit;
     }
 
-    Teleport(int movecost, TeleportScrolls scroll){
+    Teleport(int movecost, TeleportScrolls scroll, HasItems hasItem) {
         this.moveCost = movecost;
         this.location = scroll.getLocation();
-        this.requirement = () -> inMembersWorld() && scroll.canUse();
+        this.requirement = () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && (hasItem.hasItem.checkHasItem() || scroll.canUse());
         this.action = () -> scroll.teleportTo(false);
         this.teleportLimit = TeleportConstants.LEVEL_20_WILDERNESS_LIMIT;
+    }
+
+    Teleport(int movecost, RSTile location, CachedBoolean cachedBoolean) {// TODO add teleport type enums
+        this.moveCost = movecost;
     }
 
 
@@ -560,8 +665,8 @@ public enum Teleport {
         return moveCost;
     }
 
-    public void setMoveCost(int cost){
-        if(this.moveCost == 0)
+    public void setMoveCost(int cost) {
+        if (this.moveCost == 0)
             return;
         this.moveCost = cost;
     }
@@ -576,9 +681,9 @@ public enum Teleport {
 
     public boolean trigger() {
         boolean value = this.action.trigger();
-        if(!value){
+        if (!value) {
             failedAttempts++;
-            if(failedAttempts > 3){
+            if (failedAttempts > 3) {
                 canUse = false;
             }
         }
@@ -590,26 +695,42 @@ public enum Teleport {
         return tile.distanceTo(location) < 10;
     }
 
-    public static void setMoveCosts(int moveCost){
+    public static void setMoveCosts(int moveCost) {
         Arrays.stream(values()).forEach(t -> t.setMoveCost(moveCost));
     }
 
     private static List<Teleport> blacklist = new ArrayList<>();
 
-    public static void blacklistTeleports(Teleport... teleports){
+    public static void blacklistTeleports(Teleport... teleports) {
         blacklist.addAll(Arrays.asList(teleports));
     }
 
-    public static void clearTeleportBlacklist(){
+    public static void clearTeleportBlacklist() {
         blacklist.clear();
     }
 
+    public static int count = 0;
+
     public static List<RSTile> getValidStartingRSTiles() {
         List<RSTile> RSTiles = new ArrayList<>();
+        count = 0;
+        PUtils.getClient().getLogger().info("Time: " + System.currentTimeMillis());
+        for (HasItems items : HasItems.values()) {
+            items.getHasItem().resetState();
+            for (PItem invItem : PInventory.getAllItems()) {
+                items.getHasItem().mapHasItem(invItem);
+            }
+            for (PItem invItem : PInventory.getEquipmentItems()) {
+                if (items.equippable) {
+                    items.getHasItem().mapHasItem(invItem);
+                }
+            }
+        }
+        PUtils.getClient().getLogger().info("Total Count: " + count + ", " + System.currentTimeMillis());
         for (Teleport teleport : values()) {
-
             if (blacklist.contains(teleport) || !teleport.teleportLimit.canCast() ||
                     !teleport.canUse || !teleport.requirement.satisfies()) continue;
+            PUtils.getClient().getLogger().info("Teleport: " + teleport.name() + ", " + System.currentTimeMillis());
             RSTiles.add(teleport.location);
         }
         return RSTiles;
@@ -632,7 +753,7 @@ public enum Teleport {
         return PInteraction.item(item, actions);
     }
 
-    private static boolean teleportWithScrollInterface(Predicate<PItem> itemFilter, String regex){
+    private static boolean teleportWithScrollInterface(Predicate<PItem> itemFilter, String regex) {
         ArrayList<PItem> items = new ArrayList<>();
         items.addAll(PInventory.findAllItems(itemFilter));
         items.addAll(PInventory.findAllEquipmentItems(itemFilter));
@@ -641,7 +762,7 @@ public enum Teleport {
             return false;
         }
 
-        if(!PWidgets.isSubstantiated(TeleportConstants.SCROLL_INTERFACE_MASTER)){
+        if (!PWidgets.isSubstantiated(TeleportConstants.SCROLL_INTERFACE_MASTER)) {
             PItem teleportItem = items.get(0);
             if (!RSItemHelper.clickMatch(teleportItem, "(Rub|Teleport|" + regex + ")")
                     || WaitFor.condition(2500,
@@ -654,24 +775,24 @@ public enum Teleport {
         return handleScrollInterface(regex);
     }
 
-    private static boolean handleScrollInterface(String regex){
+    private static boolean handleScrollInterface(String regex) {
         RSInterface box = new RSInterface(PWidgets.get(187, 3));
-        if(box == null || box.getWidget() == null) return false;
+        if (box == null || box.getWidget() == null) return false;
 
         RSInterface[] children = box.getChildren();
-        if(children == null)
+        if (children == null)
             return false;
-        for(RSInterface child : children){
+        for (RSInterface child : children) {
             String txt = child.getText();
-            if(txt != null && txt.matches(regex)){
-                Keyboard.typeString(Text.removeTags(txt).substring(0,1));
+            if (txt != null && txt.matches(regex)) {
+                Keyboard.typeString(Text.removeTags(txt).substring(0, 1));
                 return true;
             }
         }
         return false;
     }
 
-    public static boolean castSpell(String spellName, String action){
+    public static boolean castSpell(String spellName, String action) {
         WidgetInfo spellWidgetInfo = Spells.getWidget(spellName);
         if (PWidgets.isValid(spellWidgetInfo)) {
             return PInteraction.widget(PWidgets.get(spellWidgetInfo), action);
@@ -679,7 +800,7 @@ public enum Teleport {
         return false;
     }
 
-    private static boolean hasBeenToZeah(){
+    private static boolean hasBeenToZeah() {
         return RSVarBit.get(4897).getValue() > 0;
     }
 }
