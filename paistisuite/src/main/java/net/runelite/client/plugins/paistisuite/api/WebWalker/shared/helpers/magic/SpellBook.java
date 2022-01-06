@@ -10,25 +10,38 @@ public class SpellBook {
     private static final int SPELLBOOK_VARBIT = 4070;
 
     public enum Type {
-        STANDARD (0),
-        ANCIENT (1),
-        LUNAR (2),
-        ARCEUUS (3);
+        STANDARD(0),
+        ANCIENT(1),
+        LUNAR(2),
+        ARCEUUS(3);
 
-        private int varbit;
-        Type (int varbit){
+        private final int varbit;
+
+        Type(int varbit) {
             this.varbit = varbit;
         }
 
         public boolean isInUse() {
             RSVarBit varBit = RSVarBit.get(SPELLBOOK_VARBIT);
 
-            return varBit != null && varBit.getValue() == varbit;
+            return varBit.getValue() == varbit;
         }
     }
 
-    public static Type getCurrentSpellBook(){
-        return Arrays.stream(Type.values()).filter(Type::isInUse).findAny().orElse(null);
+    private static Type currentSpellBook = null;
+
+    public static void resetCurrenSpellBook() {
+        currentSpellBook = null;
     }
 
+    private static void checkCurrentSpellBook(){
+        currentSpellBook = Arrays.stream(Type.values()).filter(Type::isInUse).findAny().orElse(null);
+    }
+
+    public static Type getCurrentSpellBook() {
+        if (currentSpellBook == null) {
+            checkCurrentSpellBook();
+        }
+        return currentSpellBook;
+    }
 }

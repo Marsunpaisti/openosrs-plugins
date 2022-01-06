@@ -201,12 +201,12 @@ public class WebWalker extends PScript {
         log.info("Start: " + start + ", Destination: " + destination);
 
         // Im doing it manually to get the path to my local variables, you can just call DaxWalker.walkTo methods too
-        DaxWalker.getInstance().allowTeleports = allowTeleports;//TODO add additional teleports and teleport filtering
+        DaxWalker.getInstance().allowTeleports = allowTeleports;
         List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
         log.info("Teleport count: " + pathRequestPairs.size());
         pathRequestPairs.add(0, new PathRequestPair(start, destination));
 
-        if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {
+        if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {//TODO add farming cape tele
             for (SpiritTree.Location location : SpiritTree.Location.values()) {
                 if (SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
                     pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
@@ -214,7 +214,7 @@ public class WebWalker extends PScript {
                 }
             }
         }
-
+        log.info("Total Combinations: " + pathRequestPairs.size());
         List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details, pathRequestPairs));
 
         //log.info("Total Paths: " + pathResults.size());
@@ -250,7 +250,6 @@ public class WebWalker extends PScript {
                 }
             }
             if (!addedPath) {
-                //log.info("Adding path1: " + path);
                 curatedPaths.add(path);
             }
         }
@@ -258,7 +257,6 @@ public class WebWalker extends PScript {
         for (PathResult first : firstPath) {
             for (PathResult second : secondPath) {
                 PathResult combinedPath = first.addPath(second);
-                //log.info("Adding path2: " + combinedPath);
                 curatedPaths.add(combinedPath);
             }
         }

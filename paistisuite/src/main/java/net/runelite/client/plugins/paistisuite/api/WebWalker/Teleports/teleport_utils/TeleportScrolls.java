@@ -22,7 +22,7 @@ public enum TeleportScrolls implements Validatable {
     ELF_CAMP("Elf camp teleport", new RSTile(2193, 3258, 0)),
     MOS_LE_HARMLESS("Mos le'harmless teleport", new RSTile(3700, 2996, 0)),
     LUMBERYARD("Lumberyard teleport", new RSTile(3302, 3487, 0)),
-    ZULLANDRA("Zul-andra teleport", new RSTile(2195, 3055, 0)),
+    ZULANDRA("Zul-andra teleport", new RSTile(2195, 3055, 0)),
     KEY_MASTER("Key master teleport", new RSTile(1311, 1251, 0)),
     REVENANT_CAVES("Revenant cave teleport", new RSTile(3130, 3832, 0)),
     WATSON("Watson teleport", new RSTile(1645, 3579, 0)),
@@ -94,8 +94,8 @@ public enum TeleportScrolls implements Validatable {
                 return MasterScrollBook.Teleports.MOS_LE_HARMLESS.getCount() > 0;
             case LUMBERYARD:
                 return MasterScrollBook.Teleports.LUMBERYARD.getCount() > 0;
-            case ZULLANDRA:
-                return MasterScrollBook.Teleports.ZULLANDRA.getCount() > 0;
+            case ZULANDRA:
+                return MasterScrollBook.Teleports.ZULANDRA.getCount() > 0;
             case KEY_MASTER:
                 return MasterScrollBook.Teleports.KEY_MASTER.getCount() > 0;
             case REVENANT_CAVES:

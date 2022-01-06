@@ -1,15 +1,9 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic;
 
 
-import kotlin.Pair;
 import net.runelite.api.ItemComposition;
-import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.plugins.paistisuite.api.PInventory;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.Teleport;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
-
-import java.util.Arrays;
-import java.util.List;
 
 public enum RuneElement {
 
@@ -22,6 +16,8 @@ public enum RuneElement {
     SOUL("Soul");
 
     private String[] alternativeNames;
+    private boolean hasStaff;
+    private int runeCount;
 
     RuneElement(String... alternativeNames) {
         this.alternativeNames = alternativeNames;
@@ -31,49 +27,62 @@ public enum RuneElement {
         return alternativeNames;
     }
 
-    public int getCount() {
-        if (haveStaff()) {
-            return Integer.MAX_VALUE;
+    public static void resetAllRuneElements() {
+        for (RuneElement rune : RuneElement.values()) {
+            rune.resetRuneElement();
         }
-        List<PItem> items = PInventory.findAllItems((PItem pair) -> {
-            if(pair.getDefinition().isMembers() && !PUtils.isMembersWorld()){
-                return false;
-            }
-
-            String name = getItemName(pair).toLowerCase();
-
-            if (!name.contains("rune")) {
-                return false;
-            }
-
-            for (String alternativeName : alternativeNames) {
-                if (name.startsWith(alternativeName.toLowerCase())) {
-                    return true;
-                }
-            }
-            return false;
-        });
-
-        return items.stream().mapToInt(i -> i.getFirst().getQuantity()).sum() + RunePouch.getQuantity(this);
     }
 
-    private boolean haveStaff() {
-        return PInventory.findEquipmentItem((PItem item) -> {
-            if(item.getDefinition().isMembers() && !PUtils.isMembersWorld()){
-                return false;
-            }
+    public void resetRuneElement() {
+        hasStaff = false;
+        runeCount = 0;
+    }
 
-            String name = getItemName(item).toLowerCase();
-            if (!name.contains("staff")) {
-                return false;
+    public void checkHasStaff(PItem item) {
+        if (hasStaff) {
+            return;
+        }
+
+        if (item.getDefinition().isMembers() && !Teleport.CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean()) {
+            return;
+        }
+
+        String name = getItemName(item).toLowerCase();
+        if (!name.contains("staff")) {
+            return;
+        }
+        for (String alternativeName : alternativeNames) {
+            if (name.contains(alternativeName.toLowerCase())) {
+                hasStaff = true;
+                return;
             }
-            for (String alternativeName : alternativeNames) {
-                if (name.contains(alternativeName.toLowerCase())) {
-                    return true;
-                }
+        }
+    }
+
+    public void checkRuneCount(PItem item) {
+        if (item.getDefinition().isMembers() && !Teleport.CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean()) {
+            return;
+        }
+
+        String name = getItemName(item).toLowerCase();
+
+        if (!name.contains("rune")) {
+            return;
+        }
+
+        for (String alternativeName : alternativeNames) {
+            if (name.startsWith(alternativeName.toLowerCase())) {
+                runeCount += item.getFirst().getQuantity();
+                return;
             }
-            return false;
-        }) != null;
+        }
+    }
+
+    public int getRuneCount() {
+        if (hasStaff) {
+            return Integer.MAX_VALUE;
+        }
+        return runeCount + RunePouch.getQuantity(this);
     }
 
     /**
@@ -85,6 +94,4 @@ public enum RuneElement {
         String name;
         return definition == null || (name = definition.getName()) == null ? "null" : name;
     }
-
-
 }

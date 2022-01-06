@@ -2,6 +2,8 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports;
 
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ItemID;
 import net.runelite.api.util.Text;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.*;
@@ -10,7 +12,10 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.teleport_
 import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.teleport_utils.TeleportScrolls;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Requirement;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.RSItemHelper;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic.RuneElement;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic.RunePouch;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic.Spell;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.helpers.magic.SpellBook;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.Keyboard;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
@@ -20,11 +25,10 @@ import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.paistisuite.api.types.Spells;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
+@Slf4j
 public enum Teleport {
     VARROCK_TELEPORT(
             35, new RSTile(3212, 3424, 0),
@@ -133,8 +137,8 @@ public enum Teleport {
     LUMBERYARD_TELEPORT(
             35, TeleportScrolls.LUMBERYARD, HasItems.LUMBERYARD
     ),
-    ZULLANDRA_TELEPORT(
-            35, TeleportScrolls.ZULLANDRA, HasItems.ZULLANDRA
+    ZULANDRA_TELEPORT(
+            35, TeleportScrolls.ZULANDRA, HasItems.ZULANDRA
     ),
     KEY_MASTER_TELEPORT(
             35, TeleportScrolls.KEY_MASTER, HasItems.KEY_MASTER
@@ -151,21 +155,21 @@ public enum Teleport {
             35, new RSTile(3161, 3478, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_WEALTH_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_WEALTH_FILTER, "(?i)Grand Exchange"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     RING_OF_WEALTH_FALADOR(
             35, new RSTile(2994, 3377, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_WEALTH_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_WEALTH_FILTER, "(?i)falador.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     RING_OF_WEALTH_MISCELLANIA(
             35, new RSTile(2535, 3861, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.RING_OF_WEALTH_FILTER.getHasItem().checkHasItem() && PVars.getSetting(359) >= 100,
             () -> WearableItemTeleport.teleport(WearableItemTeleport.RING_OF_WEALTH_FILTER, "(?i)misc.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     RING_OF_DUELING_DUEL_ARENA(
@@ -256,70 +260,70 @@ public enum Teleport {
             35, new RSTile(3087, 3496, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GLORY_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER, "(?i).*edgeville.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     GLORY_KARAMJA(
             35, new RSTile(2918, 3176, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GLORY_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER, "(?i).*karamja.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     GLORY_DRAYNOR(
             35, new RSTile(3105, 3251, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GLORY_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER, "(?i).*draynor.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     GLORY_AL_KHARID(
             35, new RSTile(3293, 3163, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.GLORY_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.GLORY_FILTER, "(?i).*al kharid.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     SKILLS_FISHING_GUILD(
             35, new RSTile(2610, 3391, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Fishing.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     SKILLS_MINING_GUILD(
             35, new RSTile(3052, 9764, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Mining.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     SKILLS_CRAFTING_GUILD(
             35, new RSTile(2935, 3293, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Craft.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     SKILLS_COOKING_GUILD(
             35, new RSTile(3145, 3442, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Cooking.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     SKILLS_WOODCUTTING_GUILD(
             35, new RSTile(1663, 3507, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Woodcutting.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
 
     SKILLS_FARMING_GUILD(
             35, new RSTile(1248, 3719, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.SKILLS_FILTER.getHasItem().checkHasItem(),
             () -> teleportWithScrollInterface(WearableItemTeleport.SKILLS_FILTER, ".*Farming.*"),
-            TeleportConstants.LEVEL_30_WILDERNESS_LIMIT
+            () -> CachedBooleans.LEVEL_30_WILDERNESS_LIMIT.getCachedBoolean().getBoolean()
     ),
     BURNING_AMULET_CHAOS_TEMPLE(
             35, new RSTile(3236, 3635, 0),
@@ -411,7 +415,7 @@ public enum Teleport {
     KANDARIN_MONASTERY_TELEPORT(
             0, new RSTile(2606, 3216, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.ARDOUGNE_CLOAK_FILTER.getHasItem().checkHasItem(),
-            () -> WearableItemTeleport.teleport(WearableItemTeleport.ARDOUGNE_CLOAK_FILTER, "Monastery.*")
+            () -> WearableItemTeleport.teleport(WearableItemTeleport.ARDOUGNE_CLOAK_FILTER, ".*Monastery.*")
     ),
 
     RIMMINGTON_TELEPORT_TAB(
@@ -532,13 +536,31 @@ public enum Teleport {
             0, new RSTile(1248, 3719, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.FARMING_CAPE_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.FARMING_CAPE_FILTER, "Teleport")
+    ),
+
+    ROYAL_SEED(
+            0, new RSTile(2465, 3495, 0),
+            () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.ROYAL_SEED.getHasItem().checkHasItem(),
+            () -> RSItemHelper.click(Filters.Items.idEquals(ItemID.ROYAL_SEED_POD), "Commune")
     );//TODO Royal seedpod
 
-    enum CachedBooleans {
+    public enum CachedBooleans {
         IN_MEMBERS_WORLD(new CachedBoolean() {
             @Override
             public boolean checkState() {
                 return inMembersWorld();
+            }
+        }),
+        LEVEL_20_WILDERNESS_LIMIT(new CachedBoolean() {
+            @Override
+            public boolean checkState() {
+                return TeleportConstants.LEVEL_20_WILDERNESS_LIMIT.canCast();
+            }
+        }),
+        LEVEL_30_WILDERNESS_LIMIT(new CachedBoolean() {
+            @Override
+            public boolean checkState() {
+                return TeleportConstants.LEVEL_30_WILDERNESS_LIMIT.canCast();
             }
         }),
         ;
@@ -549,9 +571,15 @@ public enum Teleport {
         CachedBooleans(CachedBoolean cachedBoolean) {
             this.cachedBoolean = cachedBoolean;
         }
+
+        public static void resetCachedBooleans() {
+            for (CachedBooleans bool : CachedBooleans.values()) {
+                bool.getCachedBoolean().resetState();
+            }
+        }
     }
 
-    public enum HasItems {//TODO use item IDs instead of string comparision
+    public enum HasItems {
         ENCHANTED_LYRE_FILTER(new HasItem(WearableItemTeleport.ENCHANTED_LYRE_FILTER), false),
         SLAYER_RING(new HasItem(WearableItemTeleport.SLAYER_RING)),
         CONSTRUCTION_CAPE_FILTER(new HasItem(WearableItemTeleport.CONSTRUCTION_CAPE_FILTER)),
@@ -564,7 +592,7 @@ public enum Teleport {
         RADAS_BLESSING_FILTER(new HasItem(WearableItemTeleport.RADAS_BLESSING_FILTER)),
         XERICS_TALISMAN_FILTER(new HasItem(WearableItemTeleport.XERICS_TALISMAN_FILTER)),
         TELEPORT_CRYSTAL_FILTER(new HasItem(WearableItemTeleport.TELEPORT_CRYSTAL_FILTER), false),
-        ECTOPHIAL_FILTER(new HasItem(Filters.Items.nameContains("Ectophial")), false),
+        ECTOPHIAL_FILTER(new HasItem(Filters.Items.idEquals(ItemID.ECTOPHIAL)), false),
         DIGSITE_PENDANT_FILTER(new HasItem(WearableItemTeleport.DIGSITE_PENDANT_FILTER)),
         BURNING_AMULET_FILTER(new HasItem(WearableItemTeleport.BURNING_AMULET_FILTER)),
         SKILLS_FILTER(new HasItem(WearableItemTeleport.SKILLS_FILTER)),
@@ -574,36 +602,37 @@ public enum Teleport {
         NECKLACE_OF_PASSAGE_FILTER(new HasItem(WearableItemTeleport.NECKLACE_OF_PASSAGE_FILTER)),
         RING_OF_DUELING_FILTER(new HasItem(WearableItemTeleport.RING_OF_DUELING_FILTER)),
         RING_OF_WEALTH_FILTER(new HasItem(WearableItemTeleport.RING_OF_WEALTH_FILTER)),
-        VARROCK_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Varrock teleport")), false),
-        HOSIDIUS_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Hosidius teleport")), false),
-        YANILLE_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Yanille teleport")), false),
-        POLLNIVNEACH_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Pollnivneach teleport")), false),
-        BRIMHAVEN_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Brimhaven teleport")), false),
-        RELLEKKA_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Rellekka teleport")), false),
-        TAVERLEY_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Taverley teleport")), false),
-        RIMMINGTON_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Rimmington teleport")), false),
-        SALVE_GRAVEYARD_TAB(new HasItem(Filters.Items.nameContains("Salve graveyard teleport")), false),
-        WEST_ARDOUGNE_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("West ardougne teleport")), false),
-        ARDOUGNE_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Ardougne teleport")), false),
-        CAMELOT_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Camelot teleport")), false),
-        FALADOR_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Falador teleport")), false),
-        LUMBRIDGE_TELEPORT_TAB(new HasItem(Filters.Items.nameContains("Lumbridge teleport")), false),
-        MASTER_SCROLL_BOOK(new HasItem(Filters.Items.nameContains("Master scroll book")), false),
-        NARDAH(new HasItem(Filters.Items.nameContains(TeleportScrolls.NARDAH.name())), false),
-        DIGSITE(new HasItem(Filters.Items.nameContains(TeleportScrolls.DIGSITE.name())), false),
-        FELDIP_HILLS(new HasItem(Filters.Items.nameContains(TeleportScrolls.FELDIP_HILLS.name())), false),
-        LUNAR_ISLE(new HasItem(Filters.Items.nameContains(TeleportScrolls.LUNAR_ISLE.name())), false),
-        MORTTON(new HasItem(Filters.Items.nameContains(TeleportScrolls.MORTTON.name())), false),
-        PEST_CONTROL(new HasItem(Filters.Items.nameContains(TeleportScrolls.PEST_CONTROL.name())), false),
-        PISCATORIS(new HasItem(Filters.Items.nameContains(TeleportScrolls.PISCATORIS.name())), false),
-        TAI_BWO_WANNAI(new HasItem(Filters.Items.nameContains(TeleportScrolls.TAI_BWO_WANNAI.name())), false),
-        ELF_CAMP(new HasItem(Filters.Items.nameContains(TeleportScrolls.ELF_CAMP.name())), false),
-        MOS_LE_HARMLESS(new HasItem(Filters.Items.nameContains(TeleportScrolls.MOS_LE_HARMLESS.name())), false),
-        LUMBERYARD(new HasItem(Filters.Items.nameContains(TeleportScrolls.LUMBERYARD.name())), false),
-        ZULLANDRA(new HasItem(Filters.Items.nameContains(TeleportScrolls.ZULLANDRA.name())), false),
-        KEY_MASTER(new HasItem(Filters.Items.nameContains(TeleportScrolls.KEY_MASTER.name())), false),
-        REVENANT_CAVES(new HasItem(Filters.Items.nameContains(TeleportScrolls.REVENANT_CAVES.name())), false),
-        WATSON(new HasItem(Filters.Items.nameContains(TeleportScrolls.WATSON.name())), false),
+        VARROCK_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.VARROCK_TELEPORT)), false),
+        HOSIDIUS_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.HOSIDIUS_TELEPORT)), false),
+        YANILLE_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.YANILLE_TELEPORT)), false),
+        POLLNIVNEACH_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.POLLNIVNEACH_TELEPORT)), false),
+        BRIMHAVEN_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.BRIMHAVEN_TELEPORT)), false),
+        RELLEKKA_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.RELLEKKA_TELEPORT)), false),
+        TAVERLEY_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.TAVERLEY_TELEPORT)), false),
+        RIMMINGTON_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.RIMMINGTON_TELEPORT)), false),
+        SALVE_GRAVEYARD_TAB(new HasItem(Filters.Items.idEquals(ItemID.SALVE_GRAVEYARD_TELEPORT)), false),
+        WEST_ARDOUGNE_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.WEST_ARDOUGNE_TELEPORT)), false),
+        ARDOUGNE_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.ARDOUGNE_TELEPORT)), false),
+        CAMELOT_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.CAMELOT_TELEPORT)), false),
+        FALADOR_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.FALADOR_TELEPORT)), false),
+        LUMBRIDGE_TELEPORT_TAB(new HasItem(Filters.Items.idEquals(ItemID.LUMBRIDGE_TELEPORT)), false),
+        MASTER_SCROLL_BOOK(new HasItem(Filters.Items.idEquals(ItemID.MASTER_SCROLL_BOOK)), false),
+        NARDAH(new HasItem(Filters.Items.idEquals(ItemID.NARDAH_TELEPORT)), false),
+        DIGSITE(new HasItem(Filters.Items.idEquals(ItemID.DIGSITE_TELEPORT)), false),
+        FELDIP_HILLS(new HasItem(Filters.Items.idEquals(ItemID.FELDIP_HILLS_TELEPORT)), false),
+        LUNAR_ISLE(new HasItem(Filters.Items.idEquals(ItemID.LUNAR_ISLE_TELEPORT)), false),
+        MORTTON(new HasItem(Filters.Items.idEquals(ItemID.MORTTON_TELEPORT)), false),
+        PEST_CONTROL(new HasItem(Filters.Items.idEquals(ItemID.PEST_CONTROL_TELEPORT)), false),
+        PISCATORIS(new HasItem(Filters.Items.idEquals(ItemID.PISCATORIS_TELEPORT)), false),
+        TAI_BWO_WANNAI(new HasItem(Filters.Items.idEquals(ItemID.TAI_BWO_WANNAI_TELEPORT)), false),
+        ELF_CAMP(new HasItem(Filters.Items.idEquals(ItemID.IORWERTH_CAMP_TELEPORT)), false),
+        MOS_LE_HARMLESS(new HasItem(Filters.Items.idEquals(ItemID.MOS_LEHARMLESS_TELEPORT)), false),
+        LUMBERYARD(new HasItem(Filters.Items.idEquals(ItemID.LUMBERYARD_TELEPORT)), false),
+        ZULANDRA(new HasItem(Filters.Items.idEquals(ItemID.ZULANDRA_TELEPORT)), false),
+        KEY_MASTER(new HasItem(Filters.Items.idEquals(ItemID.KEY_MASTER_TELEPORT)), false),
+        REVENANT_CAVES(new HasItem(Filters.Items.idEquals(ItemID.REVENANT_CAVE_TELEPORT)), false),
+        WATSON(new HasItem(Filters.Items.idEquals(ItemID.WATSON_TELEPORT)), false),
+        ROYAL_SEED(new HasItem(Filters.Items.idEquals(ItemID.ROYAL_SEED_POD)), false),
         ;
 
         @Getter
@@ -637,7 +666,7 @@ public enum Teleport {
         this.location = location;
         this.requirement = requirement;
         this.action = action;
-        this.teleportLimit = TeleportConstants.LEVEL_20_WILDERNESS_LIMIT;
+        this.teleportLimit = () -> CachedBooleans.LEVEL_20_WILDERNESS_LIMIT.getCachedBoolean().getBoolean();
     }
 
     Teleport(int moveCost, RSTile location, Requirement requirement, Action action, TeleportLimit limit) {
@@ -653,7 +682,7 @@ public enum Teleport {
         this.location = scroll.getLocation();
         this.requirement = () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && (hasItem.hasItem.checkHasItem() || scroll.canUse());
         this.action = () -> scroll.teleportTo(false);
-        this.teleportLimit = TeleportConstants.LEVEL_20_WILDERNESS_LIMIT;
+        this.teleportLimit = () -> CachedBooleans.LEVEL_20_WILDERNESS_LIMIT.getCachedBoolean().getBoolean();
     }
 
     Teleport(int movecost, RSTile location, CachedBoolean cachedBoolean) {// TODO add teleport type enums
@@ -699,7 +728,7 @@ public enum Teleport {
         Arrays.stream(values()).forEach(t -> t.setMoveCost(moveCost));
     }
 
-    private static List<Teleport> blacklist = new ArrayList<>();
+    private static Set<Teleport> blacklist = new HashSet<>();
 
     public static void blacklistTeleports(Teleport... teleports) {
         blacklist.addAll(Arrays.asList(teleports));
@@ -709,30 +738,49 @@ public enum Teleport {
         blacklist.clear();
     }
 
-    public static int count = 0;
-
-    public static List<RSTile> getValidStartingRSTiles() {
-        List<RSTile> RSTiles = new ArrayList<>();
-        count = 0;
-        PUtils.getClient().getLogger().info("Time: " + System.currentTimeMillis());
+    public static void checkAllItems() {
+        log.info("Start: " + System.currentTimeMillis());
+        CachedBooleans.resetCachedBooleans();
+        SpellBook.resetCurrenSpellBook();
+        RunePouch.resetHasPouch();
+        RuneElement.resetAllRuneElements();
+        List<PItem> inventoryItems = PInventory.getAllItems();
+        List<PItem> equippedItems = PInventory.getEquipmentItems();
+        for (PItem invItem : inventoryItems) {
+            RunePouch.checkIsRunePouch(invItem);
+            for (RuneElement rune : RuneElement.values()) {
+                rune.checkRuneCount(invItem);
+            }
+        }
+        for (PItem equipItem : equippedItems) {
+            for (RuneElement rune : RuneElement.values()) {
+                rune.checkHasStaff(equipItem);
+            }
+        }
         for (HasItems items : HasItems.values()) {
             items.getHasItem().resetState();
-            for (PItem invItem : PInventory.getAllItems()) {
+            for (PItem invItem : inventoryItems) {
                 items.getHasItem().mapHasItem(invItem);
             }
-            for (PItem invItem : PInventory.getEquipmentItems()) {
+            for (PItem equipItem : equippedItems) {
                 if (items.equippable) {
-                    items.getHasItem().mapHasItem(invItem);
+                    items.getHasItem().mapHasItem(equipItem);
                 }
             }
         }
-        PUtils.getClient().getLogger().info("Total Count: " + count + ", " + System.currentTimeMillis());
+        log.info("Checked Items: " + System.currentTimeMillis());
+    }
+
+    public static List<RSTile> getValidStartingRSTiles() {
+        checkAllItems();
+        List<RSTile> RSTiles = new ArrayList<>();
         for (Teleport teleport : values()) {
             if (blacklist.contains(teleport) || !teleport.teleportLimit.canCast() ||
                     !teleport.canUse || !teleport.requirement.satisfies()) continue;
-            PUtils.getClient().getLogger().info("Teleport: " + teleport.name() + ", " + System.currentTimeMillis());
+            //log.info("Teleport: " + teleport.name() + ", " + System.currentTimeMillis());
             RSTiles.add(teleport.location);
         }
+        //log.info("Finish: " + System.currentTimeMillis());
         return RSTiles;
     }
 

@@ -57,7 +57,7 @@ public enum Spell implements Validatable {
         for (RuneRequirement pair : recipe){
             int amountRequiredForSpell = pair.getFirst();
             RuneElement runeElement = pair.getSecond();
-            if (runeElement.getCount() < amountRequiredForSpell){
+            if (runeElement.getRuneCount() < amountRequiredForSpell){
                 return false;
             }
         }

@@ -33,7 +33,7 @@ public class MasterScrollBook {
         ELF_CAMP(5680,"Elf Camp", TeleportScrolls.ELF_CAMP.getLocation()),
         MOS_LE_HARMLESS(5681,"Mos Le'Harmless", TeleportScrolls.MOS_LE_HARMLESS.getLocation()),
         LUMBERYARD(5682,"Lumberyard", TeleportScrolls.LUMBERYARD.getLocation()),
-        ZULLANDRA(5683,"Zul-Andra", TeleportScrolls.ZULLANDRA.getLocation()),
+        ZULANDRA(5683,"Zul-Andra", TeleportScrolls.ZULANDRA.getLocation()),
         KEY_MASTER(5684,"Key Master", TeleportScrolls.KEY_MASTER.getLocation()),
         REVENANT_CAVES(6056,"Revenant cave", TeleportScrolls.REVENANT_CAVES.getLocation()),
         WATSON(8253, "Watson", TeleportScrolls.WATSON.getLocation());

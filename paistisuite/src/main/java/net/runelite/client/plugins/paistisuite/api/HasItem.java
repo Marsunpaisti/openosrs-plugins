@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.paistisuite.api;
 
-import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.Teleport;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 
 import java.util.function.Predicate;
@@ -21,7 +20,6 @@ public class HasItem {
     public void mapHasItem(PItem item) {
         if (!state) {
             state = FILTER.test(item);
-            Teleport.count++;
         }
     }
 
