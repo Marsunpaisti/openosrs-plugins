@@ -28,6 +28,7 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.Walke
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTree;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTreeManager;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 import org.pf4j.Extension;
@@ -120,6 +121,7 @@ public class WebWalker extends PScript {
     public void onMenuOptionClicked(MenuOptionClicked event) {
 
         if (event.getMenuOption().contains("stop walking")) {
+            log.info("Clicked Stop Walking");
             requestStop();
             return;
         }
@@ -376,6 +378,7 @@ public class WebWalker extends PScript {
                 }
             }
         } else if (configButtonClicked.getKey().equals("stopButton")) {
+            log.info("Clicked Stop Button");
             requestStop();
             return;
         }
