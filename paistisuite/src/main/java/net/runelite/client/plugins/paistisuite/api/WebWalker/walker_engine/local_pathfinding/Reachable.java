@@ -1,8 +1,8 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding;
 
-import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
 
@@ -26,12 +26,12 @@ public class Reachable {
     }
 
     public boolean canReach(RSTile position) {
-        position = position.toWorldTile();
+        position = position.toWorldTile(PUtils.getClient());
         RSTile playerPosition = new RSTile(PPlayer.location());
         if (playerPosition.getX() == position.getX() && playerPosition.getY() == position.getY()) {
             return true;
         }
-        return getParent(position.toLocalTile()) != null;
+        return getParent(position.toLocalTile(PUtils.getClient())) != null;
     }
 
     public boolean canReach(WorldPoint position) {
@@ -71,12 +71,12 @@ public class Reachable {
         return getParent(position);
     }
 
-    public static WorldPoint getNearestReachableTile(WorldPoint target, int radius){
+    public static WorldPoint getNearestReachableTile(WorldPoint target, int radius) {
         Reachable r = new Reachable();
         if (r.canReach(target)) return target;
         List<WorldPoint> reachableTiles = new ArrayList<WorldPoint>();
-        for (int dx = -radius; dx <= radius; dx++){
-            for (int dy = -radius; dy <= radius; dy++){
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dy = -radius; dy <= radius; dy++) {
                 WorldPoint eval = target.dx(dx).dy(dy);
                 if (!r.canReach(eval)) continue;
                 reachableTiles.add(eval);
@@ -85,7 +85,7 @@ public class Reachable {
 
         return reachableTiles
                 .stream()
-                .sorted((a,b) -> {
+                .sorted((a, b) -> {
                     // First sort by distance from target
                     int aObjDist = target.distanceTo(a);
                     int bObjDist = target.distanceTo(b);
@@ -101,19 +101,19 @@ public class Reachable {
                 .orElse(null);
     }
 
-    public static WorldPoint getNearestReachableTile(PTileObject to, int radius){
+    public static WorldPoint getNearestReachableTile(PTileObject to, int radius) {
         return getNearestReachableTile(to.getWorldLocation(), radius);
     }
 
     public RSTile getParent(RSTile tile) {
         if (tile.getType() != RSTile.TYPES.LOCAL) {
-            tile = tile.toLocalTile();
+            tile = tile.toLocalTile(PUtils.getClient());
         }
         int x = tile.getX(), y = tile.getY();
         if (x < 0 || y < 0) {
             return null;
         }
-        if (x >= 104 || y >= 104 || x >= map.length || y >= map[x].length){
+        if (x >= 104 || y >= 104 || x >= map.length || y >= map[x].length) {
             return null;
         }
         return map[x][y];
@@ -146,7 +146,7 @@ public class Reachable {
      */
     public ArrayList<RSTile> getPath(int x, int y) {
         ArrayList<RSTile> path = new ArrayList<>();
-        RSTile playerPos = new RSTile(PPlayer.location()).toLocalTile();
+        RSTile playerPos = new RSTile(PPlayer.location()).toLocalTile(PUtils.getClient());
         if (x == playerPos.getX() && y == playerPos.getY()) {
             return path;
         }
@@ -161,7 +161,7 @@ public class Reachable {
         }
         RSTile tile = new RSTile(x, y, PPlayer.location().getPlane(), RSTile.TYPES.LOCAL);
         while ((tile = map[tile.getX()][tile.getY()]) != null) {
-            path.add(tile.toWorldTile());
+            path.add(tile.toWorldTile(PUtils.getClient()));
         }
         Collections.reverse(path);
         return path;
@@ -174,7 +174,7 @@ public class Reachable {
     public int getDistance(RSTile localPos) {
         RSTile position = convertToLocal(localPos.getX(), localPos.getY());
         int x = position.getX(), y = position.getY();
-        RSTile playerPos = new RSTile(PPlayer.location()).toLocalTile();
+        RSTile playerPos = new RSTile(PPlayer.location()).toLocalTile(PUtils.getClient());
         if (x == playerPos.getX() && y == playerPos.getY()) {
             return 0;
         }
@@ -198,19 +198,19 @@ public class Reachable {
     private static RSTile convertToLocal(int x, int y) {
         RSTile position = new RSTile(x, y, PPlayer.location().getPlane(), x >= 104 || y >= 104 ? RSTile.TYPES.WORLD : RSTile.TYPES.LOCAL);
         if (position.getType() != RSTile.TYPES.LOCAL) {
-            position = position.toLocalTile();
+            position = position.toLocalTile(PUtils.getClient());
         }
         return position;
     }
 
     public static RSTile getBestWalkableTile(RSTile target, Reachable reachable) {
-        RSTile localPosition = target.toLocalTile();
-        HashSet<RSTile> building = new HashSet<RSTile>(); // TODO: BankHelper.getBuilding(positionable);
+        RSTile localPosition = target.toLocalTile(PUtils.getClient());
+        HashSet<RSTile> building = new HashSet<>(); // TODO: BankHelper.getBuilding(positionable);
         boolean[][] traversed = new boolean[104][104];
         RSTile[][] parentMap = new RSTile[104][104];
         Queue<RSTile> queue = new LinkedList<>();
         int[][] collisionData = getCollisionData();
-        if(collisionData == null)
+        if (collisionData == null)
             return null;
 
         queue.add(localPosition);
@@ -227,16 +227,16 @@ public class Reachable {
 
             int currentCollisionFlags = collisionData[x][y];
             if (AStarNode.isWalkable(currentCollisionFlags)) {
-                if (reachable != null && !reachable.canReach(currentLocal.toWorldTile().getX(), currentLocal.toWorldTile().getY())) {
+                if (reachable != null && !reachable.canReach(currentLocal.toWorldTile(PUtils.getClient()).getX(), currentLocal.toWorldTile(PUtils.getClient()).getY())) {
                     continue;
                 }
                 if (building != null && building.size() > 0) {
-                    if (building.contains(currentLocal.toWorldTile())) {
-                        return currentLocal.toWorldTile();
+                    if (building.contains(currentLocal.toWorldTile(PUtils.getClient()))) {
+                        return currentLocal.toWorldTile(PUtils.getClient());
                     }
                     continue; //Next tile because we are now outside of building.
                 } else {
-                    return currentLocal.toWorldTile();
+                    return currentLocal.toWorldTile(PUtils.getClient());
                 }
             }
 
@@ -274,13 +274,13 @@ public class Reachable {
      * @return local reachable tiles
      */
     private static RSTile[][] generateMap(RSTile homeTile) {
-        RSTile localPlayerPosition = homeTile.toLocalTile();
+        RSTile localPlayerPosition = homeTile.toLocalTile(PUtils.getClient());
         boolean[][] traversed = new boolean[104][104];
         RSTile[][] parentMap = new RSTile[104][104];
         Queue<RSTile> queue = new LinkedList<>();
         int[][] collisionData = getCollisionData();
 
-        if(collisionData == null)
+        if (collisionData == null)
             return new RSTile[][]{};
 
         queue.add(localPlayerPosition);

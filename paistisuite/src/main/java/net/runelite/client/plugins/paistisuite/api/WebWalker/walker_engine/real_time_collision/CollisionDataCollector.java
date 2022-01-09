@@ -33,7 +33,7 @@ public class CollisionDataCollector {
         for (int i = 0; i < collisionData.length; i++) {
             for (int j = 0; j < collisionData[i].length; j++) {
                 RSTile localTile = new RSTile(i, j, playerPosition.getPlane(), RSTile.TYPES.LOCAL);
-                RSTile worldTile = localTile.toWorldTile();
+                RSTile worldTile = localTile.toWorldTile(PUtils.getClient());
                 RealTimeCollisionTile.create(worldTile.getX(), worldTile.getY(), worldTile.getPlane(), collisionData[i][j]);
             }
         }
@@ -47,7 +47,7 @@ public class CollisionDataCollector {
         for (int i = 0; i < collisionData.length; i++) {
             for (int j = 0; j < collisionData[i].length; j++) {
                 RSTile localTile = new RSTile(i, j, playerPosition.getPlane(), RSTile.TYPES.LOCAL);
-                RSTile worldTile = localTile.toWorldTile();
+                RSTile worldTile = localTile.toWorldTile(PUtils.getClient());
                 RealTimeCollisionTile realTimeCollisionTile = RealTimeCollisionTile.get(worldTile.getX(), worldTile.getY(), worldTile.getPlane());
                 if (realTimeCollisionTile != null){
                     realTimeCollisionTile.setCollisionData(collisionData[i][j]);

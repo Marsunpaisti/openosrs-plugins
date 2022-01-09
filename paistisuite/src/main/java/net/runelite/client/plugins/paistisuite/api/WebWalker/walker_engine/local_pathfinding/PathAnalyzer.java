@@ -224,7 +224,7 @@ public class PathAnalyzer {
     }
 
     private static boolean isLoaded(RSTile tile){
-        final RSTile local = tile.toLocalTile();
+        final RSTile local = tile.toLocalTile(PUtils.getClient());
         return local.getX() >= 0 && local.getX() < 104 && local.getY() >= 0 && local.getY() < 104;
     }
 

@@ -9,10 +9,13 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.Poin
 import net.runelite.client.plugins.paistisuite.api.WebWalker.shared.InterfaceHelper;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.InteractionHelper;
-import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSInterface;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 public class SpiritTree {
@@ -33,14 +36,26 @@ public class SpiritTree {
         SPIRIT_TREE_HOSIDIUS("Hosidius", 1692, 3540, 0),
         SPIRIT_TREE_GUILD("Farming Guild", 1252, 3752, 0);
 
-        private int x, y, z;
-        private String name;
+        private final int x, y, z;
+        private final String name;
 
         Location(String name, int x, int y, int z) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.name = name;
+        }
+
+        private static final Map<Point3D, Location> locationMap = new HashMap<>();
+
+        static {
+            for (Location location : Location.values()) {
+                locationMap.put(new Point3D(location.getX(), location.getY(), location.getZ()), location);
+            }
+        }
+
+        public static Location getSpiritTree(Point3D point) {
+            return locationMap.get(point);
         }
 
         public String getName() {

@@ -1,17 +1,14 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
-import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.Teleport;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models.*;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WaitFor;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.ShipUtils;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTree;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTreeManager;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 
 import java.util.*;
@@ -20,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class DaxWalker {
+    @Getter
     private static Map<RSTile, Teleport> map;
     private static DaxWalker daxWalker;
     public boolean allowTeleports = false;
@@ -68,30 +66,20 @@ public class DaxWalker {
             WaitFor.milliseconds(500, 1200);
         }
 
-        RSTile start = new RSTile(PPlayer.location());
-        if (start.equals(destination)) {
+        Point3D start = new Point3D(PPlayer.location());
+        if (start.equals(new Point3D(destination))) {
             return true;
         }
 
         List<PathRequestPair> pathRequestPairs = getInstance().allowTeleports ? getInstance().getPathTeleports(destination) : new ArrayList<>();
+        pathRequestPairs.add(0, new PathRequestPair(start, new Point3D(destination)));
 
-        pathRequestPairs.add(new PathRequestPair(new Point3D(start), new Point3D(destination)));
-
-        log.info("Testing");
-        for (SpiritTree.Location location : SpiritTree.Location.values()) {
-            log.info(location.getName());
-            if (SpiritTreeManager.getActiveSpiritTrees(PUtils.getClient()).getOrDefault(location, false)) {
-                log.info("True");
-                pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), new Point3D(destination)));
-                pathRequestPairs.add(new PathRequestPair(new Point3D(start), location.getPoint3D()));
-            }
-        }
+        //TODO need to add planted spirit trees if we ever use this method
 
         List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(PlayerDetails.generate(), pathRequestPairs));
 
         List<PathResult> validPaths = getInstance().validPaths(pathResults);
-
-        PathResult pathResult = getInstance().getBestPath(validPaths);
+        PathResult pathResult = getInstance().getBestPath(start, validPaths);
         if (pathResult == null) {
             log.warn("No valid path found");
             return false;
@@ -123,12 +111,13 @@ public class DaxWalker {
 
         List<BankPathRequestPair> pathRequestPairs = getInstance().getBankPathTeleports();
 
-        pathRequestPairs.add(new BankPathRequestPair(new Point3D(PPlayer.location()), null));
+        Point3D start = new Point3D(PPlayer.location());
+        pathRequestPairs.add(0, new BankPathRequestPair(start, null));
 
         List<PathResult> pathResults = WebWalkerServerApi.getInstance().getBankPaths(new BulkBankPathRequest(PlayerDetails.generate(), pathRequestPairs));
 
         List<PathResult> validPaths = getInstance().validPaths(pathResults);
-        PathResult pathResult = getInstance().getBestPath(validPaths);
+        PathResult pathResult = getInstance().getBestPath(start, validPaths);
         if (pathResult == null) {
             log.warn("No valid path found");
             return false;
@@ -136,10 +125,10 @@ public class DaxWalker {
         return WalkerEngine.getInstance().walkPath(pathResult.toRSTilePath(), getGlobalWalkingCondition().combine(walkingCondition));
     }
 
-    public List<PathRequestPair> getPathTeleports(RSTile start) {
+    public List<PathRequestPair> getPathTeleports(RSTile destination) {
         return Teleport.getValidStartingRSTiles().stream()
                 .map((RSTile t) -> new PathRequestPair(new Point3D(t),
-                        new Point3D(start)))
+                        new Point3D(destination)))
                 .collect(Collectors.toList());
     }
 
@@ -158,13 +147,13 @@ public class DaxWalker {
         return Collections.emptyList();
     }
 
-    public PathResult getBestPath(List<PathResult> list) {
-        return list.stream().min(Comparator.comparingInt(this::getPathMoveCost)).orElse(null);
+    public PathResult getBestPath(Point3D start, List<PathResult> list) {
+        return list.stream().min(Comparator.comparingInt(pathResult -> getPathMoveCost(start, pathResult))).orElse(null);
     }
 
-    private int getPathMoveCost(PathResult pathResult) {
-        if (PPlayer.location().equals(pathResult.getPath().get(0).toWorldPoint())) return pathResult.getCost();
-        Teleport teleport = map.get(new RSTile(pathResult.getPath().get(0).toWorldPoint()));
+    public int getPathMoveCost(Point3D start, PathResult pathResult) {
+        if (start.equals(pathResult.getPath().get(0))) return pathResult.getCost();
+        Teleport teleport = map.get(new RSTile(pathResult.getPath().get(0)));
         if (teleport == null) return pathResult.getCost();
         return teleport.getMoveCost() + pathResult.getCost();
     }

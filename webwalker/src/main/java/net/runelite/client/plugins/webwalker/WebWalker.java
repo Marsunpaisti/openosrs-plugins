@@ -12,14 +12,17 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.plugins.OPRSExternalPluginManager;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.plugins.paistisuite.PScript;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
 import net.runelite.client.plugins.paistisuite.api.PMenu;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
 import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.PWalking;
+import net.runelite.client.plugins.paistisuite.api.WebWalker.Teleports.Teleport;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.WalkingCondition;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.DaxWalker;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.WebWalkerServerApi;
@@ -28,7 +31,6 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.Walke
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTree;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTreeManager;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
-import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 import org.pf4j.Extension;
@@ -47,7 +49,7 @@ import java.util.Set;
 @PluginDescriptor(
         name = "WebWalker",
         enabledByDefault = false,
-        description = "Walks around with DaxWalker. Special thanks to Manhattan, Illumine and Runemoro.",
+        description = "Walks around with DaxWalker. Special thanks to Satoshi Oda, Manhattan, Illumine and Runemoro.",
         tags = {"npcs", "items", "paisti", "satoshi"}
 )
 
@@ -67,6 +69,7 @@ public class WebWalker extends PScript {
 
     @Inject
     private OverlayManager overlayManager;
+
     @Inject
     private WebWalkerOverlay overlay;
 
@@ -82,6 +85,12 @@ public class WebWalker extends PScript {
     @Inject
     private ConfigManager configManager;
 
+    @Inject
+    private PluginManager pluginManager;
+
+    @Inject
+    private OPRSExternalPluginManager oprsExternalPluginManager;
+
     @Provides
     WebWalkerConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(WebWalkerConfig.class);
@@ -89,6 +98,11 @@ public class WebWalker extends PScript {
 
     @Override
     protected void startUp() {
+        Teleport.TeleportType.TELEPORT_SPELL.setMoveCost(config.teleportSpellCost());
+        Teleport.TeleportType.TELEPORT_SCROLL.setMoveCost(config.teleportScrollCost());
+        Teleport.TeleportType.NONRECHARABLE_TELE.setMoveCost(config.nonrechargableTeleCost());
+        Teleport.TeleportType.RECHARGABLE_TELE.setMoveCost(config.rechargableTeleCost());
+        Teleport.TeleportType.UNLIMITED_TELE.setMoveCost(config.unlimitedTeleportCost());
     }
 
     @Subscribe
@@ -119,7 +133,6 @@ public class WebWalker extends PScript {
 
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
-
         if (event.getMenuOption().contains("stop walking")) {
             log.info("Clicked Stop Walking");
             requestStop();
@@ -208,7 +221,13 @@ public class WebWalker extends PScript {
         log.info("Teleport count: " + pathRequestPairs.size());
         pathRequestPairs.add(0, new PathRequestPair(start, destination));
 
-        if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {//TODO add farming cape tele
+        boolean farmCapeToSpiritTree = SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(SpiritTree.Location.SPIRIT_TREE_GUILD, false)
+                && Teleport.FARMING_CAPE.getTeleportLimit().canCast() && Teleport.FARMING_CAPE.getRequirement().satisfies();
+        if (farmCapeToSpiritTree) {
+            pathRequestPairs.add(new PathRequestPair(new Point3D(Teleport.FARMING_CAPE.getLocation()), SpiritTree.Location.SPIRIT_TREE_GUILD.getPoint3D()));
+        }
+
+        if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {
             for (SpiritTree.Location location : SpiritTree.Location.values()) {
                 if (SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
                     pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
@@ -216,15 +235,16 @@ public class WebWalker extends PScript {
                 }
             }
         }
-        log.info("Total Combinations: " + pathRequestPairs.size());
+        log.info("Total Request Count: " + pathRequestPairs.size());
         List<PathResult> pathResults = WebWalkerServerApi.getInstance().getPaths(new BulkPathRequest(details, pathRequestPairs));
 
         //log.info("Total Paths: " + pathResults.size());
-        if (pathResults.get(0) != null && pathResults.get(0).getPath() != null) {
-            destination = pathResults.get(0).getLastPoint();
-        }
 
         List<PathResult> validPaths = DaxWalker.getInstance().validPaths(pathResults);
+
+        if (validPaths.get(0) != null && validPaths.get(0).getPath() != null) {
+            destination = validPaths.get(0).getLastPoint();
+        }
 
 //        log.info("Valid Paths: " + validPaths.size());
 //        for (PathResult path : validPaths) {
@@ -236,24 +256,26 @@ public class WebWalker extends PScript {
         List<PathResult> secondPath = new ArrayList<>();
 
         for (PathResult path : validPaths) {
-            boolean addedPath = false;
-            for (SpiritTree.Location location : SpiritTree.Location.values()) {
-                if (SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
-                    if (path.getFirstPoint().equals(start) && path.getLastPoint().equals(location.getPoint3D())) {
-                        firstPath.add(path);
-                        addedPath = true;
-                        break;
-                    }
-                    if (path.getFirstPoint().equals(location.getPoint3D()) && path.getLastPoint().equals(destination)) {
-                        secondPath.add(path);
-                        addedPath = true;
-                        break;
-                    }
+            if (farmCapeToSpiritTree) {
+                if (path.getFirstPoint().equals(new Point3D(Teleport.FARMING_CAPE.getLocation())) && path.getLastPoint().equals(SpiritTree.Location.SPIRIT_TREE_GUILD.getPoint3D())) {
+                    firstPath.add(path);
+                    continue;
                 }
             }
-            if (!addedPath) {
-                curatedPaths.add(path);
+
+            SpiritTree.Location entrySpirit = SpiritTree.Location.getSpiritTree(path.getLastPoint());
+            if (path.getFirstPoint().equals(start) && entrySpirit != null && SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(entrySpirit, false)) {
+                firstPath.add(path);
+                continue;
             }
+
+            SpiritTree.Location exitSpirit = SpiritTree.Location.getSpiritTree(path.getFirstPoint());
+            if (path.getLastPoint().equals(destination) && exitSpirit != null && SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(exitSpirit, false)) {
+                secondPath.add(path);
+                continue;
+            }
+
+            curatedPaths.add(path);
         }
 
         for (PathResult first : firstPath) {
@@ -263,14 +285,36 @@ public class WebWalker extends PScript {
             }
         }
 
-        //log.info("Curated Paths: " + curatedPaths.size());
+        if (curatedPaths.size() == 0) {
+            log.warn("No valid path found");
+            PUtils.sendGameMessage("No valid path found.");
+            requestStop();
+            return;
+        }
 
-        PathResult pathResult = DaxWalker.getInstance().getBestPath(curatedPaths);
+//        if (curatedPaths.get(0) != null) {
+//            log.info("Walk Path0: " + curatedPaths.get(0).getCost() + ", " + curatedPaths.get(0));
+//        }
+//        for (PathResult pathResult : curatedPaths) {
+//            if (start.equals(pathResult.getPath().get(0))) {
+//                log.info("Walk Path: " + curatedPaths.get(0).getCost() + ", " + pathResult);
+//                continue;
+//            }
+//            Teleport teleport = DaxWalker.getMap().get(new RSTile(pathResult.getPath().get(0)));
+//            if (teleport == null) {
+//                log.info("Unknown Teleport Path: " + pathResult.getCost() + ", " + pathResult);
+//                continue;
+//            }
+//            log.info(teleport.name() + " Path: " + (teleport.getMoveCost() + pathResult.getCost()) + ", " + pathResult);
+//        }
+//        log.info("Curated Paths: " + curatedPaths.size());
+
+        PathResult pathResult = DaxWalker.getInstance().getBestPath(start, curatedPaths);
 
         if (pathResult == null) {
             log.warn("No valid path found");
             PUtils.sendGameMessage("No valid path found. Path status list: ");
-            Set<PathStatus> statuses = new HashSet<PathStatus>();
+            Set<PathStatus> statuses = new HashSet<>();
             for (PathResult r : pathResults) {
                 statuses.add(r.getPathStatus());
             }
@@ -280,7 +324,7 @@ public class WebWalker extends PScript {
             requestStop();
             return;
         }
-        log.info("Path: " + pathResult);
+        log.info("Movecost: " + DaxWalker.getInstance().getPathMoveCost(start, pathResult) + ", Path: " + pathResult);
 
         ArrayList<RSTile> path = pathResult.toRSTilePath();
         if (WalkerEngine.getInstance().walkPath(path, walkingCondition)) {
@@ -319,6 +363,7 @@ public class WebWalker extends PScript {
 
     @Override
     protected void onStart() {
+        //log.info("PaistiSuite Version: " + oprsExternalPluginManager.getExternalPluginManager().getPlugin("paistisuite-plugin").getPluginState());
         gnomeVillageComplete = false;
         clientThread.invoke(() -> {
             // Checking if Tree Gnome Village is complete
@@ -347,6 +392,21 @@ public class WebWalker extends PScript {
             if (!event.getNewValue().equalsIgnoreCase("FARMING")) {
                 configManager.setConfiguration("WebWalker", "catFarming", Farming.NONE);
             }
+        }
+        if (event.getKey().equals("teleportSpellCost")) {
+            Teleport.TeleportType.TELEPORT_SPELL.setMoveCost(config.teleportSpellCost());
+        }
+        if (event.getKey().equals("teleportScrollCost")) {
+            Teleport.TeleportType.TELEPORT_SCROLL.setMoveCost(config.teleportScrollCost());
+        }
+        if (event.getKey().equals("nonrechargableTeleCost")) {
+            Teleport.TeleportType.NONRECHARABLE_TELE.setMoveCost(config.nonrechargableTeleCost());
+        }
+        if (event.getKey().equals("rechargableTeleCost")) {
+            Teleport.TeleportType.RECHARGABLE_TELE.setMoveCost(config.rechargableTeleCost());
+        }
+        if (event.getKey().equals("unlimitedTeleportCost")) {
+            Teleport.TeleportType.UNLIMITED_TELE.setMoveCost(config.unlimitedTeleportCost());
         }
     }
 

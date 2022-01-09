@@ -4,8 +4,7 @@ import net.runelite.client.config.*;
 import net.runelite.client.plugins.webwalker.farming.*;
 
 @ConfigGroup(WebWalker.CONFIG_GROUP)
-public interface WebWalkerConfig extends Config
-{
+public interface WebWalkerConfig extends Config {
     String WALKING = "walking";
 
     @ConfigTitle(
@@ -22,13 +21,11 @@ public interface WebWalkerConfig extends Config
             position = 18,
             section = instructionsTitle
     )
-    default String instructions()
-    {
+    default String instructions() {
         return "Select your location from the drop-down or enter a custom location using x,y,z format. Use Location/Tile Location in Developer Tools to obtain a custom coordinate.";
     }
 
-    default boolean notesTitle()
-    {
+    default boolean notesTitle() {
         return false;
     }
 
@@ -39,18 +36,17 @@ public interface WebWalkerConfig extends Config
             section = "notesTitle",
             position = 30
     )
-    default String notepad()
-    {
+    default String notepad() {
         return "Paste custom co-ords that you want to save for frequent use";
     }
+
     @ConfigItem(
             keyName = "category",
             name = "Category",
             description = "Select the category of destinations",
             position = 100
     )
-    default Category category()
-    {
+    default Category category() {
         return Category.NONE;
     }
 
@@ -63,8 +59,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "BANKS"
     )
-    default Banks catBanks()
-    {
+    default Banks catBanks() {
         return Banks.NONE;
     }
 
@@ -77,8 +72,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "BARCRAWL"
     )
-    default Barcrawl catBarcrawl()
-    {
+    default Barcrawl catBarcrawl() {
         return Barcrawl.NONE;
     }
 
@@ -91,8 +85,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "CITIES"
     )
-    default Cities catCities()
-    {
+    default Cities catCities() {
         return Cities.NONE;
     }
 
@@ -105,8 +98,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "FARMING"
     )
-    default Farming catFarming()
-    {
+    default Farming catFarming() {
         return Farming.NONE;
     }
 
@@ -119,8 +111,7 @@ public interface WebWalkerConfig extends Config
             unhide = "catFarming",
             unhideValue = "ALLOTMENTS"
     )
-    default Allotments catFarmAllotments()
-    {
+    default Allotments catFarmAllotments() {
         return Allotments.NONE;
     }
 
@@ -133,8 +124,7 @@ public interface WebWalkerConfig extends Config
             unhide = "catFarming",
             unhideValue = "BUSHES"
     )
-    default Bushes catFarmBushes()
-    {
+    default Bushes catFarmBushes() {
         return Bushes.NONE;
     }
 
@@ -147,8 +137,7 @@ public interface WebWalkerConfig extends Config
             unhide = "catFarming",
             unhideValue = "FRUIT_TREES"
     )
-    default FruitTrees catFarmFruitTrees()
-    {
+    default FruitTrees catFarmFruitTrees() {
         return FruitTrees.NONE;
     }
 
@@ -161,8 +150,7 @@ public interface WebWalkerConfig extends Config
             unhide = "catFarming",
             unhideValue = "HERBS"
     )
-    default Herbs catFarmHerbs()
-    {
+    default Herbs catFarmHerbs() {
         return Herbs.NONE;
     }
 
@@ -175,8 +163,7 @@ public interface WebWalkerConfig extends Config
             unhide = "catFarming",
             unhideValue = "HOPS"
     )
-    default Hops catFarmHops()
-    {
+    default Hops catFarmHops() {
         return Hops.NONE;
     }
 
@@ -189,8 +176,7 @@ public interface WebWalkerConfig extends Config
             unhide = "catFarming",
             unhideValue = "TREES"
     )
-    default Trees catFarmTrees()
-    {
+    default Trees catFarmTrees() {
         return Trees.NONE;
     }
 
@@ -203,8 +189,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "GUILDS"
     )
-    default Guilds catGuilds()
-    {
+    default Guilds catGuilds() {
         return Guilds.NONE;
     }
 
@@ -217,8 +202,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "SKILLING"
     )
-    default Skilling catSkilling()
-    {
+    default Skilling catSkilling() {
         return Skilling.NONE;
     }
 
@@ -231,8 +215,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "SLAYER"
     )
-    default Slayer catSlayer()
-    {
+    default Slayer catSlayer() {
         return Slayer.NONE;
     }
 
@@ -245,8 +228,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "MISC"
     )
-    default Misc catMisc()
-    {
+    default Misc catMisc() {
         return Misc.NONE;
     }
 
@@ -259,8 +241,7 @@ public interface WebWalkerConfig extends Config
             unhide = "category",
             unhideValue = "CUSTOM"
     )
-    default String customLocation()
-    {
+    default String customLocation() {
         return "0,0,0";
     }
 
@@ -270,8 +251,7 @@ public interface WebWalkerConfig extends Config
             description = "Disable running to arrive at your destination with 100% energy.",
             position = 145
     )
-    default boolean disableRun()
-    {
+    default boolean disableRun() {
         return false;
     }
 
@@ -281,11 +261,72 @@ public interface WebWalkerConfig extends Config
             description = "Allows walker to use teleport items in your inventory to travel.",
             position = 145
     )
-    default boolean allowTeleports()
-    {
+    default boolean allowTeleports() {
         return false;
     }
 
+    @ConfigSection(
+            name = "Teleport Movecosts",
+            description = "Movecosts define how many tiles a teleport needs to save before its used.",
+            position = 146,
+            closedByDefault = true
+    )
+    String teleportMovecosts = "Teleport Movecosts";
+
+    @ConfigItem(
+            keyName = "teleportSpellCost",
+            name = "Teleport Spell",
+            description = "Sets the Movecost for Teleport spells and tablets.",
+            position = 146,
+            section = teleportMovecosts
+    )
+    default int teleportSpellCost() {
+        return 50;
+    }
+
+    @ConfigItem(
+            keyName = "teleportScrollCost",
+            name = "Teleport Scroll",
+            description = "Sets the Movecost for Teleport scrolls.",
+            position = 147,
+            section = teleportMovecosts
+    )
+    default int teleportScrollCost() {
+        return 100;
+    }
+
+    @ConfigItem(
+            keyName = "nonrechargableTeleCost",
+            name = "Non-Rechargable",
+            description = "Sets the Movecost for non-rechargable teleports.(Ring of Duelling)",
+            position = 148,
+            section = teleportMovecosts
+    )
+    default int nonrechargableTeleCost() {
+        return 80;
+    }
+
+    @ConfigItem(
+            keyName = "rechargableTeleCost",
+            name = "Rechargable",
+            description = "Sets the Movecost for rechargable teleports.(Glory)",
+            position = 149,
+            section = teleportMovecosts
+    )
+    default int rechargableTeleCost() {
+        return 50;
+    }
+
+    @ConfigItem(
+            keyName = "unlimitedTeleportCost",
+            name = "Unlimited Teleport",
+            description = "Sets the Movecost for unlimited use teleports.(Ectophial)",
+            position = 150,
+            section = teleportMovecosts
+    )
+    default int unlimitedTeleportCost() {
+        return 10;
+    }
 
     @ConfigItem(
             keyName = "startButton",
@@ -293,8 +334,7 @@ public interface WebWalkerConfig extends Config
             description = "Start walker",
             position = 151
     )
-    default Button startButton()
-    {
+    default Button startButton() {
         return new Button();
     }
 
@@ -304,8 +344,7 @@ public interface WebWalkerConfig extends Config
             description = "Stop walker",
             position = 151
     )
-    default Button stopButton()
-    {
+    default Button stopButton() {
         return new Button();
     }
 
