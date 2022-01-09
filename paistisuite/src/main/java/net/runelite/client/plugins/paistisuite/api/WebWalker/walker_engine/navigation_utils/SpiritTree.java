@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.paistisuite.api.PObjects;
 import net.runelite.client.plugins.paistisuite.api.PPlayer;
@@ -30,20 +31,27 @@ public class SpiritTree {
         SPIRIT_TREE_VILLAGE("Tree Gnome Village", 2542, 3170, 0),
         SPIRIT_TREE_FELDIP("Feldip Hills", 2486, 2849, 0),
         SPIRIT_TREE_PRIFDDINAS("Prifddinas", 3274, 6123, 0),
-        SPIRIT_TREE_SARIM("Port Sarim", 3059, 3256, 0),
-        SPIRIT_TREE_ETCETERIA("Etceteria", 2611, 3857, 0),
-        SPIRIT_TREE_BRIMHAVEN("Brimhaven", 2800, 3204, 0),
-        SPIRIT_TREE_HOSIDIUS("Hosidius", 1692, 3540, 0),
-        SPIRIT_TREE_GUILD("Farming Guild", 1252, 3752, 0);
+        SPIRIT_TREE_SARIM("Port Sarim", 3059, 3256, 0, true),
+        SPIRIT_TREE_ETCETERIA("Etceteria", 2611, 3857, 0, true),
+        SPIRIT_TREE_BRIMHAVEN("Brimhaven", 2800, 3204, 0, true),
+        SPIRIT_TREE_HOSIDIUS("Hosidius", 1692, 3540, 0, true),
+        SPIRIT_TREE_GUILD("Farming Guild", 1252, 3752, 0, true);
 
         private final int x, y, z;
         private final String name;
+        @Getter
+        private boolean farming = false;
 
         Location(String name, int x, int y, int z) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.name = name;
+        }
+
+        Location(String name, int x, int y, int z, boolean farming){
+            this(name, x,y,z);
+            this.farming = farming;
         }
 
         private static final Map<Point3D, Location> locationMap = new HashMap<>();

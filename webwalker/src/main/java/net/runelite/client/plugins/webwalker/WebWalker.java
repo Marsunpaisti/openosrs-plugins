@@ -227,7 +227,15 @@ public class WebWalker extends PScript {
             pathRequestPairs.add(new PathRequestPair(new Point3D(Teleport.FARMING_CAPE.getLocation()), SpiritTree.Location.SPIRIT_TREE_GUILD.getPoint3D()));
         }
 
-        if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {
+        boolean hasFarmedSpiritTree = false;
+        for (SpiritTree.Location location : SpiritTree.Location.values()) {
+            if (location.isFarming() && SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
+                hasFarmedSpiritTree = true;
+                break;
+            }
+        }
+
+        if (gnomeVillageComplete && hasFarmedSpiritTree && client.getWorldType().contains(WorldType.MEMBERS)) {
             for (SpiritTree.Location location : SpiritTree.Location.values()) {
                 if (SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
                     pathRequestPairs.add(new PathRequestPair(location.getPoint3D(), destination));
