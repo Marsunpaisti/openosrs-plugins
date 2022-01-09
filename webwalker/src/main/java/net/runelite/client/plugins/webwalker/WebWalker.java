@@ -28,7 +28,6 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.Walke
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTree;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.SpiritTreeManager;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
-import net.runelite.client.plugins.paistisuite.framework.MenuInterceptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 import org.pf4j.Extension;
@@ -207,7 +206,15 @@ public class WebWalker extends PScript {
         List<PathRequestPair> pathRequestPairs = DaxWalker.getInstance().allowTeleports ? DaxWalker.getInstance().getPathTeleports(targetLocation) : new ArrayList<>();
         pathRequestPairs.add(0, new PathRequestPair(start, destination));
 
-        if (gnomeVillageComplete && client.getWorldType().contains(WorldType.MEMBERS)) {
+        boolean hasFarmedSpiritTree = false;
+        for (SpiritTree.Location location : SpiritTree.Location.values()) {
+            if (location.isFarming() && SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
+                hasFarmedSpiritTree = true;
+                break;
+            }
+        }
+
+        if (gnomeVillageComplete && hasFarmedSpiritTree && client.getWorldType().contains(WorldType.MEMBERS)) {
             for (SpiritTree.Location location : SpiritTree.Location.values()) {
                 //log.info(location.getName());
                 if (SpiritTreeManager.getActiveSpiritTrees(client).getOrDefault(location, false)) {
