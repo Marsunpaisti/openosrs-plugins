@@ -2,6 +2,9 @@ package net.runelite.client.plugins.paistisuite.api.WebWalker.api_lib.models;
 
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum RunescapeBank {
     AL_KHARID(3269, 3167, 0),
     ARCEUUS(1624, 3745, 0),
@@ -63,14 +66,27 @@ public enum RunescapeBank {
     WOODCUTTING_GUILD(1591, 3479, 0),
     YANILLE(2613, 3093, 0),
     ZANARIS(2383, 4458, 0),
-    ZEAH_SAND_BANK(1719, 3465, 0)
-    ;
+    ZEAH_SAND_BANK(1719, 3465, 0);
+
     RSTile position;
-    RunescapeBank(int x, int y, int z){
-        this.position = new RSTile(x,y,z);
+
+    RunescapeBank(int x, int y, int z) {
+        this.position = new RSTile(x, y, z);
     }
 
-    public RSTile getPosition(){
+    public RSTile getPosition() {
         return this.position;
+    }
+
+    private static final Map<RSTile, RunescapeBank> bankMap = new HashMap<>();
+
+    static {
+        for (RunescapeBank bank : RunescapeBank.values()) {
+            bankMap.put(bank.getPosition(), bank);
+        }
+    }
+
+    public static RunescapeBank getBank(RSTile point) {
+        return bankMap.get(point);
     }
 }

@@ -132,7 +132,7 @@ public class DaxWalker {
                 .collect(Collectors.toList());
     }
 
-    private List<BankPathRequestPair> getBankPathTeleports() {
+    public List<BankPathRequestPair> getBankPathTeleports() {
         return Teleport.getValidStartingRSTiles().stream()
                 .map((RSTile t) -> new BankPathRequestPair(new Point3D(t), null))
                 .collect(Collectors.toList());

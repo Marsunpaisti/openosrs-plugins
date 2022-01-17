@@ -14,15 +14,15 @@ public abstract class PScript extends Plugin {
 
     public void start() throws Exception {
         if (scriptRunner != null) {
-            PUtils.sendGameMessage("Script already running!");
             log.error("Trying to start an already running script! Killing old runner");
             requestStop();
+            PUtils.sendGameMessage("Script already running!");
             return;
         }
 
         try {
             scriptRunner = new PScriptRunner(this);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error: " + ExceptionUtils.getStackTrace(e));
             return;
         }
@@ -31,18 +31,18 @@ public abstract class PScript extends Plugin {
         isRunning = true;
     }
 
-    public synchronized boolean isRunning(){
+    public synchronized boolean isRunning() {
         return isRunning;
     }
 
-    public void requestStop(){
+    public void requestStop() {
         log.info("Requested stop.");
         if (scriptRunner != null) scriptRunner.requestStop();
         scriptRunner = null;
         isRunning = false;
     }
 
-    public boolean isStopRequested(){
+    public boolean isStopRequested() {
         return this.scriptRunner == null || this.scriptRunner.isStopRequested();
     }
 
@@ -53,6 +53,8 @@ public abstract class PScript extends Plugin {
     }
 
     protected abstract void loop();
+
     protected abstract void onStart();
+
     protected abstract void onStop();
 }

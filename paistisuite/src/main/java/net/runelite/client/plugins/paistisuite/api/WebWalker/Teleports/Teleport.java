@@ -418,7 +418,7 @@ public enum Teleport {
     ),
 
     KANDARIN_MONASTERY_TELEPORT(
-            TeleportType.UNLIMITED_TELE, new RSTile(2606, 3216, 0),
+            TeleportType.UNLIMITED_TELE, new RSTile(2606, 3221, 0),
             () -> CachedBooleans.IN_MEMBERS_WORLD.getCachedBoolean().getBoolean() && HasItems.ARDOUGNE_CLOAK_FILTER.getHasItem().checkHasItem(),
             () -> WearableItemTeleport.teleport(WearableItemTeleport.ARDOUGNE_CLOAK_FILTER, ".*Monastery.*")
     ),

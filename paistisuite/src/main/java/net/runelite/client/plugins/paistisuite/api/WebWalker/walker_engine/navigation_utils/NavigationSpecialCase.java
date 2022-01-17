@@ -13,11 +13,9 @@ import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.inter
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.interaction_handling.NPCInteraction;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.fairyring.FairyRing;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.AccurateMouse;
-import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
+import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PTileObject;
-
-import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.NavigationSpecialCase.SpecialLocation.*;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;
@@ -26,6 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.navigation_utils.NavigationSpecialCase.SpecialLocation.*;
 
 @Slf4j
 public class NavigationSpecialCase {
@@ -234,7 +234,11 @@ public class NavigationSpecialCase {
         UNKAH_SHANTAY_PASS_SOUTH_EXIT(3167, 2816, 0),
         UNKAH_SHANTAY_PASS_EAST_ENTRANCE(3193, 2842, 0),
         UNKAH_SHANTAY_PASS_EAST_EXIT(3196, 2842, 0),
-        ;
+
+        YANILLE_BALANCE_EDGE_NORTH(2580, 9520, 0),
+        YANILLE_BALANCE_EDGE_SOUTH(2580, 9512, 0),
+        YANILLE_MONKEY_BARS_WEST(2572, 9506, 0),
+        YANILLE_MONKEY_BARS_EAST(2578, 9506, 0);
 
 
         int x, y, z;
@@ -957,6 +961,18 @@ public class NavigationSpecialCase {
                     return UNKAH_SHANTAY_PASS_SOUTH_EXIT.getRSTile().equals(PPlayer.location())
                             ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE;
                 }) && WaitFor.milliseconds(600, 1800) != null;
+            case YANILLE_BALANCE_EDGE_SOUTH:
+                return clickObject(Filters.Objects.nameEquals("Balancing ledge"), "Walk-across",
+                        () -> PPlayer.location().distanceTo(YANILLE_BALANCE_EDGE_NORTH.getRSTile().toWorldPoint()) <= 2 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+            case YANILLE_BALANCE_EDGE_NORTH:
+                return clickObject(Filters.Objects.nameEquals("Balancing edge"), "Walk-across",
+                        () -> PPlayer.location().distanceTo(YANILLE_BALANCE_EDGE_SOUTH.getRSTile().toWorldPoint()) <= 2 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+            case YANILLE_MONKEY_BARS_EAST:
+                return clickObject(Filters.Objects.nameEquals("Monkeybars"), "Swing across",
+                        () -> PPlayer.location().distanceTo(YANILLE_MONKEY_BARS_WEST.getRSTile().toWorldPoint()) <= 2 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
+            case YANILLE_MONKEY_BARS_WEST:
+                return clickObject(Filters.Objects.nameEquals("Monkeybars"), "Swing across",
+                        () -> PPlayer.location().distanceTo(YANILLE_MONKEY_BARS_EAST.getRSTile().toWorldPoint()) <= 2 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE);
         }
 
         return false;

@@ -149,7 +149,7 @@ public class PInteraction {
                     target.getWidgetItem().getId(),
                     MenuAction.ITEM_USE_ON_WIDGET_ITEM.getId(),
                     target.getWidgetItem().getIndex(),
-                    9764864);
+                    WidgetInfo.INVENTORY.getId());
             PUtils.getClient().setMouseIdleTicks(0);
             PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
@@ -169,7 +169,7 @@ public class PInteraction {
                     target.getWidgetItem().getId(),
                     MenuAction.ITEM_USE_ON_WIDGET.getId(),
                     target.getWidgetItem().getIndex(),
-                    9764864);
+                    WidgetInfo.INVENTORY.getId());
             PUtils.getClient().setMouseIdleTicks(0);
             PUtils.getClient().setKeyboardIdleTicks(0);
             return true;
@@ -258,7 +258,7 @@ public class PInteraction {
                     item.getId(),
                     finalActionOp.getId(),
                     item.getWidgetItem().getIndex(),
-                    9764864);
+                    WidgetInfo.INVENTORY.getId());
             PUtils.getClient().setMouseIdleTicks(0);
             PUtils.getClient().setKeyboardIdleTicks(0);
             return true;

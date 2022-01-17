@@ -78,7 +78,7 @@ public class FairyRing {
         final WorldPoint startPos = PPlayer.getWorldLocation();
         if (location.turnTo() && pressTeleport()
                 && WaitFor.condition(8000, () -> startPos.distanceToHypotenuse(PPlayer.location()) > 20 ? WaitFor.Return.SUCCESS : WaitFor.Return.IGNORE) == WaitFor.Return.SUCCESS){
-            WaitFor.random(900, 1600);
+            WaitFor.random(1200, 1600);
             tryToEquipPreviousWeapon();
             return true;
         }

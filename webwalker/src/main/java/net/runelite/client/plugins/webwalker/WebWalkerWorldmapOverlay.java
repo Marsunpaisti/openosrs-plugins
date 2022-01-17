@@ -7,7 +7,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WebWalkerDebugRenderer;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -22,6 +21,9 @@ public class WebWalkerWorldmapOverlay extends Overlay {
     private final Client client;
     private final WebWalker plugin;
     private final WebWalkerConfig config;
+
+    @Inject
+    private WebWalkerDebugRenderer webWalkerDebugRenderer;
 
     @Inject
     private WorldMapOverlay worldMapOverlay;
@@ -40,7 +42,7 @@ public class WebWalkerWorldmapOverlay extends Overlay {
     @Override
     public Dimension render(Graphics2D graphics) {
         if (!WalkerEngine.getInstance().isNavigating()) return null;
-        WebWalkerDebugRenderer.renderWorldMap(graphics);
+        webWalkerDebugRenderer.renderWorldMap(graphics);
         return null;
         /*
         if (client.getWidget(WidgetInfo.WORLD_MAP_VIEW) == null) {
@@ -54,8 +56,6 @@ public class WebWalkerWorldmapOverlay extends Overlay {
             drawOnMap(graphics, tile.toWorldPoint(), Color.cyan);
         }
         return null;
-        *
-
          */
     }
 

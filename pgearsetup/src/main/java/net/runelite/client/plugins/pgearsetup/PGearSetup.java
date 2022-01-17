@@ -1,34 +1,59 @@
 package net.runelite.client.plugins.pgearsetup;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import com.google.inject.Provides;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.GameState;
-import net.runelite.api.events.*;
+import net.runelite.api.events.ConfigButtonClicked;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.client.chat.ChatColorType;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.OPRSExternalPluginManager;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.paistisuite.PScript;
 import net.runelite.client.plugins.paistisuite.PaistiSuite;
-import net.runelite.client.plugins.paistisuite.api.*;
+import net.runelite.client.plugins.paistisuite.api.PBanking;
+import net.runelite.client.plugins.paistisuite.api.PInteraction;
+import net.runelite.client.plugins.paistisuite.api.PInventory;
+import net.runelite.client.plugins.paistisuite.api.PUtils;
 import net.runelite.client.plugins.paistisuite.api.types.Filters;
 import net.runelite.client.plugins.paistisuite.api.types.PItem;
 import net.runelite.client.plugins.pgearsetup.UI.PGearSetupPanel;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.http.api.RuneLiteAPI;
+import okhttp3.HttpUrl;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.pf4j.Extension;
+import org.pf4j.PluginWrapper;
+import org.pf4j.update.PluginInfo;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 
 @Extension
 @PluginDependency(PaistiSuite.class)
@@ -57,6 +82,15 @@ public class PGearSetup extends PScript {
     @Inject
     public ItemManager itemManager;
 
+    @Inject
+    private OPRSExternalPluginManager oprsExternalPluginManager;
+
+    @Inject
+    private Gson gson;
+
+    @Inject
+    private ChatMessageManager chatMessageManager;
+
     private GearSetupData targetGearSetup = null;
     public ArrayList<GearSetupData> gearSetups;
 
@@ -70,13 +104,12 @@ public class PGearSetup extends PScript {
     }
 
     @Provides
-    PGearSetupConfig provideConfig(ConfigManager configManager)
-    {
+    PGearSetupConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(PGearSetupConfig.class);
     }
 
     @Override
-    protected void startUp(){
+    protected void startUp() {
         loadSetups();
 
         panel = injector.getInstance(PGearSetupPanel.class);
@@ -93,29 +126,29 @@ public class PGearSetup extends PScript {
     }
 
     @Override
-    protected void shutDown(){
+    protected void shutDown() {
         clientToolbar.removeNavigation(navButton);
     }
 
     @Subscribe
-    protected void onGameStateChanged(GameStateChanged e){
-        if (e.getGameState() == GameState.LOGIN_SCREEN){
+    protected void onGameStateChanged(GameStateChanged e) {
+        if (e.getGameState() == GameState.LOGIN_SCREEN) {
             didInitialLoad = false;
         }
-        if (e.getGameState() == GameState.LOGGED_IN && !didInitialLoad){
+        if (e.getGameState() == GameState.LOGGED_IN && !didInitialLoad) {
             didInitialLoad = true;
             rebuildPanel();
         }
     }
 
-    public void rebuildPanel(){
+    public void rebuildPanel() {
         SwingUtilities.invokeLater(() -> panel.reBuild());
         /*PaistiSuite.getInstance().clientExecutor.schedule(() -> {
             SwingUtilities.invokeLater(() -> panel.reBuild());
         }, "rebuildPanel");*/
     }
 
-    public void reloadPanel(){
+    public void reloadPanel() {
         clientToolbar.removeNavigation(navButton);
         panel = injector.getInstance(PGearSetupPanel.class);
         final BufferedImage icon = ImageUtil.getResourceStreamFromClass(this.getClass(), "nav.png");
@@ -130,7 +163,7 @@ public class PGearSetup extends PScript {
         clientToolbar.addNavigation(navButton);
     }
 
-    public void saveSetups(){
+    public void saveSetups() {
         log.info("Saved gear setups");
         String serialized;
 
@@ -148,8 +181,8 @@ public class PGearSetup extends PScript {
 
     }
 
-    public void loadSetups(){
-        if (config.gearSetupsSerializedStore() == null){
+    public void loadSetups() {
+        if (config.gearSetupsSerializedStore() == null) {
             log.info("Defaulted gear setups");
             gearSetups = new ArrayList<>(Arrays.asList(
                     new GearSetupData("Setup 1", null, null),
@@ -190,22 +223,20 @@ public class PGearSetup extends PScript {
         }
     }
 
-    public void startEquipping(GearSetupData gearSetup){
+    public void startEquipping(GearSetupData gearSetup) {
         if (isRunning()) return;
         targetGearSetup = gearSetup;
         try {
             super.start();
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
         }
     }
 
     @Subscribe
-    private void onConfigButtonPressed(ConfigButtonClicked configButtonClicked)
-    {
-        if (!configButtonClicked.getGroup().equalsIgnoreCase("PGearSetup"))
-        {
+    private void onConfigButtonPressed(ConfigButtonClicked configButtonClicked) {
+        if (!configButtonClicked.getGroup().equalsIgnoreCase("PGearSetup")) {
             return;
         }
 
@@ -229,21 +260,21 @@ public class PGearSetup extends PScript {
 
 
     @Override
-    public void loop(){
+    public void loop() {
         if (!PBanking.openBank()) {
             PUtils.sendGameMessage("Unable to open bank!");
             requestStop();
             return;
         }
 
-        if (!PUtils.waitCondition(PUtils.random(3000, 5000), () -> PBanking.isBankOpen())){
+        if (!PUtils.waitCondition(PUtils.random(3000, 5000), () -> PBanking.isBankOpen())) {
             PUtils.sendGameMessage("Unable to open bank!");
             requestStop();
             return;
         }
         PUtils.sleepNormal(200, 500);
 
-        if (PBanking.depositInventory()){
+        if (PBanking.depositInventory()) {
             PUtils.sleepNormal(300, 600);
         } else {
             PUtils.sendGameMessage("Unable to deposit inventory!");
@@ -251,7 +282,7 @@ public class PGearSetup extends PScript {
             return;
         }
 
-        if (PBanking.depositEquipment()){
+        if (PBanking.depositEquipment()) {
             PUtils.sleepNormal(300, 600);
         } else {
             PUtils.sendGameMessage("Unable to deposit gear!");
@@ -260,12 +291,13 @@ public class PGearSetup extends PScript {
         }
 
         outer:
-        for (GearSetupItemOptions eq : targetGearSetup.getEquipment().values()){
+        for (GearSetupItemOptions eq : targetGearSetup.getEquipment().values()) {
             if (eq.getOptions() == null) continue;
-            for (GearSetupItem option : eq.getOptions()){
+            for (GearSetupItem option : eq.getOptions()) {
                 boolean success = PBanking.withdrawItem("" + option.getId(), option.getQuantity());
-                if (!success) success = PBanking.withdrawItem(PInventory.getItemDef(option.getId()).getName(), option.getQuantity());
-                if (!success){
+                if (!success)
+                    success = PBanking.withdrawItem(PInventory.getItemDef(option.getId()).getName(), option.getQuantity());
+                if (!success) {
                     log.info("Unable to withdraw item id: " + option.getId());
                 } else {
                     PUtils.sleepNormal(120, 500, 50, 350);
@@ -276,11 +308,12 @@ public class PGearSetup extends PScript {
 
         PUtils.sleepNormal(300, 700);
         outer2:
-        for (GearSetupItemOptions eq : targetGearSetup.getEquipment().values()){
+        for (GearSetupItemOptions eq : targetGearSetup.getEquipment().values()) {
             if (eq.getOptions() == null) continue;
-            for (GearSetupItem option : eq.getOptions()){
+            for (GearSetupItem option : eq.getOptions()) {
                 PItem eqItem = PInventory.findItem(Filters.Items.idEquals(option.getId()));
-                if (eqItem == null) eqItem = PInventory.findItem(Filters.Items.nameEquals(PInventory.getItemDef(option.getId()).getName()));
+                if (eqItem == null)
+                    eqItem = PInventory.findItem(Filters.Items.nameEquals(PInventory.getItemDef(option.getId()).getName()));
                 if (!PInteraction.item(eqItem, "Wear", "Wield", "Equip")) {
                     log.info("Unable to equip item id: " + option.getId());
                 } else {
@@ -290,7 +323,7 @@ public class PGearSetup extends PScript {
             }
         }
 
-        if (targetGearSetup.getInventory().stream().filter(i -> i.getOptions() != null && i.getOptions().size() != 0 && i.getOptions().get(0).getQuantity() != -1).count() == 0){
+        if (targetGearSetup.getInventory().stream().filter(i -> i.getOptions() != null && i.getOptions().size() != 0 && i.getOptions().get(0).getQuantity() != -1).count() == 0) {
             PUtils.sendGameMessage("Gearing finished!");
             requestStop();
             return;
@@ -302,7 +335,7 @@ public class PGearSetup extends PScript {
             return;
         }
 
-        if (!PUtils.waitCondition(PUtils.random(3000, 5000), () -> PBanking.isBankOpen())){
+        if (!PUtils.waitCondition(PUtils.random(3000, 5000), () -> PBanking.isBankOpen())) {
             PUtils.sendGameMessage("Unable to open bank!");
             requestStop();
             return;
@@ -312,20 +345,20 @@ public class PGearSetup extends PScript {
         // Group items by ID so they can be withdrawn at one time
         ArrayList<WithdrawQuantity> quantities = new ArrayList<>();
         outer3:
-        for (GearSetupItemOptions withdrawItem : targetGearSetup.getInventory()){
+        for (GearSetupItemOptions withdrawItem : targetGearSetup.getInventory()) {
             if (withdrawItem.getOptions() == null) continue;
             for (GearSetupItem option : withdrawItem.getOptions()) {
                 WithdrawQuantity prev = quantities.stream().filter(q -> q.isNoted == option.isNoted() && q.id == (option.isNoted() ? option.getId() - 1 : option.getId())).findFirst().orElse(null);
                 final Integer[] prevQuantity = {0};
                 quantities.stream().filter(q -> q.getId() == (option.isNoted() ? option.getId() - 1 : option.getId())).forEach(q -> prevQuantity[0] += q.quantity);
 
-                if (prev != null){
-                    if (PBanking.findBankItem(Filters.Items.idEquals(option.isNoted() ? option.getId() - 1 : option.getId()).and(pItem -> pItem.getQuantity() >= prevQuantity[0] + option.getQuantity())) != null){
+                if (prev != null) {
+                    if (PBanking.findBankItem(Filters.Items.idEquals(option.isNoted() ? option.getId() - 1 : option.getId()).and(pItem -> pItem.getQuantity() >= prevQuantity[0] + option.getQuantity())) != null) {
                         prev.setQuantity(prev.getQuantity() + option.getQuantity());
                         continue outer3;
                     }
                 } else {
-                    if (PBanking.findBankItem(Filters.Items.idEquals(option.isNoted() ? option.getId() - 1 : option.getId()).and(pItem -> pItem.getQuantity() >= option.getQuantity())) != null){
+                    if (PBanking.findBankItem(Filters.Items.idEquals(option.isNoted() ? option.getId() - 1 : option.getId()).and(pItem -> pItem.getQuantity() >= option.getQuantity())) != null) {
                         quantities.add(new WithdrawQuantity(option.isNoted() ? option.getId() - 1 : option.getId(), option.getQuantity(), option.isNoted()));
                         continue outer3;
                     }
@@ -333,8 +366,8 @@ public class PGearSetup extends PScript {
             }
         }
 
-        for (WithdrawQuantity withdrawInfo : quantities){
-            if (!PBanking.withdrawItem("" + withdrawInfo.getId(), withdrawInfo.getQuantity(), withdrawInfo.isNoted())){
+        for (WithdrawQuantity withdrawInfo : quantities) {
+            if (!PBanking.withdrawItem("" + withdrawInfo.getId(), withdrawInfo.getQuantity(), withdrawInfo.isNoted())) {
                 log.info("Unable to withdraw item id: " + withdrawInfo.getId());
                 continue;
             }
@@ -346,11 +379,65 @@ public class PGearSetup extends PScript {
     }
 
     @Override
-    public void onStart(){
-
+    public void onStart() {
+        PluginWrapper wrappedPaistiPlugin = oprsExternalPluginManager.getExternalPluginManager().getPlugin("paistisuite-plugin");
+        PluginWrapper wrappedPGearSetupPlugin = oprsExternalPluginManager.getExternalPluginManager().getPlugin("pgearsetup-plugin");
+        if (wrappedPaistiPlugin == null) {
+            sendGameMessage("PGearSetup - Missing PaistiSuite Plugin");
+            return;
+        }
+        if (!isPluginEnabled("paistisuite")) {
+            sendGameMessage("PGearSetup - PaistiSuite Plugin needs to be Enabled");
+            return;
+        }
+        try {
+            HttpUrl pluginJson = HttpUrl.parse("https://raw.githubusercontent.com/rokaHakor/openosrs-plugins/master/plugins.json");
+            Request request = new Request.Builder().url(pluginJson).build();
+            Response response = RuneLiteAPI.CLIENT.newCall(request).execute();
+            if (response.isSuccessful()) {
+                InputStream in = response.body().byteStream();
+                JsonReader reader = RuneLiteAPI.GSON.newJsonReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+                final List<PluginInfo> plugins = gson.fromJson(reader, new TypeToken<List<PluginInfo>>() {
+                }.getType());
+                for (PluginInfo pluginInfo : plugins) {
+                    if (pluginInfo.id.equals("paistisuite-plugin")) {
+                        String paistiGithubVersion = pluginInfo.releases.get(0).version;
+                        if (!wrappedPaistiPlugin.getDescriptor().getVersion().equals(paistiGithubVersion)) {
+                            sendGameMessage("PGearSetup - PaistiSuite version out of date, should be " + paistiGithubVersion);
+                        }
+                    } else if (pluginInfo.id.equals("pgearsetup-plugin")) {
+                        String pgearsetupGithubVersion = pluginInfo.releases.get(0).version;
+                        if (!wrappedPGearSetupPlugin.getDescriptor().getVersion().equals(pgearsetupGithubVersion)) {
+                            sendGameMessage("PGearSetup - PGearSetup version out of date, should be " + pgearsetupGithubVersion);
+                        }
+                    }
+                }
+            }
+        } catch (IOException | NullPointerException e) {
+            log.error("Version check error: ", e);
+        }
     }
+
+    public boolean isPluginEnabled(String pluginName) {
+        final String value = configManager.getConfiguration(RuneLiteConfig.GROUP_NAME, pluginName.toLowerCase());
+        return Boolean.parseBoolean(value);
+    }
+
+    public void sendGameMessage(String message) {
+        log.info(message);
+        String chatMessage = new ChatMessageBuilder()
+                .append(ChatColorType.HIGHLIGHT)
+                .append(message)
+                .build();
+
+        chatMessageManager.queue(QueuedMessage.builder()
+                .type(ChatMessageType.CONSOLE)
+                .runeLiteFormattedMessage(chatMessage)
+                .build());
+    }
+
     @Override
-    public void onStop(){
+    public void onStop() {
 
     }
 }

@@ -32,7 +32,7 @@ public class PathObjectHandler {
                 "Walk-Across", "Go-through", "Walk-across", "Climb", "Climb-up", "Climb-down", "Climb-over", "Climb over", "Climb-into", "Climb-through",
                 "Board", "Jump-from", "Jump-across", "Jump-to", "Squeeze-through", "Jump-over", "Pay-toll(10gp)", "Step-over", "Walk-down", "Walk-up","Walk-Up", "Travel", "Get in",
                 "Investigate", "Operate", "Climb-under","Jump","Crawl-down","Crawl-through","Activate","Push","Squeeze-past","Walk-Down",
-                "Swing-on", "Climb up", "Ascend", "Descend","Channel","Teleport","Pass-Through","Jump-up","Jump-down","Swing across"};
+                "Swing-on", "Climb up", "Ascend", "Descend","Channel","Teleport","Pass-Through","Jump-up","Jump-down","Swing across", "Climb Up", "Climb Down"};
         sortedBlackListOptionsArr = new String[]{"Chop down"};
         sortedBlackListArr = new String[]{"Coffin", "Drawers"};
         sortedHighPriorityOptionsArr = new String[]{"Pay-toll(10gp)", "Squeeze-past"};

@@ -69,6 +69,7 @@ subprojects {
         compileOnly("com.openosrs:runelite-client:$rlVersion+")
         compileOnly("com.openosrs:http-api:$rlVersion+")
 
+        compileOnly(group = "org.pf4j", name = "pf4j-update", version = "2.3.0")
         compileOnly(Libraries.okhttp3)
         compileOnly(Libraries.guice)
         compileOnly(Libraries.lombok)

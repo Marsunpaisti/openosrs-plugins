@@ -27,45 +27,40 @@ package net.runelite.client.plugins.webwalker;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Perspective;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WalkerEngine;
 import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.WebWalkerDebugRenderer;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.walker_engine.local_pathfinding.PathAnalyzer;
-import net.runelite.client.plugins.paistisuite.api.WebWalker.wrappers.RSTile;
-import net.runelite.client.ui.overlay.*;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.OverlayPriority;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
-public class WebWalkerOverlay extends Overlay
-{
-	private final Client client;
-	private final WebWalker plugin;
-	private final WebWalkerConfig config;
+public class WebWalkerOverlay extends Overlay {
+    @Inject
+    private WebWalkerDebugRenderer webWalkerDebugRenderer;
 
-	@Inject
-	private WebWalkerOverlay(final Client client, final WebWalker plugin, final WebWalkerConfig config)
-	{
-		this.client = client;
-		this.plugin = plugin;
-		this.config = config;
+    private final Client client;
+    private final WebWalker plugin;
+    private final WebWalkerConfig config;
 
-		setPosition(OverlayPosition.DYNAMIC);
-		setPriority(OverlayPriority.LOW);
-		setLayer(OverlayLayer.ABOVE_SCENE);
-	}
+    @Inject
+    private WebWalkerOverlay(final Client client, final WebWalker plugin, final WebWalkerConfig config) {
+        this.client = client;
+        this.plugin = plugin;
+        this.config = config;
 
-	@Override
-	public Dimension render(Graphics2D graphics)
-	{
-		WebWalkerDebugRenderer.render(graphics);
-		return null;
-	}
+        setPosition(OverlayPosition.DYNAMIC);
+        setPriority(OverlayPriority.LOW);
+        setLayer(OverlayLayer.ABOVE_SCENE);
+    }
+
+    @Override
+    public Dimension render(Graphics2D graphics) {
+        webWalkerDebugRenderer.render(graphics);
+        return null;
+    }
 }
